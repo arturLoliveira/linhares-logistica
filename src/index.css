@@ -41,13 +41,14 @@ body {
 }
 
 .header-div {
-  height: 7rem; 
+  height: 5rem; 
   width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center; 
+  justify-content: center;
+  gap: 25rem;
   background-color: var(--cor-fundo-elemento); 
-  padding: 0 2rem; 
+  padding: 2rem; 
   box-sizing: border-box; 
 }
 .section-div {
@@ -62,7 +63,7 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  height: 40rem; 
+  height: 30rem; 
 
   color: #FFFFFF;
   position: relative; 
@@ -88,7 +89,7 @@ body {
   text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
 }
 
-.section-right {
+.boxes {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,6 +120,7 @@ body {
 }
 .box-cargas h3 {
   color: var(--cor-principal);
+  font-size: 1.5rem;
 }
 .area-atuacao-container {
   background-color: var(--cor-fundo-elemento); 
@@ -183,4 +185,21 @@ body {
 
 .regiao-grupo li {
   margin-bottom: 0.5rem;
+}
+.icon-pin {
+  margin-right: 5px;
+}
+.contact-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--raio-borda);
+  background-color: var(--cor-destaque);
+  padding: 0.5rem;
+  height: 3rem;
+}
+.contact-button:hover {
+  cursor: pointer;
+  background-color: #7ebefe;
 }
