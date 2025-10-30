@@ -1,0 +1,43 @@
+/* Importa o CSS base do Leaflet */
+@import "leaflet/dist/leaflet.css";
+
+.mapa-container-api {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 0; 
+    background-color: transparent; 
+    border-radius: 8px; 
+    width: 70rem;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.mapa-transporte-header { /* Novo estilo para o cabeçalho se você o mantiver */
+    padding: 20px;
+    background-color: #f4f4f4; /* Mantenha o fundo para o texto */
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+
+.leaflet-container {
+    height: 38rem; 
+    width: 100%; 
+    border-radius: 0 0 8px 8px; 
+    border-top: none; 
+    z-index: 1;
+}
+
+.carro-icon {
+    font-size: 2rem;
+    text-shadow: 0 0 3px rgba(0,0,0,0.5);
+    background: none;
+    border: none;
+}
+
+/* Ajustes para os marcadores se ficarem difíceis de ler */
+.leaflet-popup-content-wrapper, .leaflet-tooltip {
+    border-radius: 5px;
+    font-size: 13px;
+    color: #333;
+}
