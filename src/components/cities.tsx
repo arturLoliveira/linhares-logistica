@@ -4,21 +4,33 @@ import { useInView } from "react-intersection-observer";
 
 const regioesData = [
   {
-    titulo: 'Região de Ouro Preto',
-    cidades: ['Ouro Preto', 'Mariana', 'Catas Altas', 'Cachoeira do Campo', 'Itabirito']
+    titulo: 'Polo Ouro Branco',
+    cidades: ['Ouro Branco']
   },
   {
-    titulo: 'Região de Lafaiete',
-    cidades: ['Cons. Lafaiete', 'Congonhas', 'Queluzito', 'Casa Grande', 'Cristiano Otoni', 'São Brás do Suaçuí']
+    titulo: 'Polo Carandaí',
+    cidades: ['Carandaí', 'Cristiano Otoni', 'Casa Grande', 'Capela Nova', 'Queluzito', 'Santana dos montes', 'Caranaíba']
   },
   {
-    titulo: 'Região de Entre Rios',
-    cidades: ['Entre Rios de Minas', 'Desterro de Entre Rios', 'Belo Vale', 'Moeda', 'Jeceaba']
+    titulo: 'Polo Cons. Lafaiete',
+    cidades: ['Cons. Lafaiete']
   },
   {
-    titulo: 'Região de Piranga',
-    cidades: ['Piranga', 'Itaverava', 'Santana dos Montes', 'Capela Nova', 'Senhora de Oliveira', 'Rio Espera', 'Lamin', 'Caranaíba', 'Carandaí']
-  }
+    titulo: 'Polo São Bras do Suaçui',
+    cidades: ['São Bras do Suaçui','Entre Rios de Minas', 'Jeceaba', 'Desterro de entre rios']
+  },
+  {
+    titulo: 'Polo Congonhas',
+    cidades: ['Congonhas','Belo vale', 'Moeda']
+  },
+  {
+    titulo: 'Polo Catas Altas da Noruega',
+    cidades: ['Catas altas da noruega','Itaverava', 'Rio espera', 'Lamimm', 'Senhora de oliveira', 'Piranga']
+  },
+  {
+    titulo: 'Polo Ouro Preto',
+    cidades: ['Ouro preto','Mariana', 'Itabirito', 'Cachoeira do campo']
+  },
 ];
 
 function Cities() {
@@ -41,7 +53,7 @@ function Cities() {
               <div
                 key={regiao.titulo}
                 className={`regiao-grupo ${inView ? 'is-visible' : ''}`}
-                style={{ transitionDelay: `${index * 550}ms` }}
+                style={{ transitionDelay: `${index * 300}ms` }}
               >
                 <h4>{regiao.titulo}</h4>
                 <ul>

@@ -1,4 +1,4 @@
-import "./index.css"
+import "../index.css"
 interface BoxItemProps {
     icon: React.ReactNode;
     title: string;
