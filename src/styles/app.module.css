@@ -1,12 +1,8 @@
-/* Adicionadas as classes que faltavam */
 .globalContainer {
-  /* (Estilos para o wrapper de todo o site, se necessário) */
 }
 .mainContainer {
-  /* (Estilos para o <main> tag, se necessário) */
 }
 
-/* A classe .boxes está correta aqui */
 .boxes {
   display: flex;
   align-items: center;

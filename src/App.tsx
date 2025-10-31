@@ -1,9 +1,7 @@
 import './index.css'
 import 'leaflet/dist/leaflet.css';
-// 1. Importa o CSS Module do App
 import styles from './styles/app.module.css';
 
-import Cities from './components/cities'
 import Boxes from './components/boxes'
 import { MdOutlineInventory } from 'react-icons/md'
 import { TbTruckDelivery } from 'react-icons/tb'
