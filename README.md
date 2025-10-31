@@ -1,78 +1,86 @@
-<<<<<<< HEAD
-# React + TypeScript + Vite
+# 🚚 Transportes Linhares - Site Institucional
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Status do Deploy](https://vercel.com/arturLoliveira/linhares-logistica/badge)](https://transportelinhares.vercel.app/)
 
-Currently, two official plugins are available:
+Este é o repositório do site institucional da Transportes Linhares, uma empresa de logística focada na Região Central de Minas Gerais. O projeto foi desenvolvido com React, TypeScript e Vite, com foco em um design limpo, profissional e responsivo (Mobile-First).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> **Site no ar:** [transportelinhares.vercel.app](https://transportelinhares.vercel.app/)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+<p align="center">
+  <strong>Preview do Site (Desktop e Mobile)</strong>
+</p>
+<table align="center" style="border: none;">
+  <tr>
+    <td align="center">
+      <img src="public/prints/first.png" width="400px" alt="Preview Desktop 1"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/second.png" width="400px" alt="Preview Desktop 2"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/third.png" width="400px" alt="Preview Desktop 3"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/fourth.png" width="400px" alt="Preview Desktop 4"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="public/prints/mobile1.jpeg" width="400px" alt="Preview Mobile 1"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/mobile2.jpeg" width="400px" alt="Preview Mobile 2"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/mobile3.jpeg" width="400px" alt="Preview Mobile 3"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/mobile4.jpeg" width="400px" alt="Preview Mobile 4"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/mobile5.jpeg" width="400px" alt="Preview Mobile 5"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/mobile6.jpeg" width="400px" alt="Preview Mobile 6"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/mobile7.jpeg" width="400px" alt="Preview Mobile 7"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/mobile8.jpeg" width="400px" alt="Preview Mobile 8"/>
+    </td>
+    <td align="center">
+      <img src="public/prints/mobile9.jpeg" width="400px" alt="Preview Mobile 9"/>
+    </td>
+  </tr>
+</table>
 
-## Expanding the ESLint configuration
+## ✨ Funcionalidades
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+* **Design Responsivo:** Layout 100% adaptado para Mobile, Tablet e Desktop usando CSS Grid e Flexbox.
+* **Seção de Diferenciais:** Um grid 2x2 destacando os pontos fortes da empresa (Atendimento, Frota, Logística Integrada, etc.).
+* **Cobertura Regional:** Seção dinâmica em CSS Grid exibindo todos os polos de atendimento da transportadora.
+* **Localização e Contato:** Seção com mapa interativo (via `react-leaflet`) e um card de contato com links diretos para o Google Maps.
+* **CTAs (Call-to-Action):** Botões de "Fale Conosco" com links diretos para a API do WhatsApp.
+* **SEO e Acessibilidade:** Uso correto de tags (`lang="pt-BR"`) e atributos (`translate="no"`) para impedir traduções incorretas de nomes próprios.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ Tecnologias Utilizadas
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+* **React** (Biblioteca principal)
+* **TypeScript** (Para tipagem estática)
+* **Vite** (Build tool e servidor de desenvolvimento)
+* **CSS** (CSS puro para estilização, seguindo o padrão Mobile-First)
+* **React Leaflet** (Para o mapa interativo da seção "Onde Estamos")
+* **React Icons** (Biblioteca de ícones)
+* **vite-plugin-svgr** (Para importar SVGs como componentes)
+* **Vercel** (Plataforma de hospedagem e deploy contínuo)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🚀 Rodando o Projeto Localmente
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🌐 Deploy
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-=======
-# linhares-logistica
-Site para uma empresa local de transportes de encomendas pquenas e médias
->>>>>>> 8374c214273b31578463ae4490043bab6105cd78
+O projeto está configurado com **Deploy Contínuo** na [Vercel](https://vercel.com). Qualquer `push` ou `merge` para a branch `main` iniciará um novo build e atualizará o site de produção automaticamente.
+
