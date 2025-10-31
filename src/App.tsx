@@ -8,8 +8,6 @@ import { TbTruckDelivery } from 'react-icons/tb'
 import { FaShippingFast, FaWhatsapp } from 'react-icons/fa'
 import ContactButton from './components/contact-button'
 
-
-
 import logoDaEmpresa from './assets/logo.png';
 import Values from './components/Values';
 import ContactUs from './components/contact-us';
@@ -52,7 +50,7 @@ function App() {
           <Boxes
             icon={<FaShippingFast fontSize={45} />}
             title='Entregas Expressas'
-            description='Sua encomenda urgente é nossa prioridade. Atendemos demandas com prazo crítico (consulte regiões).'
+            description='Sua carga urgente é nossa prioridade. Atendemos demandas com prazo crítico (consulte regiões).'
           />
         </div>
         <Cities />

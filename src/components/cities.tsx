@@ -9,7 +9,7 @@ const regioesData = [
   },
   {
     titulo: 'Polo Carandaí',
-    cidades: ['Carandaí', 'Cristiano Otoni', 'Casa Grande', 'Capela Nova', 'Queluzito', 'Santana dos montes', 'Caranaíba']
+    cidades: ['Carandaí', 'Cristiano Otoni', 'Casa Grande', 'Capela Nova', 'Queluzito', 'Santana dos Montes', 'Caranaíba']
   },
   {
     titulo: 'Polo Cons. Lafaiete',
@@ -17,19 +17,19 @@ const regioesData = [
   },
   {
     titulo: 'Polo Jeceaba',
-    cidades: ['Jeceaba','São Bras do Suaçui','Entre Rios de Minas', 'Desterro de entre rios']
+    cidades: ['Jeceaba','São Bras do Suaçui','Entre Rios de Minas', 'Desterro de Entre Rios']
   },
   {
     titulo: 'Polo Congonhas',
-    cidades: ['Congonhas','Belo vale', 'Moeda']
+    cidades: ['Congonhas','Belo Vale', 'Moeda']
   },
   {
     titulo: ' Polo Itaverava',
-    cidades: [,'Itaverava','Catas altas da noruega', 'Rio espera', 'Lamimm', 'Senhora de oliveira', 'Piranga']
+    cidades: [,'Itaverava','Catas Altas da Noruega', 'Rio Espera', 'Lamimm', 'Senhora de Oliveira', 'Piranga']
   },
   {
     titulo: 'Polo Ouro Preto',
-    cidades: ['Ouro preto','Mariana', 'Itabirito', 'Cachoeira do campo']
+    cidades: ['Ouro Preto','Mariana', 'Itabirito', 'Cachoeira do Campo']
   },
 ];
 
