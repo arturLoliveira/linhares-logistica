@@ -1,3 +1,18 @@
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconAnchor: [12, 41], 
+    popupAnchor: [1, -34], 
+    shadowSize: [41, 41] 
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+
 import { FaPhone, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
@@ -5,7 +20,9 @@ import ContactInfo from "./contactInfo";
 
 
 const posicaoGalpao = [-20.525125, -43.701911] as [number, number];
-const googleMapsUrl = `https://www.google.com/maps?q=${posicaoGalpao[0]},${posicaoGalpao[1]}`;
+
+
+const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${posicaoGalpao[0]},${posicaoGalpao[1]}`;
 
 function ContactUs() {
     return (
@@ -15,7 +32,7 @@ function ContactUs() {
                 <div className='mapContact'>
                     <MapContainer center={posicaoGalpao} zoom={16} scrollWheelZoom={true}>
                         <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
                         <Marker position={posicaoGalpao}>

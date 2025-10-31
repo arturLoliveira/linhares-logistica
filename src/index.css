@@ -572,6 +572,9 @@ hr {
   .contact {
     flex-basis: auto; 
   }
+  .contact a {
+    text-decoration: none;
+  }
 }
 
 
