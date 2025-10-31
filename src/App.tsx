@@ -13,6 +13,7 @@ import Footer from './components/footer';
 import Header from './components/header';
 import Landing from './components/Landing';
 import CoverageMap from './components/coverageMap';
+import WhoWeAre from './components/whoWeAre';
 
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
           </div>
         
         <CoverageMap />
+        <WhoWeAre />
         <Values />
         <ContactUs />
       </main>

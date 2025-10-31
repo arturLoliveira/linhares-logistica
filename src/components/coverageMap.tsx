@@ -63,7 +63,7 @@ function CoverageMap() {
                 </div>
                 <div className={styles.infoCard}>
                     <p className={styles.label}>Regiões Cobertas</p>
-                    <h3 className={styles.value}>Metropolitana de BH, Campo das Vertentes e Zona da Mata</h3>
+                    <h3 className={styles.value}>Metropolitana de BH, Campo das Vertentes e região central de Minas Gerais</h3>
                 </div>
                 <div className={styles.infoCard}>
                     <p className={styles.label}>Entregas Mensais</p>

@@ -44,7 +44,7 @@
 
 .marker {
   position: absolute;
-  font-size: 2.2rem; 
+  font-size: 1.2rem; 
   color: var(--cor-texto-principald); 
   transform: translate(-50%, -100%); 
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
@@ -55,11 +55,12 @@
 .markerFeatured {
   color: #FFF; 
   z-index: 11; 
-  font-size: 3rem; 
+  font-size: 2.2rem; 
 }
 
 .marker:hover {
   transform: translate(-50%, -110%) scale(1.1); 
+  z-index: 30;
 }
 
 .tooltip {
@@ -77,7 +78,7 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
-  z-index: 20;
+  z-index: 40;
 }
 
 .marker:hover .tooltip {
@@ -92,7 +93,7 @@
   width: 100%;
   max-width: 500px; 
   position: relative;
-  z-index: 2;
+  z-index: 12;
 }
 
 .infoCard {
@@ -141,6 +142,12 @@
     flex: 1; 
     min-height: 100px; 
   }
+  .marker {
+    font-size: 1.7rem;
+  }
+  .markerFeatured {
+    font-size: 2.8rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -169,5 +176,11 @@
     flex: 4; 
     max-width: 450px;
     flex-direction: column; 
+  }
+  .marker {
+    font-size: 2.2rem;
+  }
+  .markerFeatured {
+    font-size: 3.5rem;
   }
 }
