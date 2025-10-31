@@ -1,0 +1,144 @@
+.mapContact {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 0;
+  background-color: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--sombra-elemento);
+  border: 1px solid var(--cor-borda);
+  width: 90%;
+  max-width: 500px;
+  height: 25rem;
+}
+
+.mapContact :global(.leaflet-container) {
+  width: 100%;
+  height: 100%;
+}
+
+.contactUs {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem 2rem 3rem 2rem;
+  background-color: var(--cor-fundo-site);
+  border-top: 1px solid var(--cor-borda);
+}
+
+.sectionTitle {
+  color: var(--cor-principal);
+  font-size: 2.2rem;
+  margin: 0;
+  text-align: center;
+}
+
+/* 1. CORRIGIDO: Renomeado para 'contactCardsContainer' (camelCase) */
+.contactCardsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 3rem;
+  width: 100%;
+}
+
+.contact {
+  background-color: var(--cor-fundo-elemento);
+  color: var(--cor-texto-principal);
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra-elemento);
+  border: 1px solid var(--cor-borda);
+  padding: 2rem 2.5rem;
+  box-sizing: border-box;
+  width: 90%;
+  max-width: 500px;
+}
+
+.contactTitle {
+  font-size: 2.2rem;
+  color: var(--cor-principal);
+  margin-top: 0;
+  text-align: center;
+}
+
+/* 2. CORRIGIDO: Renomeado para 'contactMapButton' (camelCase) */
+.contactMapButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background-color: var(--cor-fundo-site);
+  padding: 0.85rem 1rem;
+  margin-top: 1.5rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.buttonIcon {
+  font-size: 1.25rem;
+  color: var(--cor-principal);
+  transition: color 0.3s ease;
+}
+
+.buttonText {
+  font-size: 1rem;
+  color: var(--cor-texto-principal);
+  transition: color 0.3s ease;
+}
+
+.contactMapButton:hover {
+  cursor: pointer;
+  background-color: var(--cor-principal);
+  border-color: var(--cor-principal);
+}
+
+.contactMapButton:hover .buttonIcon,
+.contactMapButton:hover .buttonText {
+  color: var(--cor-fundo-site);
+}
+
+.divider {
+  border: none;
+  height: 2px;
+  background-color: var(--cor-principal);
+  margin: 1rem 0 1.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .sectionTitle {
+    font-size: 2.5rem;
+  }
+  /* 1. CORRIGIDO: Renomeado para 'contactCardsContainer' */
+  .contactCardsContainer {
+    gap: 3rem; 
+  }
+  .mapContact {
+    flex-basis: auto; 
+  }
+  .contact {
+    flex-basis: auto; 
+  }
+}
+
+@media (min-width: 1024px) {
+  /* 1. CORRIGIDO: Renomeado para 'contactCardsContainer' */
+  .contactCardsContainer {
+    gap: 6rem; 
+  }
+  .mapContact {
+    width: auto;
+    max-width: none;
+    flex-basis: 45%;
+  }
+  .contact {
+    width: auto;
+    max-width: none;
+    flex-basis: 40%;
+  }
+}

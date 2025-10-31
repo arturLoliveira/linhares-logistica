@@ -1,0 +1,26 @@
+.boxCargas {
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--cor-fundo-elemento);
+  max-width: 30rem;
+  width: 90%;
+  box-sizing: border-box;
+  box-shadow: var(--sombra-elemento);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.boxCargas:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+  color: var(--cor-principal);
+  font-size: 1.5rem;
+}

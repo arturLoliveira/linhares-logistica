@@ -1,3 +1,4 @@
+// Lógica do ícone do Leaflet (deixei como estava)
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -12,24 +13,24 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-
 import { FaPhone, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import ContactInfo from "./contactInfo";
 
+import styles from '../styles/contact-us.module.css';
 
 const posicaoGalpao = [-20.525125, -43.701911] as [number, number];
-
-
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${posicaoGalpao[0]},${posicaoGalpao[1]}`;
 
 function ContactUs() {
     return (
-        <div className='contactUs'>
-            <h3 className='section-title'>Onde estamos</h3>
-            <div className='contact-cards-container'>
-                <div className='mapContact'>
+        <div className={styles.contactUs}>
+            <h2 className={styles.sectionTitle}>Contatos</h2>
+
+            <div className={styles.contactCardsContainer}>
+                
+                <div className={styles.mapContact}>
                     <MapContainer center={posicaoGalpao} zoom={16} scrollWheelZoom={true}>
                         <TileLayer
                             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -49,33 +50,38 @@ function ContactUs() {
                         </Marker>
                     </MapContainer>
                 </div>
-                <div className='contact'>
-                    <h3>Fale conosco</h3>
-                    <hr />
+                
+                <div className={styles.contact}>
+                    <h3 className={styles.contactTitle}>Estamos aqui para lhe atender!</h3>
+                    <hr className={styles.divider} />
+
                     <ContactInfo
-                        icon={<FaPhone className='iconContact' />}
+                        icon={<FaPhone />}
                         info="31 993751683"
                     />
                     <ContactInfo
-                        icon={<FaEnvelope className='iconContact' />}
+                        icon={<FaEnvelope />}
                         info="transporteslinhares7@gmail.com"
+                        isLink={true} 
                     />
                     <ContactInfo
-                        icon={<FaMapMarkerAlt className='iconContact' />}
+                        icon={<FaMapMarkerAlt />}
                         info="Rua Santo Antônio, 1372, Centro, Ouro Branco"
                     />
+
                     <a
                         href={googleMapsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="contact-map-button"
+                        className={styles.contactMapButton}
                     >
-                        <MdLocationOn />
-                        <span>Ver no Google Maps</span>
+                        <MdLocationOn className={styles.buttonIcon} />
+                        <span className={styles.buttonText}>Ver no Google Maps</span>
                     </a>
                 </div>
             </div>
         </div>
     )
 }
+
 export default ContactUs;

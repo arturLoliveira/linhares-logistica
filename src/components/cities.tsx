@@ -1,6 +1,6 @@
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useInView } from "react-intersection-observer";
-
+import styles from '../styles/cities.module.css';
 
 const regioesData = [
   {
@@ -24,8 +24,8 @@ const regioesData = [
     cidades: ['Congonhas','Belo Vale', 'Moeda']
   },
   {
-    titulo: ' Polo Itaverava',
-    cidades: [,'Itaverava','Catas Altas da Noruega', 'Rio Espera', 'Lamimm', 'Senhora de Oliveira', 'Piranga']
+    titulo: 'Polo Itaverava',
+    cidades: ['Itaverava','Catas Altas da Noruega', 'Rio Espera', 'Lamin', 'Senhora de Oliveira', 'Piranga']
   },
   {
     titulo: 'Polo Ouro Preto',
@@ -38,34 +38,34 @@ function Cities() {
     triggerOnce: true,
     threshold: 0.1,
   });
-    return (
-            <div className="area-atuacao-container" ref={ref}>
 
-          <h2>Nossa Cobertura Regional</h2>
-          <p className="subtitulo">
+    return (
+        <div className={styles.areaAtuacaoContainer} ref={ref}>
+
+          <h2 className={styles.title}>Nossa Cobertura Regional</h2>
+          <p className={styles.subtitulo}>
             Dividimos nossa logística por centros regionais para garantir sua entrega.
           </p>
 
-          <div className="atuacao-grid">
+          <div className={styles.atuacaoGrid}>
 
             {regioesData.map((regiao, index) => (
-
+              
               <div
                 key={regiao.titulo}
-                className={`regiao-grupo ${inView ? 'is-visible' : ''}`}
+                className={`${styles.regiaoGrupo} ${inView ? styles.isVisible : ''}`}
                 style={{ transitionDelay: `${index * 300}ms` }}
               >
-                <h4>{regiao.titulo}</h4>
-                <ul>
+                <h4 className={styles.groupTitle} translate="no">{regiao.titulo}</h4>
+                <ul className={styles.cityList}>
                   {regiao.cidades.map((cidade) => (
-                    <li key={cidade}>
-                      <FaMapMarkerAlt className="icon-pin" />
+                    <li key={cidade} className={styles.cityItem} translate="no">
+                      <FaMapMarkerAlt />
                       {cidade}
                     </li>
                   ))}
                 </ul>
               </div>
-
             ))}
             
           </div>

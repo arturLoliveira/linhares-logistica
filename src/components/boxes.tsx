@@ -1,4 +1,6 @@
-import "../index.css"
+
+import styles from '../styles/boxes.module.css';
+
 interface BoxItemProps {
     icon: React.ReactNode;
     title: string;
@@ -6,12 +8,13 @@ interface BoxItemProps {
 }
 
 function Boxes({ icon, title, description }: BoxItemProps) {
-    return(
-         <div className='box-cargas'>
+    return (
+        <div className={styles.boxCargas}>
             {icon}
-            <h3>{title}</h3>
+            <h3 className={styles.title}>{title}</h3>
             <p>{description}</p>
-         </div>
+        </div>
     )
 }
+
 export default Boxes;

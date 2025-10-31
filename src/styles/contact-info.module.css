@@ -1,0 +1,27 @@
+.contactInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease, color 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.contactInfo:hover {
+  color: var(--cor-principal);
+  transform: translateX(5px);
+}
+
+.infoText {
+  font-size: 0.9rem;
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  display: flex;
+  flex-wrap: wrap;
+  word-break: break-all; 
+}
+
+.link {
+  text-decoration: none;
+  color: inherit; 
+}

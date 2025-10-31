@@ -1,0 +1,20 @@
+/* Adicionadas as classes que faltavam */
+.globalContainer {
+  /* (Estilos para o wrapper de todo o site, se necessário) */
+}
+.mainContainer {
+  /* (Estilos para o <main> tag, se necessário) */
+}
+
+/* A classe .boxes está correta aqui */
+.boxes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: -5rem;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
