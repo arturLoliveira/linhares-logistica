@@ -12,7 +12,7 @@ import logoDaEmpresa from './assets/logo.png';
 import Values from './components/Values';
 import ContactUs from './components/contact-us';
 
-const linkWhatsapp = "https://wa.me/5531985704428?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20transportadora%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.";
+const linkWhatsapp = "https://wa.me/5531993751683?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20transportadora%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.";
 
 function App() {
   return (
