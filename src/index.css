@@ -39,6 +39,7 @@ body {
   width: 100%;
   box-shadow: var(--sombra-elemento);
   justify-content: center;
+  background-color: var(--cor-fundo-elemento);
 }
 
 .header-div {
