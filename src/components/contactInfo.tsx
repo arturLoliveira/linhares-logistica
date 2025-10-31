@@ -7,7 +7,7 @@ function ContactInfo({ icon, info }:ContactInfoProps) {
     return (
         <div className='contactInfo'>
             {icon}
-            <h4>{info}</h4>
+            <h3>{info}</h3>
         </div>
     )
 }

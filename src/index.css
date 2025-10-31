@@ -347,7 +347,10 @@ body {
   flex-wrap: wrap;
   word-break: break-all;
 }
-
+.contactInfo h3 a {
+  text-decoration: none;
+  color: inherit;
+}
 .iconContact {
   font-size: 1rem;
 }
