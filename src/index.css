@@ -339,7 +339,7 @@ body {
   transform: translateX(5px);
 }
 
-.contactInfo h4 {
+.contactInfo h3 {
   font-size: 0.6rem;
   margin: 0;
   color: var(--cor-texto-secundario);
@@ -572,7 +572,7 @@ hr {
   .contact {
     flex-basis: auto; 
   }
-  .contact a {
+  .contact h4 {
     text-decoration: none;
   }
 }
