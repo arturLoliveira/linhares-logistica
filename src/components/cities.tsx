@@ -16,7 +16,7 @@ const regioesData = [
     cidades: ['Cons. Lafaiete']
   },
   {
-    titulo: 'Jeceaba',
+    titulo: 'Polo Jeceaba',
     cidades: ['Jeceaba','São Bras do Suaçui','Entre Rios de Minas', 'Desterro de entre rios']
   },
   {
@@ -24,7 +24,7 @@ const regioesData = [
     cidades: ['Congonhas','Belo vale', 'Moeda']
   },
   {
-    titulo: 'Itaverava',
+    titulo: ' Polo Itaverava',
     cidades: [,'Itaverava','Catas altas da noruega', 'Rio espera', 'Lamimm', 'Senhora de oliveira', 'Piranga']
   },
   {
