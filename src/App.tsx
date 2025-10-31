@@ -33,7 +33,7 @@ function App() {
         <div className='section-div'>
           <div className='text-content'>
             <h1>Sua carga, nossa prioridade.</h1>
-            <h2>Mais do que uma transportadora, somos o parceiro logístico que sua empresa precisa para crescer. Entregas em toda zona da mata mineira com a agilidade que o seu negócio exige.</h2>
+            <h2>Mais do que uma transportadora, somos o parceiro logístico que sua empresa precisa para crescer. Entregas em toda região central de Minas Gerais com a agilidade que o seu negócio exige.</h2>
           </div>
         </div>
         <div className='boxes'>
