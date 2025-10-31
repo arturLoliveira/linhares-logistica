@@ -35,17 +35,17 @@ function Values() {
 
                     <div className={`${styles.featureCard} ${styles.featureCardSecondary}`}>
                         <FaTruckMoving className={styles.icon} />
-                        Frota Própria e Confiável
+                        Motoristas capacitados
                     </div>
 
                     <div className={`${styles.featureCard} ${styles.featureCardSecondary}`}>
                         <FaSitemap className={styles.icon} />
-                        Logística Integrada
+                        Plano de logística personalizado
                     </div>
 
                     <div className={`${styles.featureCard} ${styles.featureCardPrimary}`}>
                         <FaTags className={styles.icon} />
-                        Custo-Benefício
+                        Atendimento exclusivo
                     </div>
 
                 </div>

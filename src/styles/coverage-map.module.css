@@ -19,7 +19,6 @@
   color: var(--cor-principal);
   position: relative; 
   z-index: 2;
-  /* (Removemos o display: none da media query anterior) */
 }
 
 .mapContainer {
@@ -46,12 +45,17 @@
 .marker {
   position: absolute;
   font-size: 2.2rem; 
-  color: var(--cor-principal); 
+  color: var(--cor-texto-principald); 
   transform: translate(-50%, -100%); 
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
   transition: transform 0.2s ease;
   cursor: pointer;
   z-index: 10; 
+}
+.markerFeatured {
+  color: #FFF; 
+  z-index: 11; 
+  font-size: 3rem; 
 }
 
 .marker:hover {
@@ -81,7 +85,6 @@
   visibility: visible;
 }
 
-/* --- REVERTEMOS A COLUNA DA DIREITA PARA 'INFO CARDS' --- */
 .infoCardsContainer {
   display: flex;
   flex-direction: column;
@@ -95,7 +98,7 @@
 .infoCard {
   background-color: var(--cor-fundo-elemento);
   border: 1px solid var(--cor-borda);
-  border-left: 5px solid var(--cor-principal); /* Destaque azul */
+  border-left: 5px solid var(--cor-principal);
   padding: 1.5rem;
   border-radius: var(--raio-borda);
   text-align: left;
@@ -119,10 +122,7 @@
   color: var(--cor-principal);
   margin: 0;
 }
-/* --- FIM DOS ESTILOS DOS INFO CARDS --- */
 
-
-/* --- RESPONSIVIDADE --- */
 @media (min-width: 768px) {
   .coverageSection {
     padding: 4rem 3rem;
@@ -135,33 +135,27 @@
   }
   .infoCardsContainer {
     max-width: 600px;
-    /* (Muda para 3 colunas no tablet) */
     flex-direction: row;
   }
   .infoCard {
-    flex: 1; /* Faz os 3 cards dividirem o espaço */
-    min-height: 100px; /* Alinha a altura */
+    flex: 1; 
+    min-height: 100px; 
   }
 }
 
-/* Layout lado a lado para Desktop */
 @media (min-width: 1024px) {
   .coverageSection {
-    /* MUDANÇA: Agora o 'coverageSection' é o container flex */
     flex-direction: row;
     justify-content: center;
     align-items: flex-start; 
     padding: 5rem 4rem;
     gap: 3rem;
     
-    /* Precisamos de um novo container para o Título + Cards da Direita */
-    /* Mas, para simplificar, vamos usar 'align-items: center' no mobile */
-    /* e 'flex-wrap: wrap' */
-    flex-wrap: wrap; /* Permite que o título fique acima de tudo */
+    flex-wrap: wrap; 
   }
   
   .title {
-    width: 100%; /* Faz o título ocupar a linha inteira, acima das colunas */
+    width: 100%; 
     margin-bottom: 2rem;
   }
 
@@ -174,6 +168,6 @@
   .infoCardsContainer {
     flex: 4; 
     max-width: 450px;
-    flex-direction: column; /* Volta a ser coluna no desktop */
+    flex-direction: column; 
   }
 }
