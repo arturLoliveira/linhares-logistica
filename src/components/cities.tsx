@@ -16,16 +16,16 @@ const regioesData = [
     cidades: ['Cons. Lafaiete']
   },
   {
-    titulo: 'Polo São Bras do Suaçui',
-    cidades: ['São Bras do Suaçui','Entre Rios de Minas', 'Jeceaba', 'Desterro de entre rios']
+    titulo: 'Jeceaba',
+    cidades: ['Jeceaba','São Bras do Suaçui','Entre Rios de Minas', 'Desterro de entre rios']
   },
   {
     titulo: 'Polo Congonhas',
     cidades: ['Congonhas','Belo vale', 'Moeda']
   },
   {
-    titulo: 'Polo Catas Altas da Noruega',
-    cidades: ['Catas altas da noruega','Itaverava', 'Rio espera', 'Lamimm', 'Senhora de oliveira', 'Piranga']
+    titulo: 'Itaverava',
+    cidades: [,'Itaverava','Catas altas da noruega', 'Rio espera', 'Lamimm', 'Senhora de oliveira', 'Piranga']
   },
   {
     titulo: 'Polo Ouro Preto',
