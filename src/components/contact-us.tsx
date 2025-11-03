@@ -7,9 +7,9 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 let DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow,
-    iconAnchor: [12, 41], 
-    popupAnchor: [1, -34], 
-    shadowSize: [41, 41] 
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -28,10 +28,12 @@ function ContactUs() {
     return (
         <div className={styles.contactUs}>
             <h2 className={styles.sectionTitle}>Contatos</h2>
+            <p className={styles.contactSubtitle}>
+                Diversos canais de comunicação para que você se sinta mais à vontade para nos contactar quando quiser.
+            </p>
 
             <div className={styles.contactCardsContainer}>
-                
-                {/* Card do Mapa (sem alteração) */}
+
                 <div className={styles.mapContact}>
                     <MapContainer center={posicaoGalpao} zoom={16} scrollWheelZoom={true}>
                         <TileLayer
@@ -52,35 +54,35 @@ function ContactUs() {
                         </Marker>
                     </MapContainer>
                 </div>
-                
-                {/* Card de Contato (Agora com Infos E Formulário) */}
+
                 <div className={styles.contact}>
                     <h3 className={styles.contactTitle}>Estamos aqui para lhe atender!</h3>
-                    
-                    {/* --- PARTE 1: INFOS DE CONTATO (Mantidas) --- */}
+
                     <hr className={styles.divider} />
                     <ContactInfo
                         icon={<FaPhone />}
                         info="31 993751683"
                     />
                     <ContactInfo
-                        icon={<AiOutlineMail />} // Ícone de Email
+                        icon={<AiOutlineMail />}
                         info="transporteslinhares7@gmail.com"
-                        isLink={true} 
+                        isLink={true}
                     />
                     <ContactInfo
                         icon={<FaMapMarkerAlt />}
                         info="Rua Santo Antônio, 1372, Centro, Ouro Branco"
                     />
-                    <a 
-                      href="https://www.instagram.com/transportes.linhares" // <-- TROQUE PELA SUA URL REAL
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className={styles.contactInfoLink}
-                      translate="no"
+                    <a
+                        href="https://www.instagram.com/transportes.linhares"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.contactInfoLink}
+                        translate="no"
                     >
-                      <AiFillInstagram /> 
-                      <h4 className={styles.infoText}>@transportes.linhares</h4>
+                        <ContactInfo
+                            icon={<AiFillInstagram />}
+                            info="@transportes.linhares"
+                        />
                     </a>
                     <a
                         href={googleMapsUrl}
@@ -91,18 +93,11 @@ function ContactUs() {
                         <MdLocationOn className={styles.buttonIcon} />
                         <span className={styles.buttonText}>Ver no Google Maps</span>
                     </a>
-
-                    {/* --- PARTE 2: FORMULÁRIO (Adicionado) --- */}
-                    
-                    {/* Novo subtítulo para o formulário */}
-                    <h3 className={`${styles.contactTitle} ${styles.formTitleSeparator}`}>
-                        Ou envie uma mensagem
+                </div>
+                <div className={styles.contactForm}>
+                    <h3 className={styles.contactTitle}>
+                        Ou nos envie um e-mail
                     </h3>
-                    <p className={styles.contactSubtitle}>
-                        {/* Usei o texto que você pediu */}
-                        Diversos canais de comunicação para que você se sinta mais à vontade para nos contactar quando quiser.
-                    </p>
-
                     <form className={styles.form}>
                         <div className={styles.formGroup}>
                             <label htmlFor="nome" className={styles.formLabel}>Nome</label>

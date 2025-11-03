@@ -62,11 +62,32 @@
   color: var(--cor-principal);
   margin-top: 0;
   text-align: center;
-  /* Título do card centralizado */
   margin-bottom: 0.5rem;
 }
-
-/* --- Estilos do Formulário (Já corretos) --- */
+.contactMapButton {
+  background-color: var(--cor-principal);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  border: none;
+  border-radius: var(--raio-borda);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 4rem;
+  text-decoration: none;
+  gap: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.contactMapButton:hover {
+  background-color: var(--cor-principal-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-elemento);
+}
 .contactSubtitle {
   text-align: left;
   font-size: 1rem;
@@ -155,11 +176,18 @@
   transform: translateY(-2px);
   box-shadow: var(--sombra-elemento);
 }
+.contactForm {
+    background-color: var(--cor-fundo-elemento);
+  color: var(--cor-texto-principal);
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra-elemento);
+  border: 1px solid var(--cor-borda);
+  padding: 1rem 1.5rem;
+}
+.contactInfoLink {
+  text-decoration: none;
+}
 
-/* --- Fim dos Estilos do Formulário --- */
-
-
-/* --- MUDANÇA PRINCIPAL AQUI (TABLET) --- */
 @media (min-width: 768px) {
   .sectionTitle {
     font-size: 2.5rem;
@@ -168,36 +196,42 @@
   .contactCardsContainer {
     gap: 3rem;
   }
-
-  /* Faz o mapa ficar lado a lado no tablet */
   .mapContact {
     width: auto;
     max-width: none;
     flex-basis: 45%;
   }
 
-  /* Faz o card de contato ficar lado a lado no tablet */
   .contact {
     width: auto;
     max-width: none;
-    flex-basis: 40%;
+    flex-basis: 45%;
+  }
+  .contactForm {
+    width: auto;
+    max-width: none;
+    flex-basis: 93%; 
   }
 }
 
-/* --- FIM DA MUDANÇA --- */
-
-
 @media (min-width: 1024px) {
   .contactCardsContainer {
-    gap: 6rem;
-    /* Apenas aumenta o espaço no desktop */
+    gap: 2rem;
   }
 
   .mapContact {
-    flex-basis: 45%;
+    flex-basis: 31%;
   }
 
   .contact {
-    flex-basis: 40%;
+    flex-basis: 31%;
+    height: 25rem; 
+    overflow-y: auto; 
+  }
+
+  .contactForm {
+    flex-basis: 31%;
+    height: 23rem; 
+    overflow-y: auto;
   }
 }
