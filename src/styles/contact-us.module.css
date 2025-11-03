@@ -76,7 +76,7 @@
   border-radius: var(--raio-borda);
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 4rem;
+  margin-top: 3rem;
   text-decoration: none;
   gap: 1rem;
   display: flex;
@@ -89,7 +89,7 @@
   box-shadow: var(--sombra-elemento);
 }
 .contactSubtitle {
-  text-align: left;
+  text-align: center;
   font-size: 1rem;
   line-height: 1.5;
   color: var(--cor-texto-secundario);
@@ -212,11 +212,20 @@
     max-width: none;
     flex-basis: 93%; 
   }
+  .contactTitle {
+    font-size: 1.5rem;
+  }
+  .buttonText {
+    font-size: .8rem;
+  }
+  .contactMapButton {
+    margin-top: 1rem;
+  }
 }
 
 @media (min-width: 1024px) {
   .contactCardsContainer {
-    gap: 2rem;
+    gap: 1.5rem;
   }
 
   .mapContact {
@@ -230,8 +239,11 @@
   }
 
   .contactForm {
-    flex-basis: 31%;
+    flex-basis:60%;
     height: 23rem; 
     overflow-y: auto;
+  }
+  .contactMapButton {
+    margin-top: 4rem;
   }
 }
