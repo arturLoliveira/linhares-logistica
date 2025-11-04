@@ -74,18 +74,17 @@ function ListaColetas() {
                 <table className={styles.tabelaDevolucoes}>
                     <thead>
                         <tr>
-                            <th>Encomenda</th>
-                            <th>NF</th>
-                            <th>Cliente</th>
-                            <th>Valor (R$)</th>
-                            <th>Status</th>
-                            <th>Ações</th>
+                            <th data-label="Encomenda">Encomenda</th>
+                            <th data-label="NF">NF</th>
+                            <th data-label="Cliente">Cliente</th>
+                            <th data-label="Valor (R$)">Valor (R$)</th>
+                            <th data-label="Status">Status</th>
+                            <th data-label="Ações">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {coletas.map((coleta) => (
                             <tr key={coleta.id}>
-                                {/* --- CÉLULAS COM data-label ADICIONADO --- */}
                                 <td data-label="Encomenda">{coleta.numeroEncomenda}</td>
                                 <td data-label="NF">{coleta.numeroNotaFiscal}</td>
                                 <td data-label="Cliente">{coleta.nomeCliente}</td>
@@ -109,7 +108,6 @@ function ListaColetas() {
                 </table>
             )}
             
-            {/* Modal do QR Code */}
             {qrCodeVisivel && (
                 <div className={styles.modalOverlay} onClick={() => setQrCodeVisivel(null)}>
                     <div id="printable-qr-code" className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -203,7 +201,6 @@ function FormAdminCadastraColeta() {
     );
 }
 
-// --- (COMPONENTE 3: Formulário para Adicionar Evento de Rastreio) ---
 function FormAdminAdicionaHistorico() {
     const [notaFiscal, setNotaFiscal] = useState('');
     const [localizacao, setLocalizacao] = useState('');
@@ -292,7 +289,6 @@ function FormAdminAdicionaHistorico() {
 }
 
 
-// --- (Página Principal) ---
 function AdminColetas() {
     return (
         <div style={{width: '100%'}}>
