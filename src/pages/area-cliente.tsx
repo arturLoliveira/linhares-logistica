@@ -61,7 +61,7 @@ function FormRastreioDestinatario() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <p>Acesse com seu CNPJ/CPF, Senha de Acesso e Número da Encomenda.</p>
+            <p>Acesse com seu CNPJ/CPF e Número da Encomenda.</p>
              <div className={styles.formGroup}>
                 <label htmlFor="num_encomenda_dest">Número da Encomenda</label>
                 <input type="text" id="num_encomenda_dest" value={numeroEncomenda} onChange={e => setNumeroEncomenda(e.target.value)} placeholder="Ex: OC-1001" required />
