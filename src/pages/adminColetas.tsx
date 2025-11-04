@@ -24,8 +24,7 @@ function ListaColetas() {
         const token = localStorage.getItem('admin_token');
         setIsLoading(true);
         setErro('');
-        // A URL da API no Render/Railway (lida da variável de ambiente)
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         const url = `${API_URL}/api/admin/coletas?status=${filtroStatus}`;
 
         try {
@@ -61,11 +60,9 @@ function ListaColetas() {
                 <button className={filtroStatus === 'EM_TRANSITO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_TRANSITO')}>Em Trânsito</button>
                 <button className={filtroStatus === 'EM_ROTA_ENTREGA' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_ROTA_ENTREGA')}>Em Rota</button>
                 
-                {/* --- BOTÃO ADICIONADO --- */}
                 <button className={filtroStatus === 'EM_DEVOLUCAO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_DEVOLUCAO')}>
                     Em Devolução
                 </button>
-                {/* --------------------- */}
 
                 <button className={filtroStatus === 'CONCLUIDA' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('CONCLUIDA')}>Concluídas</button>
                 <button className={filtroStatus === '' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('')}>Ver Todas</button>
