@@ -22,7 +22,7 @@ function ListaDevolucoes() {
         const fetchDevolucoes = async () => {
             const token = localStorage.getItem('admin_token');
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/devolucoes`, {
+                const response = await fetch('https://linhares-logistica-backend.onrender.com/api/admin/devolucoes', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

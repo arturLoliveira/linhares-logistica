@@ -25,7 +25,7 @@ function ListaColetas() {
         const token = localStorage.getItem('admin_token');
         setIsLoading(true);
         setErro('');
-        const url = `${import.meta.env.VITE_API_URL}/api/admin/coletas?status=${filtroStatus}`;
+        const url = `https://linhares-logistica-backend.onrender.com/api/admin/coletas?status=${filtroStatus}`;
 
         try {
             const response = await fetch(url, {
@@ -141,7 +141,7 @@ const handlePrint = () => {
                         <p>Imprima e cole na etiqueta. O motorista deve escanear este código.</p>
                         
                         <QRCodeSVG 
-                            value={`http://localhost:5173/driver/update?id=${qrCodeVisivel}&token=${coletas.find(c => c.numeroEncomenda === qrCodeVisivel)?.driverToken}`}
+                            value={`https://linhares-logistica-backend.onrender.com/driver/update?id=${qrCodeVisivel}&token=${coletas.find(c => c.numeroEncomenda === qrCodeVisivel)?.driverToken}`}
                             size={256}
                             style={{margin: '20px auto', display: 'block'}}
                         />
@@ -184,7 +184,7 @@ function FormAdminCadastraColeta() {
             valorFrete, pesoKg, dataVencimento
         };
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/coletas/solicitar`, {
+            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/coletas/solicitar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),
@@ -243,7 +243,7 @@ function FormAdminAdicionaHistorico() {
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/coletas/${notaFiscal}/historico`, {
+            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/admin/coletas/${notaFiscal}/historico', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

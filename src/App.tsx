@@ -9,7 +9,7 @@ import AdminLayout from './components/admin-layout';
 
 
 import HomePage from './pages/HomePage';
-import AreaCliente from './components/area-cliente';
+import AreaCliente from './pages/area-cliente';
 import AdminLogin from './pages/adminLogin';
 
 

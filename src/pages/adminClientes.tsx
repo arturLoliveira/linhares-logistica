@@ -16,7 +16,7 @@ function FormAdminCadastraCliente() {
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/clientes/registrar`, {
+            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/admin/clientes/registrar', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
