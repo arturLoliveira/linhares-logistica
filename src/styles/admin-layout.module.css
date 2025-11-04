@@ -1,74 +1,78 @@
-/* ---------------------------------------------------- */
-/* --- MOBILE FIRST (PADRÃO PARA TELAS PEQUENAS) --- */
-/* ---------------------------------------------------- */
 .adminLayout {
   display: flex;
-  flex-direction: column; /* MOBILE: Menu em cima, Conteúdo em baixo */
+  flex-direction: column; 
   min-height: 100vh;
-  background-color: var(--cor-fundo-site); /* Fundo suave */
+  background-color: #f4f7fa; 
 }
 
 
 .sidebar {
-  width: 100%; /* Ocupa toda a largura do celular */
+  width: 100%; 
   background-color: #1a202c;
   color: #e2e8f0;
-  padding: 0.5rem 1rem; /* Padding reduzido */
+  padding: 0.5rem 1rem; 
   display: flex;
-  flex-direction: row; /* Itens do menu alinhados horizontalmente */
+  flex-direction: row; 
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Permite quebrar se a tela for muito pequena */
+  flex-wrap: wrap;
 }
 
 .sidebarTitle {
-  font-size: 1.2rem; /* Título menor no celular */
+  font-size: 1.2rem; 
   font-weight: 700;
   color: #fff;
   margin: 0;
 }
 
 .sidebarNav {
-  display: none; /* ESCONDIDO NO CELULAR (Pode ser substituído por um ícone de menu) */
-  /* NO ADMIN REAL, ESSA NAVEGAÇÃO DEVE SER UM ACORDION OU ICONES */
+  display: none; 
 }
 
 .sidebarLink {
-  display: flex;
-  align-items: center;
+  color: #a0aec0;
   text-decoration: none;
   font-size: 0.9rem;
   padding: 0.5rem;
-  color: #a0aec0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
 }
-/* Estilos desktop (hover/active) mantidos */
 
+.sidebarLink:hover {
+  background-color: #2d3748;
+  color: #fff;
+}
+
+.sidebarLink.active {
+  background-color: var(--cor-principal);
+  color: #fff;
+  font-weight: 600;
+}
 
 .logoutButton {
-  /* No mobile, movemos o botão para o menu de desktop ou usamos um ícone */
   display: none; 
 }
 
 
 .contentArea {
   flex-grow: 1;
-  padding: 1rem; /* Padding reduzido para celular */
+  padding: 1rem; 
   overflow-y: auto;
 }
 
-/* ---------------------------------------------------- */
-/* --- MEDIA QUERY: DESKTOP/TABLET (Min-width: 768px) --- */
-/* ---------------------------------------------------- */
+
 @media (min-width: 768px) {
   .adminLayout {
-    flex-direction: row; /* DESKTOP: Menu ao lado do Conteúdo */
+    flex-direction: row; 
   }
   
   .sidebar {
-    width: 250px; /* Largura fixa para a sidebar */
+    width: 250px; 
     min-height: 100vh;
     padding: 1.5rem;
-    flex-direction: column; /* Volta para coluna */
+    flex-direction: column; 
     justify-content: flex-start;
   }
   
@@ -79,7 +83,7 @@
   }
 
   .sidebarNav {
-    display: flex; /* Mostra a navegação no desktop */
+    display: flex; 
     flex-direction: column;
     gap: 0.5rem;
     flex-grow: 1;
@@ -92,25 +96,13 @@
   }
 
   .logoutButton {
-    display: block; /* Mostra o botão no desktop */
+    display: block; 
     margin-top: 1rem;
   }
 
   .contentArea {
-    padding: 2rem 3rem; /* Padding completo */
+    padding: 2rem 3rem; 
   }
-}
-
-/* --- ESTILOS DE COMPONENTES SECUNDÁRIOS (Sem alteração) --- */
-/* (Estes estilos foram movidos para o final para não interferir na lógica de layout) */
-.sidebarLink:hover {
-  background-color: #2d3748;
-  color: #fff;
-}
-.sidebarLink.active {
-  background-color: var(--cor-principal);
-  color: #fff;
-  font-weight: 600;
 }
 
 .botaoAcao {
