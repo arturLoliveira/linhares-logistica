@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from '../styles/area-cliente.module.css'; 
+import styles from '../styles/area-cliente.module.css';
 
 function AdminLogin() {
     const [email, setEmail] = useState('');
@@ -11,9 +11,10 @@ function AdminLogin() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErro('');
-
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-api.onrender.com';
         try {
-            const response = await fetch('https://linhares-logistica-api.onrender.com/api/admin/login', {
+            const apiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+            const response = await fetch(`${apiUrl}/api/admin/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, senha })
@@ -35,23 +36,23 @@ function AdminLogin() {
     };
 
     return (
-        <div className={styles.areaCliente}> 
+        <div className={styles.areaCliente}>
             <h2 className={styles.tituloPrincipal}>Login do Administrador</h2>
             <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.formGroup}>
                     <label htmlFor="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
+                    <input
+                        type="email"
+                        id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="senha">Senha</label>
-                    <input 
-                        type="password" 
-                        id="senha" 
+                    <input
+                        type="password"
+                        id="senha"
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
                     />
