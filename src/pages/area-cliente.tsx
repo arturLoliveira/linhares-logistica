@@ -85,6 +85,7 @@ function FormRastreioDestinatario() {
                         <hr />
                         {resultado.historico && resultado.historico.map((evento: any) => (
                              <li key={evento.id} className={styles.historicoItem}>
+                                <hr />
                                 <div className={styles.historicoData}>{new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}</div>
                                 <div className={styles.historicoStatus}>{evento.status.replace('_', ' ')}</div>
                                 <div className={styles.historicoLocal}>{evento.localizacao}</div>
