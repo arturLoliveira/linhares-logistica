@@ -82,7 +82,6 @@ function FormRastreioDestinatario() {
                     )}
                     <h5 className={styles.historicoTitulo}>Histórico de Rastreio</h5>
                     <ul className={styles.historicoLista}>
-                        <hr />
                         {resultado.historico && resultado.historico.map((evento: any) => (
                              <li key={evento.id} className={styles.historicoItem}>
                                 <hr />
@@ -92,6 +91,7 @@ function FormRastreioDestinatario() {
                             </li>
                         ))}
                     </ul>
+                    <hr />
                 </div>
             )}
         </form>
