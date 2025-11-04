@@ -1,104 +1,114 @@
-.areaCliente {
-    width: 100%;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px 40px; 
-    background-color: var(--cor-fundo-site);
+/* --- ESTILOS BASE (MOBILE FIRST) --- */
+/* (Estilos para telas pequenas, como celulares) */
+
+.mapContact {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 0;
+  background-color: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--sombra-elemento);
+  border: 1px solid var(--cor-borda);
+  width: 90%;
+  max-width: 500px; /* Limite em tablets/celulares grandes */
+  height: 25rem;
 }
 
-.tituloPrincipal {
-    text-align: center;
-    color: var(--cor-principal);
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-}
-.accordion {
-    border: 1px solid var(--cor-borda);
-    border-radius: var(--raio-borda);
-    overflow: hidden;
-    box-shadow: var(--sombra-elemento);
+.mapContact :global(.leaflet-container) {
+  width: 100%;
+  height: 100%;
 }
 
-.accordionItem {
-    border-bottom: 1px solid var(--cor-borda);
-}
-.accordionItem:last-child {
-    border-bottom: none;
-}
-
-.accordionHeader {
-    background-color: var(--cor-fundo-elemento);
-    color: var(--cor-texto-principal);
-    cursor: pointer;
-    padding: 1.5rem;
-    width: 100%;
-    border: none;
-    text-align: left;
-    outline: none;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-    
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+.contactUs {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem 2rem 3rem 2rem;
+  background-color: var(--cor-fundo-site);
+  border-top: 1px solid var(--cor-borda);
 }
 
-.accordionHeader:hover {
-    background-color: #f0f0f0; 
+.sectionTitle {
+  color: var(--cor-principal);
+  font-size: 2.2rem;
+  margin: 0;
+  text-align: center;
 }
 
-.headerIcon {
-    color: var(--cor-principal);
-    font-size: 1.5rem;
+/* No Mobile, os cartões são empilhados verticalmente */
+.contactCardsContainer {
+  display: flex;
+  flex-direction: column; /* Empilha no mobile */
+  align-items: center;  /* Centraliza os cartões */
+  flex-wrap: wrap;
+  gap: 2rem; /* Espaço entre os cartões no mobile */
+  width: 100%;
 }
 
-.headerTitulo {
-    flex-grow: 1; 
+.contact,
+.contactForm {
+  background-color: var(--cor-fundo-elemento);
+  color: var(--cor-texto-principal);
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra-elemento);
+  border: 1px solid var(--cor-borda);
+  padding: 2rem 2.5rem;
+  box-sizing: border-box;
+  width: 90%;
+  max-width: 500px; /* Limite no mobile */
+  text-align: left;
 }
 
-.headerSeta {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--cor-principal);
+.contactTitle {
+  font-size: 2.2rem;
+  color: var(--cor-principal);
+  margin-top: 0;
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
-.accordionContent {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    background-color: #fdfdfd;
+.contactSubtitle {
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--cor-texto-secundario);
+  margin-top: 0;
+  margin-bottom: 2rem;
 }
 
-.accordionContent.aberto {
-    max-height: 1000px; 
-    transition: max-height 0.5s ease-in;
-}
-
-.contentPadding {
-    padding: 2rem;
+.formTitleSeparator {
+  font-size: 1.5rem;
+  text-align: left;
+  margin-top: 2.5rem;
+  margin-bottom: 0.5rem;
+  border-top: 1px solid var(--cor-borda);
+  padding-top: 2rem;
 }
 
 .form {
-    width: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.25rem; 
 }
 
-.formGroup label {
+.formLabel {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--cor-texto-secundario);
   margin-bottom: 0.35rem;
 }
 
-.formGroup input,
-.formGroup textarea,
-.formGroup select {
+.formInput,
+.formTextarea {
   width: 100%;
   padding: 0.85rem;
   font-family: 'Inter', system-ui, sans-serif;
@@ -108,11 +118,24 @@
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio-borda);
   box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.formGroup textarea {
-    resize: vertical;
-    min-height: 100px;
+.formInput:invalid,
+.formTextarea:invalid {
+  box-shadow: none;
+}
+
+.formInput:focus,
+.formTextarea:focus {
+  outline: none;
+  border-color: var(--cor-principal);
+  box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.2);
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
 .formButton {
@@ -120,253 +143,67 @@
   color: #FFFFFF;
   font-weight: 700;
   font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   padding: 1rem;
   border: none;
   border-radius: var(--raio-borda);
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 1rem;
-  width: 100%; 
 }
 
-.formButton:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.formButton:hover:not(:disabled) {
+.formButton:hover {
   background-color: var(--cor-principal-dark);
-}
-.tabelaDevolucoes {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-elemento);
 }
 
-.tabelaDevolucoes th,
-.tabelaDevolucoes td {
-    border: 1px solid var(--cor-borda);
-    padding: 0.75rem;
-    text-align: left;
-    vertical-align: top;
-}
+/* --- ESTILOS TABLET --- */
+/* (Telas maiores que 768px) */
+@media (min-width: 768px) {
+  .sectionTitle {
+    font-size: 2.5rem;
+  }
 
-.tabelaDevolucoes th {
-    background-color: #f4f4f4;
-    font-weight: 600;
-}
-
-.tabelaDevolucoes tbody tr:nth-child(even) {
-    background-color: var(--cor-fundo-elemento);
-}
-.statsContainer {
-    display: flex;
-    flex-wrap: wrap;
+  /* Muda o container para horizontal e justifica */
+  .contactCardsContainer {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch; /* Garante que os cartões tenham a mesma altura */
     gap: 2rem;
-    justify-content: center;
-    margin-top: 2.5rem;
-}
+  }
 
-.statCard {
-    background-color: var(--cor-fundo-elemento);
-    border: 1px solid var(--cor-borda);
-    border-radius: var(--raio-borda);
-    box-shadow: var(--sombra-elemento);
-    padding: 2rem;
-    text-align: center;
-    min-width: 220px;
-    flex-basis: 250px;
-}
-
-.statValue {
-    display: block;
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--cor-principal);
-    line-height: 1;
-}
-
-.statLabel {
-    display: block;
-    font-size: 1rem;
-    color: var(--cor-texto-secundario);
-    margin-top: 0.75rem;
-}
-.filtroContainer {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.filtroContainer button {
-    background-color: #f0f0f0;
-    border: 1px solid var(--cor-borda);
-    padding: 0.5rem 1rem;
-    border-radius: var(--raio-borda);
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.filtroContainer button:hover {
-    background-color: #e0e0e0;
-}
-
-
-.filtroContainer button.filtroAtivo {
-    background-color: var(--cor-principal);
-    color: white;
-    border-color: var(--cor-principal);
-}
-
-
-.statusBadge {
-    padding: 0.25rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #333;
-}
-
-.statusBadge.pendente {
-    background-color: #fee440;
-    color: #574802;
-}
-.statusBadge.em_andamento {
-    background-color: #00b4d8;
-    color: white;
-}
-.statusBadge.concluida {
-    background-color: #52b788;
-    color: white;
-}
-.statusBadge.cancelada {
-    background-color: #d90429;
-    color: white;
-}
-
-.statusSelect {
-    padding: 0.25rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    border: 2px solid transparent;
-    cursor: pointer;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-   
-}
-
-
-.statusSelect.pendente {
-    background-color: #fee440;
-    color: #574802;
-    border-color: #f7d900;
-}
-.statusSelect.em_andamento {
-    background-color: #00b4d8;
-    color: white;
-    border-color: #0096b5;
-}
-.statusSelect.concluida {
-    background-color: #52b788;
-    color: white;
-    border-color: #429b72;
-}
-.statusSelect.cancelada {
-    background-color: #d90429;
-    color: white;
-    border-color: #b50322;
-}
-.rastreioResultado {
-    margin-top: 2rem;
-    border-top: 1px solid var(--cor-borda);
-    padding-top: 1.5rem;
-}
-
-.statusAtual {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--cor-principal);
-    margin-bottom: 0.5rem;
-}
-
-.localAtual {
-    font-size: 1.1rem;
-    color: var(--cor-texto-secundario);
-    margin-bottom: 1.5rem;
-}
-
-.historicoTitulo {
-    font-size: 1.2rem;
-    color: var(--cor-texto-principal);
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--cor-borda);
-    padding-bottom: 0.5rem;
-}
-
-.historicoLista {
-    list-style: none;
-    padding-left: 0;
-}
-
-.historicoItem {
-    padding: 1rem 0;
-    border-bottom: 1px dashed var(--cor-borda);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-}
-.historicoItem:last-child {
-    border-bottom: none;
-}
-
-.historicoData {
-    font-weight: 700;
-    min-width: 80px;
-}
-
-.historicoStatus {
-    font-weight: 600;
-    color: var(--cor-principal);
-    flex-basis: 150px;
-    flex-grow: 1;
-}
-
-.historicoLocal {
-    color: var(--cor-texto-secundario);
-    flex-basis: 100%;
-}
-.modalActions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 2rem;
-}
-
-.modalActions .formButton {
+  /* Define o tamanho para um layout 2 + 1 */
+  .mapContact,
+  .contact {
+    width: auto; /* Remove a largura fixa do mobile */
+    max-width: none;
+    flex-basis: 45%; /* Cada um ocupa ~metade */
+    min-width: 300px;
+  }
+  
+  .contactForm {
     width: auto;
-    padding: 0.8rem 1.5rem;
+    max-width: none;
+    flex-basis: 90%; /* Ocupa a linha de baixo */
+    max-width: 800px; /* Limita o formulário para não ficar muito largo */
+  }
 }
 
-.formButtonSecondary {
-    background-color: #6c757d; 
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: var(--raio-borda);
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-.formButtonSecondary:hover {
-    background-color: #5a6268;
+
+/* --- ESTILOS DESKTOP --- */
+/* (Telas maiores que 1024px) */
+@media (min-width: 1024px) {
+  .contactCardsContainer {
+    gap: 2rem;
+  }
+
+  /* Define o tamanho para 3 colunas */
+  .mapContact,
+  .contact,
+  .contactForm {
+    flex-basis: 31%; /* (31 * 3 = 93% + gaps) */
+    max-width: 500px; /* Limita a largura de cada cartão */
+  }
 }
