@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import styles from '../styles/area-cliente.module.css';
 import { QRCodeSVG } from 'qrcode.react';
 
-// --- (COMPONENTE 1: Lista de Coletas com Filtro e QR Code) ---
 function ListaColetas() {
     type Coleta = {
         id: number;
@@ -25,7 +24,7 @@ function ListaColetas() {
         const token = localStorage.getItem('admin_token');
         setIsLoading(true);
         setErro('');
-        const url = `http://localhost:3001/api/admin/coletas?status=${filtroStatus}`;
+        const url = `https://linhares-logistica-backend.onrender.com/api/admin/coletas?status=${filtroStatus}`;
 
         try {
             const response = await fetch(url, {
@@ -46,7 +45,6 @@ function ListaColetas() {
         fetchColetas();
     }, [filtroStatus]);
 
-    // Função para imprimir (usada no modal)
     const handlePrint = () => {
         window.print();
     };
@@ -136,7 +134,6 @@ function ListaColetas() {
 }
 
 
-// --- (COMPONENTE 2: Formulário para o Admin CADASTRAR uma coleta) ---
 function FormAdminCadastraColeta() {
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
@@ -161,7 +158,7 @@ function FormAdminCadastraColeta() {
             valorFrete, pesoKg, dataVencimento
         };
         try {
-            const response = await fetch('http://localhost:3001/api/coletas/solicitar', {
+            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/coletas/solicitar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),
@@ -221,7 +218,7 @@ function FormAdminAdicionaHistorico() {
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch(`http://localhost:3001/api/admin/coletas/${notaFiscal}/historico`, {
+            const response = await fetch(`https://linhares-logistica-backend.onrender.com/api/admin/coletas/${notaFiscal}/historico`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
