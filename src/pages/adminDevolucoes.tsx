@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from '../../styles/area-cliente.module.css';
+import styles from '../styles/area-cliente.module.css';
 
 function ListaDevolucoes() {
     type Devolucao = {

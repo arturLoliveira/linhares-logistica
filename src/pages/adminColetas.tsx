@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from '../../styles/area-cliente.module.css';
+import styles from '../styles/area-cliente.module.css';
 import { QRCodeSVG } from 'qrcode.react';
 
 // --- (COMPONENTE 1: Lista de Coletas com Filtro e QR Code) ---
