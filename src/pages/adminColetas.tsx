@@ -72,8 +72,8 @@ function ListaColetas() {
 
             {!isLoading && !erro && coletas.length > 0 && (
                 <table className={styles.tabelaDevolucoes}>
-                    <thead>
-                        <tr>
+                    <thead className={styles.tablethead}>
+                        <tr className='tabletr'>
                             <th data-label="Encomenda">Encomenda</th>
                             <th data-label="NF">NF</th>
                             <th data-label="Cliente">Cliente</th>
@@ -84,17 +84,17 @@ function ListaColetas() {
                     </thead>
                     <tbody>
                         {coletas.map((coleta) => (
-                            <tr key={coleta.id}>
-                                <td data-label="Encomenda">{coleta.numeroEncomenda}</td>
-                                <td data-label="NF">{coleta.numeroNotaFiscal}</td>
-                                <td data-label="Cliente">{coleta.nomeCliente}</td>
-                                <td data-label="Valor (R$)">{coleta.valorFrete.toFixed(2)}</td>
-                                <td data-label="Status">
+                            <tr key={coleta.id} className='tabletr'>
+                                <td data-label="Encomenda" className={styles.tabletd}>{coleta.numeroEncomenda}</td>
+                                <td data-label="NF" className={styles.tabletd}>{coleta.numeroNotaFiscal}</td>
+                                <td data-label="Cliente" className={styles.tabletd}>{coleta.nomeCliente}</td>
+                                <td data-label="Valor (R$)" className={styles.tabletd}>{coleta.valorFrete.toFixed(2)}</td>
+                                <td data-label="Status" className={styles.tabletd}>
                                     <span className={`${styles.statusBadge} ${styles[coleta.status.toLowerCase()]}`}>
                                         {coleta.status.replace(/_/g, ' ')}
                                     </span>
                                 </td>
-                                <td data-label="Ações">
+                                <td data-label="Ações" className='tabletd'>
                                     <button 
                                         className={styles.botaoAcao}
                                         onClick={() => setQrCodeVisivel(coleta.numeroEncomenda)}

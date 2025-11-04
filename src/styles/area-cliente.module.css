@@ -360,19 +360,19 @@
         padding: 20px 40px; 
     }
 
-    .tabelaDevolucoes thead {
+    .tablethead {
         display: table-header-group;
     }
-    .tabelaDevolucoes tr {
+    .tabletr {
         display: table-row;
         border: none;
     }
-    .tabelaDevolucoes td {
+    .tabletd {
         display: table-cell;
         text-align: left;
         padding-left: 0.75rem;
     }
-    .tabelaDevolucoes td::before {
+    .tabletd::before {
         content: none;
     }
     
