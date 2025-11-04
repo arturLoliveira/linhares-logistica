@@ -24,7 +24,9 @@ function ListaColetas() {
         const token = localStorage.getItem('admin_token');
         setIsLoading(true);
         setErro('');
-        const url = `https://linhares-logistica-backend.onrender.com/api/admin/coletas?status=${filtroStatus}`;
+        // A URL da API no Render/Railway (lida da variável de ambiente)
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const url = `${API_URL}/api/admin/coletas?status=${filtroStatus}`;
 
         try {
             const response = await fetch(url, {
@@ -49,17 +51,22 @@ function ListaColetas() {
         window.print();
     };
 
-
     return (
         <div style={{width: '100%'}}>
             <h4>Visualizar Coletas</h4>
             
-            {/* Botões de Filtro */}
             <div className={styles.filtroContainer}>
                 <button className={filtroStatus === 'PENDENTE' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('PENDENTE')}>Pendentes</button>
                 <button className={filtroStatus === 'COLETADO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('COLETADO')}>Coletados</button>
                 <button className={filtroStatus === 'EM_TRANSITO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_TRANSITO')}>Em Trânsito</button>
                 <button className={filtroStatus === 'EM_ROTA_ENTREGA' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_ROTA_ENTREGA')}>Em Rota</button>
+                
+                {/* --- BOTÃO ADICIONADO --- */}
+                <button className={filtroStatus === 'EM_DEVOLUCAO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_DEVOLUCAO')}>
+                    Em Devolução
+                </button>
+                {/* --------------------- */}
+
                 <button className={filtroStatus === 'CONCLUIDA' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('CONCLUIDA')}>Concluídas</button>
                 <button className={filtroStatus === '' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('')}>Ver Todas</button>
             </div>
@@ -91,7 +98,7 @@ function ListaColetas() {
                                 <td data-label="Cliente">{coleta.nomeCliente}</td>
                                 <td data-label="Valor (R$)">{coleta.valorFrete.toFixed(2)}</td>
                                 <td data-label="Status">
-                                    <span className={`${styles.statusBadge} ${styles[coleta.status.toLowerCase()]}`}>
+                                    <span className={`${styles.statusBadge} ${styles[coleta.status.toLowerCase().replace('_', '')]}`}>
                                         {coleta.status.replace(/_/g, ' ')}
                                     </span>
                                 </td>
@@ -116,7 +123,7 @@ function ListaColetas() {
                         <p>Imprima e cole na etiqueta. O motorista deve escanear este código.</p>
                         
                         <QRCodeSVG 
-                            value={`https://transportelinhares.vercel.app/driver/update?id=${qrCodeVisivel}&token=${coletas.find(c => c.numeroEncomenda === qrCodeVisivel)?.driverToken}`}
+                            value={`${import.meta.env.VITE_FRONTEND_URL}/driver/update?id=${qrCodeVisivel}&token=${coletas.find(c => c.numeroEncomenda === qrCodeVisivel)?.driverToken}`}
                             size={256}
                             style={{margin: '20px auto', display: 'block'}}
                         />
@@ -131,7 +138,6 @@ function ListaColetas() {
         </div>
     );
 }
-
 
 function FormAdminCadastraColeta() {
     const [nomeCliente, setNomeCliente] = useState('');
