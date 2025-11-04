@@ -74,7 +74,6 @@ function ListaColetas() {
             {!isLoading && !erro && coletas.length > 0 && (
                 <table className={styles.tabelaDevolucoes}>
                     <thead>
-                        {/* --- CABEÇALHOS NA ORDEM DA FOTO --- */}
                         <tr>
                             <th>Encomenda</th>
                             <th>NF</th>
@@ -87,7 +86,6 @@ function ListaColetas() {
                     <tbody>
                         {coletas.map((coleta) => (
                             <tr key={coleta.id}>
-                                {/* --- CÉLULAS NA ORDEM DA FOTO --- */}
                                 <td data-label="Encomenda">{coleta.numeroEncomenda}</td>
                                 <td data-label="NF">{coleta.numeroNotaFiscal}</td>
                                 <td data-label="Cliente">{coleta.nomeCliente}</td>
@@ -111,7 +109,6 @@ function ListaColetas() {
                 </table>
             )}
             
-            {/* Modal do QR Code (Lógica completa) */}
             {qrCodeVisivel && (
                 <div className={styles.modalOverlay} onClick={() => setQrCodeVisivel(null)}>
                     <div id="printable-qr-code" className={styles.modalContent} onClick={(e) => e.stopPropagation()}>

@@ -1,16 +1,16 @@
 .areaCliente {
-    width: 95%; 
+    width: 100%;
     max-width: 900px;
-    margin: 20px auto; 
-    padding: 10px; 
+    margin: 40px auto;
+    padding: 20px 40px; 
     background-color: var(--cor-fundo-site);
 }
 
 .tituloPrincipal {
     text-align: center;
     color: var(--cor-principal);
-    font-size: 2rem; 
-    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
 }
 .accordion {
     border: 1px solid var(--cor-borda);
@@ -137,51 +137,35 @@
 .formButton:hover:not(:disabled) {
   background-color: var(--cor-principal-dark);
 }
-
-/* --- TABELA RESPONSIVA (MOBILE FIRST) --- */
-.tabelaDevolucoes thead {
-    display: none; 
-}
-
-.tabelaDevolucoes,
-.tabelaDevolucoes tbody,
-.tabelaDevolucoes tr,
-.tabelaDevolucoes td {
-    display: block;
+.tabelaDevolucoes {
     width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
 }
 
+.tabelaDevolucoes th,
 .tabelaDevolucoes td {
-    border: none;
-    border-bottom: 1px solid var(--cor-borda);
-    text-align: right;
-    padding: 0.75rem 0.5rem;
-    position: relative; 
-    padding-left: 55%; 
-}
-
-.tabelaDevolucoes td::before {
-    content: attr(data-label);
-    float: left;
-    font-weight: 600;
-    color: var(--cor-texto-secundario);
-    width: 50%; 
-    text-align: left;
-}
-.tabelaDevolucoes tr {
-    margin-bottom: 1.5rem; 
     border: 1px solid var(--cor-borda);
-    border-radius: var(--raio-borda);
+    padding: 0.75rem;
+    text-align: left;
+    vertical-align: top;
 }
-/* FIM TABELA RESPONSIVA */
 
+.tabelaDevolucoes th {
+    background-color: #f4f4f4;
+    font-weight: 600;
+}
 
+.tabelaDevolucoes tbody tr:nth-child(even) {
+    background-color: var(--cor-fundo-elemento);
+}
 .statsContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem; 
+    gap: 2rem;
     justify-content: center;
-    margin-top: 1.5rem;
+    margin-top: 2.5rem;
 }
 
 .statCard {
@@ -189,9 +173,10 @@
     border: 1px solid var(--cor-borda);
     border-radius: var(--raio-borda);
     box-shadow: var(--sombra-elemento);
-    padding: 1.5rem;
+    padding: 2rem;
     text-align: center;
-    flex-basis: 100%; 
+    min-width: 220px;
+    flex-basis: 250px;
 }
 
 .statValue {
@@ -208,10 +193,8 @@
     color: var(--cor-texto-secundario);
     margin-top: 0.75rem;
 }
-
 .filtroContainer {
     display: flex;
-    flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1.5rem;
 }
@@ -225,8 +208,6 @@
     font-size: 0.9rem;
     font-weight: 600;
     transition: all 0.2s ease;
-    flex-grow: 1;
-    min-width: 100px;
 }
 
 .filtroContainer button:hover {
@@ -267,7 +248,43 @@
     color: white;
 }
 
+.statusSelect {
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: 2px solid transparent;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+   
+}
 
+
+.statusSelect.pendente {
+    background-color: #fee440;
+    color: #574802;
+    border-color: #f7d900;
+}
+.statusSelect.em_andamento {
+    background-color: #00b4d8;
+    color: white;
+    border-color: #0096b5;
+}
+.statusSelect.concluida {
+    background-color: #52b788;
+    color: white;
+    border-color: #429b72;
+}
+.statusSelect.cancelada {
+    background-color: #d90429;
+    color: white;
+    border-color: #b50322;
+}
 .rastreioResultado {
     margin-top: 2rem;
     border-top: 1px solid var(--cor-borda);
@@ -352,36 +369,4 @@
 }
 .formButtonSecondary:hover {
     background-color: #5a6268;
-}
-
-/* --- MEDIA QUERY: DESKTOP/TABLET (Min-width: 768px) --- */
-@media (min-width: 768px) {
-    .areaCliente {
-        padding: 20px 40px; 
-    }
-
-    /* --- CORREÇÃO FINAL PARA O DESKTOP --- */
-    .tabelaDevolucoes thead {
-        display: table-header-group; 
-    }
-    .tabelaDevolucoes tr {
-        display: table-row;
-        border: none;
-        border-bottom: 1px solid var(--cor-borda);
-        margin-bottom: 0;
-    }
-    .tabelaDevolucoes td {
-        display: table-cell;
-        text-align: left;
-        padding-left: 0.75rem;
-        position: static;
-        border-bottom: 1px solid var(--cor-borda);
-    }
-    .tabelaDevolucoes td::before {
-        content: none;
-    }
-    
-    .statCard {
-        flex-basis: 250px; 
-    }
 }
