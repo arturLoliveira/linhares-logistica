@@ -20,7 +20,7 @@ function DriverUpdatePage() {
         setMensagem('');
 
         try {
-            const response = await fetch('${import.meta.env.VITE_API_URL}/api/driver/update', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/driver/update`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -20,7 +20,7 @@ function AdminOverview() {
             setError('');
 
             try {
-                const response = await fetch('${import.meta.env.VITE_API_URL}/api/admin/stats', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

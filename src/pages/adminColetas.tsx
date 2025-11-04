@@ -184,7 +184,7 @@ function FormAdminCadastraColeta() {
             valorFrete, pesoKg, dataVencimento
         };
         try {
-            const response = await fetch('${import.meta.env.VITE_API_URL}/api/coletas/solicitar', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/coletas/solicitar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),

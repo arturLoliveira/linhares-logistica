@@ -41,7 +41,7 @@ function FormRastreioRemetente() {
         setResultado(null);
         setErro('');
         try {
-            const res = await fetch('${import.meta.env.VITE_API_URL}/api/rastreamento/remetente', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rastreamento/remetente`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ numeroEncomenda, cpfCnpj }) 
@@ -110,7 +110,7 @@ function FormRastreioDestinatario() {
         setResultado(null);
         setErro('');
         try {
-            const res = await fetch('${import.meta.env.VITE_API_URL}/api/rastreamento/destinatario', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rastreamento/destinatario`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ numeroEncomenda, cpfCnpj, senha }) 
@@ -194,7 +194,7 @@ function FormColetaEntrega() {
             dataVencimento: null
         };
         try {
-            const response = await fetch('${import.meta.env.VITE_API_URL}/api/coletas/solicitar', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/coletas/solicitar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),
@@ -246,7 +246,7 @@ function FormColetaDevolucao() {
         setIsLoading(true);
         setMensagem('');
         try {
-            const res = await fetch('${import.meta.env.VITE_API_URL}/api/devolucoes/solicitar', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/devolucoes/solicitar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nomeCliente, emailCliente, numeroNFOriginal, motivoDevolucao })
