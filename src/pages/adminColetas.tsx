@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import styles from '../styles/area-cliente.module.css';
-import { QRCodeSVG } from 'qrcode.react'; 
+import styles from '../../styles/area-cliente.module.css';
+import { QRCodeSVG } from 'qrcode.react';
 
+// --- (COMPONENTE 1: Lista de Coletas com Filtro e QR Code) ---
 function ListaColetas() {
     type Coleta = {
         id: number;
@@ -18,22 +19,18 @@ function ListaColetas() {
     const [isLoading, setIsLoading] = useState(true);
     const [erro, setErro] = useState('');
     const [filtroStatus, setFiltroStatus] = useState('PENDENTE');
-    
     const [qrCodeVisivel, setQrCodeVisivel] = useState<string | null>(null);
 
     const fetchColetas = async () => {
         const token = localStorage.getItem('admin_token');
         setIsLoading(true);
         setErro('');
-        const url = `https://linhares-logistica-backend.onrender.com/api/admin/coletas?status=${filtroStatus}`;
+        const url = `http://localhost:3001/api/admin/coletas?status=${filtroStatus}`;
 
         try {
             const response = await fetch(url, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) throw new Error('Falha ao buscar coletas.');
             const data = await response.json();
@@ -49,44 +46,23 @@ function ListaColetas() {
         fetchColetas();
     }, [filtroStatus]);
 
-const handlePrint = () => {
-        window.print(); 
+    // Função para imprimir (usada no modal)
+    const handlePrint = () => {
+        window.print();
     };
+
+
     return (
         <div style={{width: '100%'}}>
             <h4>Visualizar Coletas</h4>
             
             <div className={styles.filtroContainer}>
-                <button 
-                    className={filtroStatus === 'PENDENTE' ? styles.filtroAtivo : ''}
-                    onClick={() => setFiltroStatus('PENDENTE')}>
-                    Pendentes
-                </button>
-                <button 
-                    className={filtroStatus === 'COLETADO' ? styles.filtroAtivo : ''}
-                    onClick={() => setFiltroStatus('COLETADO')}>
-                    Coletados
-                </button>
-                <button 
-                    className={filtroStatus === 'EM_TRANSITO' ? styles.filtroAtivo : ''}
-                    onClick={() => setFiltroStatus('EM_TRANSITO')}>
-                    Em Trânsito
-                </button>
-                <button 
-                    className={filtroStatus === 'EM_ROTA_ENTREGA' ? styles.filtroAtivo : ''}
-                    onClick={() => setFiltroStatus('EM_ROTA_ENTREGA')}>
-                    Em Rota
-                </button>
-                 <button 
-                    className={filtroStatus === 'CONCLUIDA' ? styles.filtroAtivo : ''}
-                    onClick={() => setFiltroStatus('CONCLUIDA')}>
-                    Concluídas
-                </button>
-                 <button 
-                    className={filtroStatus === '' ? styles.filtroAtivo : ''}
-                    onClick={() => setFiltroStatus('')}>
-                    Ver Todas
-                </button>
+                <button className={filtroStatus === 'PENDENTE' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('PENDENTE')}>Pendentes</button>
+                <button className={filtroStatus === 'COLETADO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('COLETADO')}>Coletados</button>
+                <button className={filtroStatus === 'EM_TRANSITO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_TRANSITO')}>Em Trânsito</button>
+                <button className={filtroStatus === 'EM_ROTA_ENTREGA' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_ROTA_ENTREGA')}>Em Rota</button>
+                <button className={filtroStatus === 'CONCLUIDA' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('CONCLUIDA')}>Concluídas</button>
+                <button className={filtroStatus === '' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('')}>Ver Todas</button>
             </div>
 
             {isLoading && <p>Carregando coletas...</p>}
@@ -111,16 +87,17 @@ const handlePrint = () => {
                     <tbody>
                         {coletas.map((coleta) => (
                             <tr key={coleta.id}>
-                                <td>{coleta.numeroEncomenda}</td>
-                                <td>{coleta.numeroNotaFiscal}</td>
-                                <td>{coleta.nomeCliente}</td>
-                                <td>{coleta.valorFrete.toFixed(2)}</td>
-                                <td>
+                                {/* --- CÉLULAS COM data-label ADICIONADO --- */}
+                                <td data-label="Encomenda">{coleta.numeroEncomenda}</td>
+                                <td data-label="NF">{coleta.numeroNotaFiscal}</td>
+                                <td data-label="Cliente">{coleta.nomeCliente}</td>
+                                <td data-label="Valor (R$)">{coleta.valorFrete.toFixed(2)}</td>
+                                <td data-label="Status">
                                     <span className={`${styles.statusBadge} ${styles[coleta.status.toLowerCase()]}`}>
                                         {coleta.status.replace(/_/g, ' ')}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Ações">
                                     <button 
                                         className={styles.botaoAcao}
                                         onClick={() => setQrCodeVisivel(coleta.numeroEncomenda)}
@@ -133,10 +110,11 @@ const handlePrint = () => {
                     </tbody>
                 </table>
             )}
-
+            
+            {/* Modal do QR Code */}
             {qrCodeVisivel && (
                 <div className={styles.modalOverlay} onClick={() => setQrCodeVisivel(null)}>
-                    <div className={styles.modalContent} id='printable-qr-code' onClick={(e) => e.stopPropagation()}>
+                    <div id="printable-qr-code" className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <h3>QR Code para Encomenda {qrCodeVisivel}</h3>
                         <p>Imprima e cole na etiqueta. O motorista deve escanear este código.</p>
                         
@@ -145,13 +123,11 @@ const handlePrint = () => {
                             size={256}
                             style={{margin: '20px auto', display: 'block'}}
                         />
+                        
                         <div className={styles.modalActions}>
-                            
-                            <button onClick={handlePrint} className={styles.formButton}>
-                                Imprimir
-                            </button>
+                            <button onClick={() => setQrCodeVisivel(null)} className={styles.formButtonSecondary}>Fechar</button>
+                            <button onClick={handlePrint} className={styles.formButton}>Imprimir</button>
                         </div>
-                        <button onClick={() => setQrCodeVisivel(null)} className={styles.formButton}>Fechar</button>
                     </div>
                 </div>
             )}
@@ -160,6 +136,7 @@ const handlePrint = () => {
 }
 
 
+// --- (COMPONENTE 2: Formulário para o Admin CADASTRAR uma coleta) ---
 function FormAdminCadastraColeta() {
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
@@ -184,7 +161,7 @@ function FormAdminCadastraColeta() {
             valorFrete, pesoKg, dataVencimento
         };
         try {
-            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/coletas/solicitar', {
+            const response = await fetch('http://localhost:3001/api/coletas/solicitar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),
@@ -194,7 +171,7 @@ function FormAdminCadastraColeta() {
                  throw new Error(data.error || 'Falha ao cadastrar a coleta.');
             }
             const novaColeta = await response.json();
-            setMensagem(`Coleta cadastrada! Nº Encomenda: ${novaColeta.numeroEncomenda}`);
+            setMensagem(`Coleta cadastrada com sucesso! Nº Encomenda: ${novaColeta.numeroEncomenda}`);
             setNomeCliente(''); setEmailCliente(''); setEnderecoColeta(''); setTipoCarga('');
             setCpfCnpjRemetente(''); setCpfCnpjDestinatario(''); setNumeroNotaFiscal('');
             setValorFrete(''); setPesoKg(''); setDataVencimento('');
@@ -229,6 +206,7 @@ function FormAdminCadastraColeta() {
     );
 }
 
+// --- (COMPONENTE 3: Formulário para Adicionar Evento de Rastreio) ---
 function FormAdminAdicionaHistorico() {
     const [notaFiscal, setNotaFiscal] = useState('');
     const [localizacao, setLocalizacao] = useState('');
@@ -243,7 +221,7 @@ function FormAdminAdicionaHistorico() {
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/admin/coletas/${notaFiscal}/historico', {
+            const response = await fetch(`http://localhost:3001/api/admin/coletas/${notaFiscal}/historico`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -317,12 +295,14 @@ function FormAdminAdicionaHistorico() {
 }
 
 
+// --- (Página Principal) ---
 function AdminColetas() {
     return (
-        <div>
+        <div style={{width: '100%'}}>
             <h2 className={styles.tituloPrincipal}>Gerenciar Coletas</h2>
-            
+
             <ListaColetas />
+            
             <FormAdminCadastraColeta />
             <FormAdminAdicionaHistorico />
         </div>

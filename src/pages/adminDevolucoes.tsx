@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import styles from '../styles/area-cliente.module.css';
-
+import styles from '../../styles/area-cliente.module.css';
 
 function ListaDevolucoes() {
-    
     type Devolucao = {
         id: number;
         nomeCliente: string;
@@ -17,24 +15,18 @@ function ListaDevolucoes() {
     const [isLoading, setIsLoading] = useState(true);
     const [erro, setErro] = useState('');
 
-    
     useEffect(() => {
         const fetchDevolucoes = async () => {
             const token = localStorage.getItem('admin_token');
             try {
-                const response = await fetch('https://linhares-logistica-backend.onrender.com/api/admin/devolucoes', {
+                const response = await fetch('http://localhost:3001/api/admin/devolucoes', {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
                 });
 
-                if (!response.ok) {
-                    throw new Error('Falha ao buscar solicitações.');
-                }
+                if (!response.ok) throw new Error('Falha ao buscar solicitações.');
                 
-                const data = await response.json();
+                const data: Devolucao[] = await response.json();
                 setDevolucoes(data);
 
             } catch (err) {
@@ -45,7 +37,7 @@ function ListaDevolucoes() {
         };
 
         fetchDevolucoes();
-    }, []); 
+    }, []);
 
     if (isLoading) {
         return <p>Carregando solicitações de devolução...</p>;
@@ -74,11 +66,11 @@ function ListaDevolucoes() {
                     <tbody>
                         {devolucoes.map((dev) => (
                             <tr key={dev.id}>
-                                <td>{new Date(dev.dataSolicitacao).toLocaleDateString()}</td>
-                                <td>{dev.nomeCliente}</td>
-                                <td>{dev.emailCliente}</td>
-                                <td>{dev.numeroNFOriginal}</td>
-                                <td>{dev.motivoDevolucao || 'N/A'}</td>
+                                <td data-label="Data">{new Date(dev.dataSolicitacao).toLocaleDateString()}</td>
+                                <td data-label="Cliente">{dev.nomeCliente}</td>
+                                <td data-label="Email">{dev.emailCliente}</td>
+                                <td data-label="NF Original">{dev.numeroNFOriginal}</td>
+                                <td data-label="Motivo">{dev.motivoDevolucao || 'N/A'}</td>
                             </tr>
                         ))}
                     </tbody>
