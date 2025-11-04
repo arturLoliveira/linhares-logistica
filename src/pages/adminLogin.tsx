@@ -11,7 +11,7 @@ function AdminLogin() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErro('');
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-api.onrender.com';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         try {
             const apiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
             const response = await fetch(`${apiUrl}/api/admin/login`, {

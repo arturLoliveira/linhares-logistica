@@ -32,7 +32,6 @@ function AdminLayout() {
 
     return (
         <div className={styles.adminLayout}>
-            {/* --- O Menu Lateral --- */}
             <nav className={styles.sidebar}>
                 <h2 className={styles.sidebarTitle}>Painel Admin</h2>
                 <div className={styles.sidebarNav}>
@@ -47,10 +46,7 @@ function AdminLayout() {
                     <span style={{marginLeft: '0.75rem'}}>Sair</span>
                 </button>
             </nav>
-
-            {/* --- A Página Atual --- */}
             <main className={styles.contentArea}>
-                {/* O React Router renderizará a página (ex: AdminColetas) aqui */}
                 <Outlet />
             </main>
         </div>
