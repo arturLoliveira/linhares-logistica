@@ -28,77 +28,8 @@ const handleDownloadPDF = async (url: string, filename: string, setLoading: (b: 
     }
 };
 
-function FormRastreioRemetente() {
-    const [cpfCnpj, setCpfCnpj] = useState('');
-    const [numeroEncomenda, setNumeroEncomenda] = useState(''); 
-    const [isLoading, setIsLoading] = useState(false);
-    const [resultado, setResultado] = useState<any | null>(null);
-    const [erro, setErro] = useState('');
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setResultado(null);
-        setErro('');
-        try {
-            const res = await fetch('https://linhares-logistica-backend.onrender.com/api/rastreamento/remetente', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ numeroEncomenda, cpfCnpj }) 
-            });
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || 'Coleta não encontrada.');
-            }
-            const data = await res.json();
-            setResultado(data);
-        } catch (err) {
-            setErro((err as Error).message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <p>Tenha em mãos o seu CPF/CNPJ (Remetente) e o Número da Encomenda.</p>
-            <div className={styles.formGroup}>
-                <label htmlFor="num_encomenda_rem">Número da Encomenda</label>
-                <input type="text" id="num_encomenda_rem" value={numeroEncomenda} onChange={e => setNumeroEncomenda(e.target.value)} placeholder="Ex: OC-1001" required />
-            </div>
-            <div className={styles.formGroup}>
-                <label htmlFor="cnpj_remetente">Seu CPF/CNPJ (Remetente)</label>
-                <input type="text" id="cnpj_remetente" value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} required />
-            </div>
-            <button type="submit" className={styles.formButton} disabled={isLoading}>{isLoading ? "Buscando..." : "Rastrear"}</button>
-            
-            {erro && <p style={{ color: 'red', marginTop: '1rem' }}>{erro}</p>}
-            
-            {resultado && (
-                <div className={styles.rastreioResultado}>
-                    <div className={styles.statusAtual}><strong>Status Atual:</strong> {resultado.status.replace('_', ' ')}</div>
-                    {resultado.historico && resultado.historico.length > 0 && (
-                         <div className={styles.localAtual}><strong>Localização:</strong> {resultado.historico[0].localizacao}</div>
-                    )}
-                    <h5 className={styles.historicoTitulo}>Histórico de Rastreio</h5>
-                    <ul className={styles.historicoLista}>
-                        {resultado.historico && resultado.historico.map((evento: any) => (
-                            <li key={evento.id} className={styles.historicoItem}>
-                                <div className={styles.historicoData}>{new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}</div>
-                                <div className={styles.historicoStatus}>{evento.status.replace('_', ' ')}</div>
-                                <div className={styles.historicoLocal}>{evento.localizacao}</div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-        </form>
-    );
-}
-
 function FormRastreioDestinatario() {
     const [cpfCnpj, setCpfCnpj] = useState('');
-    const [senha, setSenha] = useState(''); 
     const [numeroEncomenda, setNumeroEncomenda] = useState(''); 
     const [isLoading, setIsLoading] = useState(false);
     const [resultado, setResultado] = useState<any | null>(null);
@@ -113,7 +44,7 @@ function FormRastreioDestinatario() {
             const res = await fetch('https://linhares-logistica-backend.onrender.com/api/rastreamento/destinatario', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ numeroEncomenda, cpfCnpj, senha }) 
+                body: JSON.stringify({ numeroEncomenda, cpfCnpj }) 
             });
             if (!res.ok) {
                  const data = await res.json();
@@ -138,10 +69,6 @@ function FormRastreioDestinatario() {
              <div className={styles.formGroup}>
                 <label htmlFor="cnpj_dest">Seu CNPJ/CPF (Destinatário)</label>
                 <input type="text" id="cnpj_dest" value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} required />
-            </div>
-             <div className={styles.formGroup}>
-                <label htmlFor="senha_dest">Senha de Acesso</label>
-                <input type="password" id="senha_dest" value={senha} onChange={e => setSenha(e.target.value)} required />
             </div>
             <button type="submit" className={styles.formButton} disabled={isLoading}>{isLoading ? "Buscando..." : "Acessar"}</button>
             
@@ -328,12 +255,6 @@ function FormImprimirEtiqueta() {
 }
 
 const secoes = [
-    { 
-        id: 'rastreio_remetente', 
-        titulo: 'Rastreamento (Remetente/Pagador)', 
-        icon: <FaTruck />,
-        conteudo: <FormRastreioRemetente />
-    },
     { 
         id: 'rastreio_destinatario', 
         titulo: 'Rastreamento (Destinatário)', 
