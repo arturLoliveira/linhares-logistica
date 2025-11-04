@@ -54,6 +54,7 @@ function ListaColetas() {
         <div style={{width: '100%'}}>
             <h4>Visualizar Coletas</h4>
             
+            {/* Botões de Filtro */}
             <div className={styles.filtroContainer}>
                 <button className={filtroStatus === 'PENDENTE' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('PENDENTE')}>Pendentes</button>
                 <button className={filtroStatus === 'COLETADO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('COLETADO')}>Coletados</button>
@@ -73,18 +74,20 @@ function ListaColetas() {
             {!isLoading && !erro && coletas.length > 0 && (
                 <table className={styles.tabelaDevolucoes}>
                     <thead>
+                        {/* --- CABEÇALHOS NA ORDEM DA FOTO --- */}
                         <tr>
-                            <th data-label="Encomenda">Encomenda</th>
-                            <th data-label="NF">NF</th>
-                            <th data-label="Cliente">Cliente</th>
-                            <th data-label="Valor (R$)">Valor (R$)</th>
-                            <th data-label="Status">Status</th>
-                            <th data-label="Ações">Ações</th>
+                            <th>Encomenda</th>
+                            <th>NF</th>
+                            <th>Cliente</th>
+                            <th>Valor (R$)</th>
+                            <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {coletas.map((coleta) => (
                             <tr key={coleta.id}>
+                                {/* --- CÉLULAS NA ORDEM DA FOTO --- */}
                                 <td data-label="Encomenda">{coleta.numeroEncomenda}</td>
                                 <td data-label="NF">{coleta.numeroNotaFiscal}</td>
                                 <td data-label="Cliente">{coleta.nomeCliente}</td>
@@ -108,6 +111,7 @@ function ListaColetas() {
                 </table>
             )}
             
+            {/* Modal do QR Code (Lógica completa) */}
             {qrCodeVisivel && (
                 <div className={styles.modalOverlay} onClick={() => setQrCodeVisivel(null)}>
                     <div id="printable-qr-code" className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
