@@ -2,7 +2,6 @@ import { useState } from 'react';
 import styles from '../styles/area-cliente.module.css'; 
 import { FaTruck, FaFileInvoice, FaPrint, FaBoxOpen, FaUndo } from 'react-icons/fa';
 
-
 const handleDownloadPDF = async (url: string, filename: string, setLoading: (b: boolean) => void, setMensagem: (s: string) => void) => {
     setLoading(true);
     setMensagem('');
@@ -29,13 +28,9 @@ const handleDownloadPDF = async (url: string, filename: string, setLoading: (b: 
     }
 };
 
-
-
-
-function FormRastreioDestinatario() {
+function FormRastreioRemetente() {
     const [cpfCnpj, setCpfCnpj] = useState('');
-    const [senha, setSenha] = useState(''); 
-    const [notaFiscal, setNotaFiscal] = useState('');
+    const [numeroEncomenda, setNumeroEncomenda] = useState(''); 
     const [isLoading, setIsLoading] = useState(false);
     const [resultado, setResultado] = useState<any | null>(null);
     const [erro, setErro] = useState('');
@@ -46,10 +41,79 @@ function FormRastreioDestinatario() {
         setResultado(null);
         setErro('');
         try {
-            const res = await fetch('http://localhost:3001/api/rastreamento/destinatario', {
+            const res = await fetch('${import.meta.env.VITE_API_URL}/api/rastreamento/remetente', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cpfCnpj, senha, notaFiscal }) 
+                body: JSON.stringify({ numeroEncomenda, cpfCnpj }) 
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Coleta não encontrada.');
+            }
+            const data = await res.json();
+            setResultado(data);
+        } catch (err) {
+            setErro((err as Error).message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <p>Tenha em mãos o seu CPF/CNPJ (Remetente) e o Número da Encomenda.</p>
+            <div className={styles.formGroup}>
+                <label htmlFor="num_encomenda_rem">Número da Encomenda</label>
+                <input type="text" id="num_encomenda_rem" value={numeroEncomenda} onChange={e => setNumeroEncomenda(e.target.value)} placeholder="Ex: OC-1001" required />
+            </div>
+            <div className={styles.formGroup}>
+                <label htmlFor="cnpj_remetente">Seu CPF/CNPJ (Remetente)</label>
+                <input type="text" id="cnpj_remetente" value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} required />
+            </div>
+            <button type="submit" className={styles.formButton} disabled={isLoading}>{isLoading ? "Buscando..." : "Rastrear"}</button>
+            
+            {erro && <p style={{ color: 'red', marginTop: '1rem' }}>{erro}</p>}
+            
+            {resultado && (
+                <div className={styles.rastreioResultado}>
+                    <div className={styles.statusAtual}><strong>Status Atual:</strong> {resultado.status.replace('_', ' ')}</div>
+                    {resultado.historico && resultado.historico.length > 0 && (
+                         <div className={styles.localAtual}><strong>Localização:</strong> {resultado.historico[0].localizacao}</div>
+                    )}
+                    <h5 className={styles.historicoTitulo}>Histórico de Rastreio</h5>
+                    <ul className={styles.historicoLista}>
+                        {resultado.historico && resultado.historico.map((evento: any) => (
+                            <li key={evento.id} className={styles.historicoItem}>
+                                <div className={styles.historicoData}>{new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}</div>
+                                <div className={styles.historicoStatus}>{evento.status.replace('_', ' ')}</div>
+                                <div className={styles.historicoLocal}>{evento.localizacao}</div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </form>
+    );
+}
+
+function FormRastreioDestinatario() {
+    const [cpfCnpj, setCpfCnpj] = useState('');
+    const [senha, setSenha] = useState(''); 
+    const [numeroEncomenda, setNumeroEncomenda] = useState(''); 
+    const [isLoading, setIsLoading] = useState(false);
+    const [resultado, setResultado] = useState<any | null>(null);
+    const [erro, setErro] = useState('');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setResultado(null);
+        setErro('');
+        try {
+            const res = await fetch('${import.meta.env.VITE_API_URL}/api/rastreamento/destinatario', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ numeroEncomenda, cpfCnpj, senha }) 
             });
             if (!res.ok) {
                  const data = await res.json();
@@ -66,42 +130,36 @@ function FormRastreioDestinatario() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <p>Acesse com seu CNPJ/CPF, Senha de Acesso e Nota Fiscal.</p>
+            <p>Acesse com seu CNPJ/CPF, Senha de Acesso e Número da Encomenda.</p>
+             <div className={styles.formGroup}>
+                <label htmlFor="num_encomenda_dest">Número da Encomenda</label>
+                <input type="text" id="num_encomenda_dest" value={numeroEncomenda} onChange={e => setNumeroEncomenda(e.target.value)} placeholder="Ex: OC-1001" required />
+            </div>
              <div className={styles.formGroup}>
                 <label htmlFor="cnpj_dest">Seu CNPJ/CPF (Destinatário)</label>
                 <input type="text" id="cnpj_dest" value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} required />
             </div>
-            <div className={styles.formGroup}>
-                <label htmlFor="nf_dest">Nota Fiscal ou Ordem de Coleta</label>
-                <input type="text" id="nf_dest" value={notaFiscal} onChange={e => setNotaFiscal(e.target.value)} required />
+             <div className={styles.formGroup}>
+                <label htmlFor="senha_dest">Senha de Acesso</label>
+                <input type="password" id="senha_dest" value={senha} onChange={e => setSenha(e.target.value)} required />
             </div>
             <button type="submit" className={styles.formButton} disabled={isLoading}>{isLoading ? "Buscando..." : "Acessar"}</button>
             
             {erro && <p style={{ color: 'red', marginTop: '1rem' }}>{erro}</p>}
-
+            
             {resultado && (
                 <div className={styles.rastreioResultado}>
-                    <div className={styles.statusAtual}>
-                        <strong>Status Atual:</strong> {resultado.status.replace('_', ' ')}
-                    </div>
+                    <div className={styles.statusAtual}><strong>Status Atual:</strong> {resultado.status.replace('_', ' ')}</div>
                     {resultado.historico && resultado.historico.length > 0 && (
-                         <div className={styles.localAtual}>
-                            <strong>Localização:</strong> {resultado.historico[0].localizacao}
-                        </div>
+                         <div className={styles.localAtual}><strong>Localização:</strong> {resultado.historico[0].localizacao}</div>
                     )}
                     <h5 className={styles.historicoTitulo}>Histórico de Rastreio</h5>
                     <ul className={styles.historicoLista}>
                         {resultado.historico && resultado.historico.map((evento: any) => (
                              <li key={evento.id} className={styles.historicoItem}>
-                                <div className={styles.historicoData}>
-                                    {new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}
-                                </div>
-                                <div className={styles.historicoStatus}>
-                                    {evento.status.replace('_', ' ')}
-                                </div>
-                                <div className={styles.historicoLocal}>
-                                    {evento.localizacao}
-                                </div>
+                                <div className={styles.historicoData}>{new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}</div>
+                                <div className={styles.historicoStatus}>{evento.status.replace('_', ' ')}</div>
+                                <div className={styles.historicoLocal}>{evento.localizacao}</div>
                             </li>
                         ))}
                     </ul>
@@ -111,7 +169,6 @@ function FormRastreioDestinatario() {
     );
 }
 
-
 function FormColetaEntrega() {
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
@@ -120,10 +177,8 @@ function FormColetaEntrega() {
     const [cpfCnpjRemetente, setCpfCnpjRemetente] = useState('');
     const [cpfCnpjDestinatario, setCpfCnpjDestinatario] = useState('');
     const [numeroNotaFiscal, setNumeroNotaFiscal] = useState('');
-    const [valorFrete, setValorFrete] = useState(''); 
-    const [pesoKg, setPesoKg] = useState(''); 
-    const [dataVencimento, setDataVencimento] = useState(''); 
-
+    const [valorFrete, setValorFrete] = useState('');
+    const [pesoKg, setPesoKg] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [mensagem, setMensagem] = useState('');
 
@@ -131,19 +186,15 @@ function FormColetaEntrega() {
         e.preventDefault();
         setIsLoading(true);
         setMensagem('');
-
-        
-        
         const dadosColeta = {
             nomeCliente, emailCliente, enderecoColeta, tipoCarga,
             cpfCnpjRemetente, cpfCnpjDestinatario, numeroNotaFiscal,
-            valorFrete: 0.01, 
-            pesoKg: null,
+            valorFrete: valorFrete,
+            pesoKg: pesoKg,
             dataVencimento: null
         };
-
         try {
-            const response = await fetch('http://localhost:3001/api/coletas/solicitar', {
+            const response = await fetch('${import.meta.env.VITE_API_URL}/api/coletas/solicitar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),
@@ -152,14 +203,11 @@ function FormColetaEntrega() {
                  const data = await response.json();
                  throw new Error(data.error || 'Falha ao solicitar a coleta.');
             }
-
             const novaColeta = await response.json();
-            setMensagem(`Coleta solicitada com sucesso! ID da Coleta: ${novaColeta.id}`);
-            
-            
+            setMensagem(`Coleta solicitada com sucesso! Seu N° de Encomenda é: ${novaColeta.numeroEncomenda}`);
             setNomeCliente(''); setEmailCliente(''); setEnderecoColeta(''); setTipoCarga('');
             setCpfCnpjRemetente(''); setCpfCnpjDestinatario(''); setNumeroNotaFiscal('');
-
+            setValorFrete(''); setPesoKg('');
         } catch (error) {
             setMensagem((error as Error).message);
         } finally {
@@ -170,6 +218,8 @@ function FormColetaEntrega() {
     return (
         <form onSubmit={handleSubmitColeta}>
             <p>Após o preenchimento do formulário será gerado o número da coleta.</p>
+            <div className={styles.formGroup}><label htmlFor="carga_valor">Valor do Frete (R$) (Conforme cotação)</label><input type="number" step="0.01" id="carga_valor" value={valorFrete} onChange={(e) => setValorFrete(e.target.value)} placeholder="Ex: 150.00" required /></div>
+            <div className={styles.formGroup}><label htmlFor="carga_peso">Peso (Kg) (Opcional)</label><input type="number" step="0.1" id="carga_peso" value={pesoKg} onChange={(e) => setPesoKg(e.target.value)} placeholder="Ex: 25.5"/></div>
             <div className={styles.formGroup}><label htmlFor="nome_coleta">Seu Nome</label><input type="text" id="nome_coleta" value={nomeCliente} onChange={(e) => setNomeCliente(e.target.value)} required/></div>
             <div className={styles.formGroup}><label htmlFor="email_coleta">Seu E-mail</label><input type="email" id="email_coleta" value={emailCliente} onChange={(e) => setEmailCliente(e.target.value)} required/></div>
             <div className={styles.formGroup}><label htmlFor="end_coleta">Endereço de Coleta</label><input type="text" id="end_coleta" value={enderecoColeta} onChange={(e) => setEnderecoColeta(e.target.value)} required/></div>
@@ -182,7 +232,6 @@ function FormColetaEntrega() {
         </form>
     );
 }
-
 
 function FormColetaDevolucao() {
     const [nomeCliente, setNomeCliente] = useState('');
@@ -197,7 +246,7 @@ function FormColetaDevolucao() {
         setIsLoading(true);
         setMensagem('');
         try {
-            const res = await fetch('http://localhost:3001/api/devolucoes/solicitar', {
+            const res = await fetch('${import.meta.env.VITE_API_URL}/api/devolucoes/solicitar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nomeCliente, emailCliente, numeroNFOriginal, motivoDevolucao })
@@ -207,7 +256,6 @@ function FormColetaDevolucao() {
                 throw new Error(data.error || 'Falha ao enviar solicitação.');
             }
             setMensagem('Solicitação de devolução enviada! Você receberá um e-mail de confirmação.');
-            
             setNomeCliente(''); setEmailCliente(''); setNumeroNFOriginal(''); setMotivoDevolucao('');
         } catch (err) {
             setMensagem((err as Error).message);
@@ -229,15 +277,15 @@ function FormColetaDevolucao() {
     );
 }
 
-
 function FormEmissaoFatura() {
     const [notaFiscal, setNotaFiscal] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [mensagem, setMensagem] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        const url = `http://localhost:3001/api/fatura/${notaFiscal}`;
-        window.open(url, '_blank');
+        const url = `${import.meta.env.VITE_API_URL}/api/fatura/${notaFiscal}`;
+        handleDownloadPDF(url, `fatura_${notaFiscal}.pdf`, setIsLoading, setMensagem);
     };
 
     return (
@@ -247,11 +295,13 @@ function FormEmissaoFatura() {
                 <label htmlFor="nf_fatura">Número da Nota Fiscal</label>
                 <input type="text" id="nf_fatura" value={notaFiscal} onChange={e => setNotaFiscal(e.target.value)} required />
             </div>
-            <button type="submit" className={styles.formButton}>Gerar Fatura</button>
+            <button type="submit" className={styles.formButton} disabled={isLoading}>
+                {isLoading ? 'Gerando...' : 'Gerar Fatura'}
+            </button>
+            {mensagem && <p style={{ marginTop: '1rem', textAlign: 'center' }}>{mensagem}</p>}
         </form>
     );
 }
-
 
 function FormImprimirEtiqueta() {
     const [notaFiscal, setNotaFiscal] = useState('');
@@ -260,8 +310,7 @@ function FormImprimirEtiqueta() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const url = `http:/localhost:3001/api/etiqueta/${notaFiscal}`;
-        
+        const url = `${import.meta.env.VITE_API_URL}/api/etiqueta/${notaFiscal}`;
         handleDownloadPDF(url, `etiqueta_${notaFiscal}.pdf`, setIsLoading, setMensagem);
     };
 
@@ -278,10 +327,13 @@ function FormImprimirEtiqueta() {
     );
 }
 
-
-
 const secoes = [
-
+    { 
+        id: 'rastreio_remetente', 
+        titulo: 'Rastreamento (Remetente/Pagador)', 
+        icon: <FaTruck />,
+        conteudo: <FormRastreioRemetente />
+    },
     { 
         id: 'rastreio_destinatario', 
         titulo: 'Rastreamento (Destinatário)', 
@@ -313,7 +365,6 @@ const secoes = [
         conteudo: <FormImprimirEtiqueta />
     }
 ];
-
 
 function AreaCliente() {
     const [secaoAberta, setSecaoAberta] = useState<string | null>(null);

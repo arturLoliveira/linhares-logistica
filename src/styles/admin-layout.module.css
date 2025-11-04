@@ -75,3 +75,33 @@
   padding: 2rem 3rem;
   overflow-y: auto;
 }
+
+.botaoAcao {
+    background-color: #4a5568;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+.botaoAcao:hover {
+    background-color: #2d3748;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modalContent {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+}

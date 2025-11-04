@@ -1,30 +1,31 @@
 import { useState, useEffect } from 'react';
 import styles from '../styles/area-cliente.module.css';
-
+import { QRCodeSVG } from 'qrcode.react'; 
 
 function ListaColetas() {
     type Coleta = {
         id: number;
+        numeroEncomenda: string;
         numeroNotaFiscal: string;
         nomeCliente: string;
-        cpfCnpjRemetente: string;
         cpfCnpjDestinatario: string;
-        dataSolicitacao: string;
         status: string;
         valorFrete: number;
+        driverToken: string; 
     };
 
     const [coletas, setColetas] = useState<Coleta[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [erro, setErro] = useState('');
     const [filtroStatus, setFiltroStatus] = useState('PENDENTE');
-
     
+    const [qrCodeVisivel, setQrCodeVisivel] = useState<string | null>(null);
+
     const fetchColetas = async () => {
         const token = localStorage.getItem('admin_token');
         setIsLoading(true);
         setErro('');
-        const url = `http://localhost:3001/api/admin/coletas?status=${filtroStatus}`;
+        const url = `${import.meta.env.VITE_API_URL}/api/admin/coletas?status=${filtroStatus}`;
 
         try {
             const response = await fetch(url, {
@@ -44,15 +45,17 @@ function ListaColetas() {
         }
     };
 
-    
     useEffect(() => {
         fetchColetas();
     }, [filtroStatus]);
 
-
+const handlePrint = () => {
+        window.print(); 
+    };
     return (
         <div style={{width: '100%'}}>
             <h4>Visualizar Coletas</h4>
+            
             <div className={styles.filtroContainer}>
                 <button 
                     className={filtroStatus === 'PENDENTE' ? styles.filtroAtivo : ''}
@@ -97,38 +100,67 @@ function ListaColetas() {
                 <table className={styles.tabelaDevolucoes}>
                     <thead>
                         <tr>
+                            <th>Encomenda</th>
                             <th>NF</th>
                             <th>Cliente</th>
-                            <th>Destinatário (CPF/CNPJ)</th>
                             <th>Valor (R$)</th>
                             <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {coletas.map((coleta) => (
                             <tr key={coleta.id}>
+                                <td>{coleta.numeroEncomenda}</td>
                                 <td>{coleta.numeroNotaFiscal}</td>
                                 <td>{coleta.nomeCliente}</td>
-                                <td>{coleta.cpfCnpjDestinatario}</td>
                                 <td>{coleta.valorFrete.toFixed(2)}</td>
                                 <td>
                                     <span className={`${styles.statusBadge} ${styles[coleta.status.toLowerCase()]}`}>
                                         {coleta.status.replace(/_/g, ' ')}
                                     </span>
                                 </td>
+                                <td>
+                                    <button 
+                                        className={styles.botaoAcao}
+                                        onClick={() => setQrCodeVisivel(coleta.numeroEncomenda)}
+                                    >
+                                        Ver QR Code
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+            )}
+
+            {qrCodeVisivel && (
+                <div className={styles.modalOverlay} onClick={() => setQrCodeVisivel(null)}>
+                    <div className={styles.modalContent} id='printable-qr-code' onClick={(e) => e.stopPropagation()}>
+                        <h3>QR Code para Encomenda {qrCodeVisivel}</h3>
+                        <p>Imprima e cole na etiqueta. O motorista deve escanear este código.</p>
+                        
+                        <QRCodeSVG 
+                            value={`http://localhost:5173/driver/update?id=${qrCodeVisivel}&token=${coletas.find(c => c.numeroEncomenda === qrCodeVisivel)?.driverToken}`}
+                            size={256}
+                            style={{margin: '20px auto', display: 'block'}}
+                        />
+                        <div className={styles.modalActions}>
+                            
+                            <button onClick={handlePrint} className={styles.formButton}>
+                                Imprimir
+                            </button>
+                        </div>
+                        <button onClick={() => setQrCodeVisivel(null)} className={styles.formButton}>Fechar</button>
+                    </div>
+                </div>
             )}
         </div>
     );
 }
 
 
-
 function FormAdminCadastraColeta() {
-    
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
     const [enderecoColeta, setEnderecoColeta] = useState('');
@@ -152,7 +184,7 @@ function FormAdminCadastraColeta() {
             valorFrete, pesoKg, dataVencimento
         };
         try {
-            const response = await fetch('http://localhost:3001/api/coletas/solicitar', {
+            const response = await fetch('${import.meta.env.VITE_API_URL}/api/coletas/solicitar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),
@@ -162,7 +194,7 @@ function FormAdminCadastraColeta() {
                  throw new Error(data.error || 'Falha ao cadastrar a coleta.');
             }
             const novaColeta = await response.json();
-            setMensagem(`Coleta cadastrada com sucesso! ID: ${novaColeta.id}`);
+            setMensagem(`Coleta cadastrada! Nº Encomenda: ${novaColeta.numeroEncomenda}`);
             setNomeCliente(''); setEmailCliente(''); setEnderecoColeta(''); setTipoCarga('');
             setCpfCnpjRemetente(''); setCpfCnpjDestinatario(''); setNumeroNotaFiscal('');
             setValorFrete(''); setPesoKg(''); setDataVencimento('');
@@ -197,12 +229,10 @@ function FormAdminCadastraColeta() {
     );
 }
 
-
 function FormAdminAdicionaHistorico() {
     const [notaFiscal, setNotaFiscal] = useState('');
     const [localizacao, setLocalizacao] = useState('');
-    
-    const [novoStatus, setNovoStatus] = useState('EM_TRANSITO'); 
+    const [novoStatus, setNovoStatus] = useState('EM_TRANSITO');
     const [mensagem, setMensagem] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -213,7 +243,7 @@ function FormAdminAdicionaHistorico() {
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch(`http://localhost:3001/api/admin/coletas/${notaFiscal}/historico`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/coletas/${notaFiscal}/historico`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -227,7 +257,7 @@ function FormAdminAdicionaHistorico() {
                 throw new Error(data.error || 'Falha ao adicionar histórico.');
             }
 
-            setMensagem('Histórico adicionado com sucesso! (A lista acima será atualizada no próximo recarregamento)');
+            setMensagem('Histórico adicionado com sucesso! (A lista será atualizada no próximo recarregamento)');
             setNotaFiscal('');
             setLocalizacao('');
 
@@ -271,7 +301,6 @@ function FormAdminAdicionaHistorico() {
                     onChange={(e) => setNovoStatus(e.target.value)}
                     className={styles.formInput}
                 >
-                    {/* --- CORREÇÃO AQUI --- */}
                     <option value="COLETADO">Coletado</option>
                     <option value="EM_TRANSITO">Em Trânsito</option>
                     <option value="EM_ROTA_ENTREGA">Em Rota de Entrega</option>
@@ -288,12 +317,11 @@ function FormAdminAdicionaHistorico() {
 }
 
 
-
 function AdminColetas() {
     return (
         <div>
             <h2 className={styles.tituloPrincipal}>Gerenciar Coletas</h2>
-
+            
             <ListaColetas />
             <FormAdminCadastraColeta />
             <FormAdminAdicionaHistorico />

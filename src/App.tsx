@@ -17,7 +17,7 @@ import AdminOverview from './pages/adminOverview';
 import AdminColetas from './pages/adminColetas';
 import AdminDevolucoes from './pages/adminDevolucoes';
 import AdminClientes from './pages/adminClientes';
-
+import DriverUpdatePage from './pages/driverUpdatePage';
 
 function App() {
   return (
@@ -28,6 +28,7 @@ function App() {
         </Route>
 
         <Route path="/area-cliente" element={<AreaCliente />} />
+        <Route path="/driver/update" element={<DriverUpdatePage />} />
 
         <Route path="/admin/login" element={<AdminLogin />} />
 

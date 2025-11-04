@@ -1,4 +1,4 @@
-areaCliente {
+.areaCliente {
     width: 100%;
     max-width: 900px;
     margin: 40px auto;
@@ -343,4 +343,30 @@ areaCliente {
 .historicoLocal {
     color: var(--cor-texto-secundario);
     flex-basis: 100%;
+}
+.modalActions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.modalActions .formButton {
+    width: auto;
+    padding: 0.8rem 1.5rem;
+}
+
+.formButtonSecondary {
+    background-color: #6c757d; 
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--raio-borda);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.formButtonSecondary:hover {
+    background-color: #5a6268;
 }

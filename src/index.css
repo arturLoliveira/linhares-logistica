@@ -35,3 +35,31 @@ body {
 }
 
 
+
+@media print {
+    body * {
+      visibility: hidden;
+    }
+
+    #printable-qr-code,
+    #printable-qr-code * {
+      visibility: visible;
+    }
+
+    #printable-qr-code {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      padding: 40px;
+      margin: 0;
+      border: none !important;
+      box-shadow: none !important;
+      text-align: center;
+    }
+    
+    #printable-qr-code .modalActions {
+      display: none !important;
+    }
+}
