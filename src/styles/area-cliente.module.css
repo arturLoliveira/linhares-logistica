@@ -339,4 +339,7 @@
     .modalActions .formButton {
         width: auto;
     }
+    .rastreioResultado {
+        margin-top: 2rem;
+    }
 }

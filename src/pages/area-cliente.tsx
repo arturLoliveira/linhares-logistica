@@ -82,6 +82,7 @@ function FormRastreioDestinatario() {
                     )}
                     <h5 className={styles.historicoTitulo}>Histórico de Rastreio</h5>
                     <ul className={styles.historicoLista}>
+                        <hr />
                         {resultado.historico && resultado.historico.map((evento: any) => (
                              <li key={evento.id} className={styles.historicoItem}>
                                 <div className={styles.historicoData}>{new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}</div>
