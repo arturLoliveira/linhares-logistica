@@ -141,7 +141,7 @@ const handlePrint = () => {
                         <p>Imprima e cole na etiqueta. O motorista deve escanear este código.</p>
                         
                         <QRCodeSVG 
-                            value={`https://linhares-logistica-backend.onrender.com/driver/update?id=${qrCodeVisivel}&token=${coletas.find(c => c.numeroEncomenda === qrCodeVisivel)?.driverToken}`}
+                            value={`https://transportelinhares.vercel.app/driver/update?id=${qrCodeVisivel}&token=${coletas.find(c => c.numeroEncomenda === qrCodeVisivel)?.driverToken}`}
                             size={256}
                             style={{margin: '20px auto', display: 'block'}}
                         />
