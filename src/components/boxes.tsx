@@ -20,12 +20,12 @@ function Boxes({ icon, title, description }: BoxItemProps) {
             borderRadius="lg"
             p={{ base: 6, md: 8 }}
             textAlign="center"
-            minH="300px" 
-            minW="400px" 
+            minH={{ base: 'auto', md: '240px' }} 
+            minW="300px"
             w="100%"
             display="flex"
             alignItems="center"
-            mt={{base:0, md: -140}}
+            py={{ base: 8, md: 8 }}
         >
             <VStack 
                 spacing={3} 
@@ -37,12 +37,13 @@ function Boxes({ icon, title, description }: BoxItemProps) {
                 <Heading 
                     as="h3" 
                     size="md" 
-                    fontWeight="bold" 
+                    fontWeight="bold"
                 >
                     {title}
                 </Heading>
                 <Text 
-                    color="gray.500" 
+                    color="gray.600" 
+                    fontSize="md"
                 >
                     {description}
                 </Text>
