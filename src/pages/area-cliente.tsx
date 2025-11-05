@@ -27,21 +27,16 @@ import {
     NumberInputField,
     InputGroup,
     InputLeftAddon,
-    Flex // <-- ADICIONADO PARA CORRIGIR O ALINHAMENTO
+    Flex 
 } from '@chakra-ui/react';
 import { MdCheckCircle } from 'react-icons/md';
 
-// --- (Todos os formulários internos: FormRastreioDestinatario, FormColetaEntrega, etc...
-// --- ...permanecem os mesmos de antes) ---
-
 function FormRastreioDestinatario() {
-    // ... (código do formulário)
     const [cpfCnpj, setCpfCnpj] = useState('');
     const [numeroEncomenda, setNumeroEncomenda] = useState(''); 
     const [isLoading, setIsLoading] = useState(false);
     const [resultado, setResultado] = useState<any | null>(null);
     const [erro, setErro] = useState('');
-    const toast = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,7 +44,7 @@ function FormRastreioDestinatario() {
         setResultado(null);
         setErro('');
         
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
         try {
             const res = await fetch(`${API_URL}/api/rastreamento/destinatario`, {
@@ -124,7 +119,6 @@ function FormRastreioDestinatario() {
 }
 
 function FormColetaEntrega() {
-    // ... (código do formulário)
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
     const [enderecoColeta, setEnderecoColeta] = useState('');
@@ -149,7 +143,7 @@ function FormColetaEntrega() {
             dataVencimento: null
         };
         
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
         try {
             const response = await fetch(`${API_URL}/api/coletas/solicitar`, {
@@ -171,7 +165,6 @@ function FormColetaEntrega() {
                 isClosable: true,
             });
 
-            // Limpa o formulário
             setNomeCliente(''); setEmailCliente(''); setEnderecoColeta(''); setTipoCarga('');
             setCpfCnpjRemetente(''); setCpfCnpjDestinatario(''); setNumeroNotaFiscal('');
             setValorFrete(''); setPesoKg('');
@@ -193,7 +186,6 @@ function FormColetaEntrega() {
             <Text mb={4}>Após o preenchimento do formulário será gerado o número da coleta.</Text>
             
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                {/* Coluna 1 */}
                 <VStack spacing={4}>
                     <FormControl isRequired>
                         <FormLabel>Valor do Frete (R$) (Conforme cotação)</FormLabel>
@@ -227,7 +219,6 @@ function FormColetaEntrega() {
                     </FormControl>
                 </VStack>
                 
-                {/* Coluna 2 */}
                 <VStack spacing={4}>
                     <FormControl>
                         <FormLabel>Peso (Kg) (Opcional)</FormLabel>
@@ -272,7 +263,6 @@ function FormColetaEntrega() {
 }
 
 function FormColetaDevolucao() {
-    // ... (código do formulário)
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
     const [numeroNFOriginal, setNumeroNFOriginal] = useState('');
@@ -284,7 +274,7 @@ function FormColetaDevolucao() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
         try {
             const res = await fetch(`${API_URL}/api/devolucoes/solicitar`, {
@@ -348,7 +338,6 @@ function FormColetaDevolucao() {
 }
 
 function FormEmissaoFatura() {
-    // ... (código do formulário)
     const [notaFiscal, setNotaFiscal] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
@@ -356,7 +345,7 @@ function FormEmissaoFatura() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         
         const url = `${API_URL}/api/fatura/${notaFiscal}`; 
         const filename = `fatura_${notaFiscal}.pdf`;
@@ -414,7 +403,6 @@ function FormEmissaoFatura() {
 }
 
 function FormImprimirEtiqueta() {
-    // ... (código do formulário)
     const [notaFiscal, setNotaFiscal] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
@@ -422,7 +410,7 @@ function FormImprimirEtiqueta() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         
         const url = `${API_URL}/api/etiqueta/${notaFiscal}`; 
         const filename = `etiqueta_${notaFiscal}.pdf`;
@@ -512,7 +500,6 @@ const secoes = [
     }
 ];
 
-// --- (Componente Principal - ATUALIZADO) ---
 function AreaCliente() {
 
     return (
@@ -526,34 +513,30 @@ function AreaCliente() {
                     <AccordionItem 
                         key={secao.id} 
                         bg="white" 
-                        shadow="md" // Sombra mais forte
+                        shadow="md" 
                         mb={4} 
                         borderRadius="md"
-                        // Estilo da borda azul (como em)
                         borderLeftWidth="5px" 
                         borderLeftColor="blue.500"
-                        overflow="hidden" // Para o borderRadius funcionar com a borda
+                        overflow="hidden" 
                     >
                         <h2>
                             <AccordionButton 
                                 _expanded={{ bg: 'blue.500', color: 'white' }} 
                                 borderRadius="md"
-                                py={4} // Aumenta o padding vertical
+                                py={4} 
                             >
-                                {/* --- Alinhamento Corrigido --- */}
                                 <Flex 
                                     align="center" 
                                     flex="1" 
                                     textAlign="left"
-                                    // A cor do ícone muda quando expandido
-                                    color={undefined} // Permite que _expanded defina a cor
+                                    color={undefined} 
                                 >
                                     <Box as="span" mr={3} color="blue.500" _expanded={{ color: 'white' }}>
                                         {secao.icon}
                                     </Box>
                                     <Text fontWeight="medium">{secao.titulo}</Text>
                                 </Flex>
-                                {/* --- Fim da Correção --- */}
                                 <AccordionIcon />
                             </AccordionButton>
                         </h2>

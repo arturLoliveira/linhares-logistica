@@ -1,4 +1,3 @@
-// import styles from '../styles/landing.module.css'; // <-- Removido
 import { 
     Box, 
     Container, 
@@ -25,10 +24,9 @@ function Landing() {
             bgRepeat="no-repeat"
             display="flex"
             alignItems="center"
-            justifyContent="center" // Garante a centralização geral
+            justifyContent="center" 
             bgAttachment="fixed" 
          >
-            {/* Overlay escuro para legibilidade do texto */}
             <Box
                 position="absolute"
                 top="0"
@@ -39,19 +37,17 @@ function Landing() {
                 zIndex={1}
             />
             
-            {/* Conteúdo de Texto */}
             <Container 
                 maxW="container.lg" 
                 position="relative" 
-                zIndex={2} // Coloca o texto acima do overlay
+                zIndex={2} 
             >
-                {/* --- ATUALIZADO AQUI --- */}
                 <VStack 
                     spacing={6} 
-                    align="center" // Centraliza o conteúdo horizontalmente
-                    textAlign="center" // Centraliza o texto
+                    align="center" 
+                    textAlign="center" 
                     maxW="650px"
-                    mx="auto" // Garante que o VStack em si esteja no meio
+                    mx="auto"
                 >
                     <Heading 
                         as="h1" 

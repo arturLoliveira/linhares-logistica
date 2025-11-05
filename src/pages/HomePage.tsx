@@ -3,7 +3,6 @@ import {
     SimpleGrid, 
     VStack 
 } from '@chakra-ui/react';
-// import styles from '../styles/app.module.css'; // Removido
 
 import Boxes from '../components/boxes';
 import { MdOutlineInventory } from 'react-icons/md';

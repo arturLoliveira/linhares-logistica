@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-// import styles from '../styles/area-cliente.module.css'; // <-- Removido
 import {
     Box,
     Heading,
@@ -33,7 +32,7 @@ function ListaDevolucoes() {
     useEffect(() => {
         const fetchDevolucoes = async () => {
             const token = localStorage.getItem('admin_token');
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
             
             try {
                 const response = await fetch(`${API_URL}/api/admin/devolucoes`, { //
@@ -44,12 +43,12 @@ function ListaDevolucoes() {
                 if (!response.ok) throw new Error('Falha ao buscar solicitações.');
                 
                 const data: Devolucao[] = await response.json();
-                setDevolucoes(data); //
+                setDevolucoes(data); 
 
             } catch (err) {
                 setErro((err as Error).message); //
             } finally {
-                setIsLoading(false); //
+                setIsLoading(false); 
             }
         };
 

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-// Importe os ícones E o tipo IconType
 import { FaTruck, FaUndo, FaCheckDouble } from 'react-icons/fa';
 import type { IconType } from 'react-icons'; 
 import {
@@ -14,7 +13,6 @@ import {
     HStack,
     VStack,
     Icon,
-    // O 'As' foi removido desta importação
 } from '@chakra-ui/react';
 
 type StatsData = {
@@ -33,7 +31,7 @@ function AdminOverview() {
             const token = localStorage.getItem('admin_token');
             setIsLoading(true);
             setError('');
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
             try {
                 const response = await fetch(`${API_URL}/api/admin/stats`, {
@@ -108,8 +106,6 @@ function AdminOverview() {
     );
 }
 
-// --- Componente auxiliar ATUALIZADO ---
-// O tipo do ícone foi corrigido de 'As' para 'IconType'
 function StatBox({ label, value, icon }: { label: string, value: number | string, icon: IconType }) {
     return (
         <Box p={5} shadow="md" borderWidth="1px" borderRadius="md" bg="white">

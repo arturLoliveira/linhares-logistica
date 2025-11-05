@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import styles from '../styles/area-cliente.module.css'; // <-- Removido
 import {
     Box,
     Heading,
@@ -15,18 +14,18 @@ import {
 } from '@chakra-ui/react';
 
 function AdminLogin() {
-    const [email, setEmail] = useState(''); //
-    const [senha, setSenha] = useState(''); //
-    const [erro, setErro] = useState(''); //
-    const navigate = useNavigate(); //
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState(''); 
+    const [erro, setErro] = useState(''); 
+    const navigate = useNavigate(); 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErro('');
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         try {
             const apiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-            const response = await fetch(`${apiUrl}/api/admin/login`, { //
+            const response = await fetch(`${apiUrl}/api/admin/login`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, senha }) //
@@ -35,14 +34,14 @@ function AdminLogin() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Falha no login'); //
+                throw new Error(data.error || 'Falha no login');
             }
 
-            localStorage.setItem('admin_token', data.token); //
-            navigate('/admin/dashboard'); //
+            localStorage.setItem('admin_token', data.token); 
+            navigate('/admin/dashboard'); 
 
         } catch (err) {
-            setErro((err as Error).message); //
+            setErro((err as Error).message); 
         }
     };
 

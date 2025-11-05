@@ -3,7 +3,6 @@ import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// ... (configuração do Leaflet)
 let DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow, 
@@ -37,7 +36,7 @@ import {
     AlertIcon,
     AlertTitle,
     AlertDescription,
-    Spacer // <-- 1. IMPORTAR O SPACER
+    Spacer 
 } from '@chakra-ui/react';
 
 const posicaoGalpao = [-20.525125, -43.701911] as [number, number];
@@ -48,7 +47,6 @@ function ContactUs() {
     const [state, handleSubmit] = useForm("xldoynye");
 
     if (state.succeeded) {
-        // ... (bloco de sucesso)
         return (
             <Box as="section" w="100%" py={16} bg="#F0F4FA">
                 <Alert
@@ -80,7 +78,6 @@ function ContactUs() {
                 Contatos
             </Heading>
 
-            {/* 2. FORÇAR A MESMA ALTURA NOS CARDS */}
             <SimpleGrid 
                 columns={{ base: 1, lg: 3 }} 
                 spacing={8} 
@@ -89,13 +86,11 @@ function ContactUs() {
                 px={4}
                 alignItems="stretch" 
             >
-                {/* --- Coluna 1: Mapa --- */}
                 <Box bg="white" borderRadius="md" overflow="hidden" shadow="lg">
                     <MapContainer 
                         center={posicaoGalpao} 
                         zoom={16} 
                         scrollWheelZoom={true} 
-                        // Altura 100% para preencher o card
                         style={{ height: '100%', minHeight: '500px', width: '100%' }}
                     >
                         <TileLayer
@@ -115,7 +110,6 @@ function ContactUs() {
                     </MapContainer>
                 </Box>
 
-                {/* --- Coluna 2: Informações --- */}
                 <VStack 
                     spacing={5} 
                     align="flex-start" 
@@ -123,7 +117,7 @@ function ContactUs() {
                     bg="white" 
                     borderRadius="md" 
                     shadow="lg"
-                    flex="1" // 3. FAZER O VSTACK CRESCER
+                    flex="1" 
                 >
                     <Heading as="h3" size="lg">
                         Estamos aqui para lhe atender!
@@ -141,7 +135,7 @@ function ContactUs() {
                         <ContactInfo icon={<AiFillInstagram />} info="@transportes.linhares" />
                     </Link>
                     
-                    <Spacer /> {/* 4. ADICIONAR O SPACER */}
+                    <Spacer /> 
                     
                     <Button 
                         as={Link}
@@ -157,7 +151,6 @@ function ContactUs() {
                     </Button>
                 </VStack>
 
-                {/* --- Coluna 3: Formulário --- */}
                 <Box 
                     as="form" 
                     onSubmit={handleSubmit}
@@ -165,10 +158,10 @@ function ContactUs() {
                     bg="white" 
                     borderRadius="md" 
                     shadow="lg"
-                    display="flex" // 3. FAZER O FORM CRESCER
+                    display="flex" 
                     flexDirection="column"
                 >
-                    <VStack spacing={4} flex="1"> {/* 3. FAZER O VSTACK CRESCER */}
+                    <VStack spacing={4} flex="1">
                         <Heading as="h3" size="lg" w="100%">
                             Ou envie uma mensagem
                         </Heading>
@@ -199,7 +192,7 @@ function ContactUs() {
                             <ValidationError prefix="Mensagem" field="mensagem" errors={state.errors} />
                         </FormControl>
                         
-                        <Spacer /> {/* 4. ADICIONAR O SPACER */}
+                        <Spacer />
 
                         <Button 
                           type="submit" 

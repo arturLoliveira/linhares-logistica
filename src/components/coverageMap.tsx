@@ -4,7 +4,6 @@ import {
     Box,
     Heading,
     Icon,
-    Text,
     Tooltip,
     Grid, 
     GridItem, 

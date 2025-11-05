@@ -1,4 +1,3 @@
-// import styles from '../styles/footer.module.css'; // <-- Removido
 import { Box, Text } from '@chakra-ui/react';
 
 function Footer() {

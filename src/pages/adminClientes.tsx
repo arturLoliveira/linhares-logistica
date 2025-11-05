@@ -1,5 +1,4 @@
 import { useState } from 'react';
-// import styles from '../styles/area-cliente.module.css'; // <-- Removido
 import {
     Box,
     Heading,
@@ -18,18 +17,14 @@ function FormAdminCadastraCliente() {
     const [email, setEmail] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
-    // const [mensagem, setMensagem] = useState(''); // <-- Substituído pelo useToast
     const toast = useToast();
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // setMensagem(''); // <-- Removido
         const token = localStorage.getItem('admin_token');
 
         try {
-            // A URL da API
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
             const response = await fetch(`${API_URL}/api/admin/clientes/registrar`, { //
                 method: 'POST',
                 headers: {
@@ -44,7 +39,6 @@ function FormAdminCadastraCliente() {
                 throw new Error(data.error || 'Falha ao cadastrar.');
             }
 
-            // setMensagem(`Cliente ${data.nome || data.cpfCnpj} cadastrado com sucesso!`); // <-- Substituído
             toast({
                 title: 'Cliente cadastrado!',
                 description: `Cliente ${data.nome || data.cpfCnpj} foi cadastrado com sucesso.`,
@@ -56,7 +50,6 @@ function FormAdminCadastraCliente() {
             setCpfCnpj(''); setNome(''); setEmail(''); //
 
         } catch (err) {
-            // setMensagem((err as Error).message); // <-- Substituído
             toast({
                 title: 'Erro ao cadastrar.',
                 description: (err as Error).message,
@@ -73,7 +66,7 @@ function FormAdminCadastraCliente() {
         <Box 
             as="form" 
             onSubmit={handleSubmit} 
-            w={{ base: '100%', md: '70%', lg: '50%' }} // Limita a largura em telas maiores
+            w={{ base: '100%', md: '70%', lg: '50%' }} 
         >
             <Heading as="h4" size="md" mb={1}>
                 Cadastrar Novo Cliente (Destinatário)
@@ -120,8 +113,6 @@ function FormAdminCadastraCliente() {
             >
                 Cadastrar Cliente
             </Button>
-            
-            {/* {mensagem && <p>...</p>} // <-- Removido */ }
         </Box>
     );
 }

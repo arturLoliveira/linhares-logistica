@@ -1,5 +1,5 @@
 
-import { Box, HStack, Icon, Text, Link } from '@chakra-ui/react'; 
+import { Box, HStack, Text, Link } from '@chakra-ui/react'; 
 import type { ReactNode } from 'react'; 
 
 interface ContactInfoProps {

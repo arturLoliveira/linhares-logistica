@@ -22,8 +22,8 @@ import {
     Thead,
     Tbody,
     Tr,
-    Th, // Th (cabeçalho)
-    Td, // Td (célula)
+    Th, 
+    Td, 
     TableContainer,
     Badge,
     Modal,
@@ -40,11 +40,8 @@ import {
     NumberInputField
 } from '@chakra-ui/react';
 
-// --- (COMPONENTE 1: Lista de Coletas - ATUALIZADO) ---
 function ListaColetas() {
-    
-    // --- 1. ATUALIZAÇÃO DO TIPO ---
-    type Coleta = {
+        type Coleta = {
         id: number;
         numeroEncomenda: string;
         numeroNotaFiscal: string;
@@ -53,7 +50,7 @@ function ListaColetas() {
         status: string;
         valorFrete: number;
         driverToken: string; 
-        pesoKg: number | null; // <-- ADICIONADO
+        pesoKg: number | null;
     };
 
     type PaginationData = {
@@ -77,8 +74,8 @@ function ListaColetas() {
     const [qrCodeVisivel, setQrCodeVisivel] = useState<string | null>(null);
     const [driverTokenVisivel, setDriverTokenVisivel] = useState<string | null>(null);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-    const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+    const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'https://transportelinhares.vercel.app';
 
 
     useEffect(() => {
@@ -198,19 +195,17 @@ function ListaColetas() {
             {!isLoading && !erro && coletas.length > 0 && (
                 <TableContainer>
                     <Table variant="simple" size="sm">
-                        {/* --- 2. ATUALIZAÇÃO DO HEADER --- */}
                         <Thead>
                             <Tr>
                                 <Th>Encomenda</Th>
                                 <Th>NF</Th>
                                 <Th>Cliente</Th>
                                 <Th isNumeric>Valor (R$)</Th>
-                                <Th isNumeric>Peso (Kg)</Th> {/* <-- ADICIONADO */}
+                                <Th isNumeric>Peso (Kg)</Th>
                                 <Th>Status</Th>
                                 <Th>Ações</Th>
                             </Tr>
                         </Thead>
-                        {/* --- 3. ATUALIZAÇÃO DAS CÉLULAS --- */}
                         <Tbody>
                             {coletas.map((coleta) => (
                                 <Tr key={coleta.id}>
@@ -218,7 +213,6 @@ function ListaColetas() {
                                     <Td>{coleta.numeroNotaFiscal}</Td>
                                     <Td>{coleta.nomeCliente}</Td>
                                     <Td isNumeric>{coleta.valorFrete.toFixed(2)}</Td>
-                                    {/* --- CÉLULA DO PESO ADICIONADA --- */}
                                     <Td isNumeric>
                                         {coleta.pesoKg ? `${coleta.pesoKg.toFixed(1)}` : 'N/A'}
                                     </Td>
@@ -293,8 +287,6 @@ function ListaColetas() {
 }
 
 
-// --- (COMPONENTE 2: Formulário Admin Cadastra Coleta) ---
-// (Sem alterações, permanece o mesmo)
 function FormAdminCadastraColeta() {
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
@@ -308,7 +300,7 @@ function FormAdminCadastraColeta() {
     const [dataVencimento, setDataVencimento] = useState('');
     
     const [isLoading, setIsLoading] = useState(false);
-    const toast = useToast(); // Hook para notificações
+    const toast = useToast(); 
 
     const handleSubmitColeta = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -319,7 +311,7 @@ function FormAdminCadastraColeta() {
             valorFrete, pesoKg: pesoKg || null, dataVencimento: dataVencimento || null
         };
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
             const response = await fetch(`${API_URL}/api/coletas/solicitar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -338,8 +330,6 @@ function FormAdminCadastraColeta() {
                 duration: 5000,
                 isClosable: true,
             });
-
-            // Limpa o formulário
             setNomeCliente(''); setEmailCliente(''); setEnderecoColeta(''); setTipoCarga('');
             setCpfCnpjRemetente(''); setCpfCnpjDestinatario(''); setNumeroNotaFiscal('');
             setValorFrete(''); setPesoKg(''); setDataVencimento('');
@@ -461,9 +451,6 @@ function FormAdminCadastraColeta() {
     );
 }
 
-
-// --- (COMPONENTE 3: Formulário Admin Adiciona Histórico) ---
-// (Sem alterações, permanece o mesmo)
 function FormAdminAdicionaHistorico() {
     const [notaFiscal, setNotaFiscal] = useState('');
     const [localizacao, setLocalizacao] = useState('');
@@ -476,7 +463,7 @@ function FormAdminAdicionaHistorico() {
         e.preventDefault();
         setIsLoading(true);
         const token = localStorage.getItem('admin_token');
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
         try {
             const response = await fetch(`${API_URL}/api/admin/coletas/${notaFiscal}/historico`, {
@@ -573,9 +560,6 @@ function FormAdminAdicionaHistorico() {
     );
 }
 
-
-// --- (Página Principal) ---
-// (Sem alterações, permanece o mesmo)
 function AdminColetas() {
     return (
         <Box w="100%" p={4}>
