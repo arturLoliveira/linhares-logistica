@@ -9,7 +9,7 @@ import {
     HStack,
     Icon,
     Button,
-    IconButton,
+    IconButton, 
     useDisclosure,
     Drawer,
     DrawerBody,
@@ -35,18 +35,38 @@ function Header() {
             bg="white" 
             shadow="sm"
         >
-          <Flex align="center" maxW="1400px" mx="auto">
+          <Flex 
+            align="center" 
+            maxW="1400px" 
+            mx="auto"
+            justifyContent={{ base: 'space-between', md: 'flex-start' }}
+          >
             
-            <RouterLink to="/">
-                <Image 
-                  src={logoDaEmpresa} 
-                  alt="Logo Transportes Linhares" 
-                  h={{ base: '120px', md: '140px' }} 
-                  objectFit="contain"
-                />
-            </RouterLink>
+            <IconButton
+                aria-label="Abrir menu"
+                icon={<FaBars />}
+                display={{ base: 'flex', md: 'none' }} 
+                onClick={onOpen}
+                variant="ghost"
+                fontSize="2xl"
+            />
+
+            <Flex 
+                flex={{ base: 1, md: 'none' }} 
+                justifyContent={{ base: 'center', md: 'flex-start' }} 
+                align="center"
+            >
+                <RouterLink to="/">
+                    <Image 
+                      src={logoDaEmpresa} 
+                      alt="Logo Transportes Linhares" 
+                      h={{ base: '90px', md: '110px' }} 
+                      objectFit="contain"
+                    />
+                </RouterLink>
+            </Flex>
             
-            <Spacer /> 
+            <Spacer display={{ base: 'none', md: 'block' }}/> 
 
             <HStack 
                 spacing={{ base: 3, md: 6 }} 
@@ -73,6 +93,7 @@ function Header() {
                 >
                     Admin
                 </ChakraLink>
+
                 <Button
                   as={ChakraLink} 
                   href={linkWhatsapp}
