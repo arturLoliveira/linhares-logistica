@@ -1,29 +1,47 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
-import styles from '../styles/area-cliente.module.css'; 
+// import styles from '../styles/area-cliente.module.css'; // <-- Removido
+import {
+    Box,
+    Heading,
+    Text,
+    FormControl,
+    FormLabel,
+    Input,
+    Select,
+    Button,
+    VStack,
+    Center,
+    Alert,
+    AlertIcon,
+    Icon
+} from '@chakra-ui/react';
+import { FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa'; // Ícones para os estados
+
 function DriverUpdatePage() {
-    const [searchParams] = useSearchParams();
+    const [searchParams] = useSearchParams(); //
 
-    const numeroEncomenda = searchParams.get('id');
-    const token = searchParams.get('token');
+    const numeroEncomenda = searchParams.get('id'); //
+    const token = searchParams.get('token'); //
 
-    const [localizacao, setLocalizacao] = useState('');
-    const [status, setStatus] = useState('COLETADO');
-    const [mensagem, setMensagem] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [erro, setErro] = useState('');
+    const [localizacao, setLocalizacao] = useState(''); //
+    const [status, setStatus] = useState('COLETADO'); //
+    const [mensagem, setMensagem] = useState(''); //
+    const [isLoading, setIsLoading] = useState(false); //
+    const [erro, setErro] = useState(''); //
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setErro('');
-        setMensagem('');
+        e.preventDefault(); //
+        setIsLoading(true); //
+        setErro(''); //
+        setMensagem(''); //
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
         try {
-            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/driver/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const response = await fetch(`${API_URL}/api/driver/update`, { //
+                method: 'POST', //
+                headers: { 'Content-Type': 'application/json' }, //
+                body: JSON.stringify({ //
                     numeroEncomenda,
                     token,
                     status,
@@ -31,74 +49,103 @@ function DriverUpdatePage() {
                 })
             });
 
-            const data = await response.json();
+            const data = await response.json(); //
             if (!response.ok) {
-                throw new Error(data.error || 'Falha ao atualizar.');
+                throw new Error(data.error || 'Falha ao atualizar.'); //
             }
 
-            setMensagem('Status atualizado com sucesso!');
+            setMensagem('Status atualizado com sucesso!'); //
 
         } catch (err) {
-            setErro((err as Error).message);
+            setErro((err as Error).message); //
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); //
         }
     };
 
-    if (!numeroEncomenda || !token) {
+    // Estado 1: Link Inválido (sem token ou id)
+    if (!numeroEncomenda || !token) { //
         return (
-            <div className={styles.areaCliente}>
-                <h2 className={styles.tituloPrincipal}>Erro</h2>
-                <p style={{color: 'red', textAlign: 'center'}}>Link inválido. Por favor, escaneie o QR Code novamente.</p>
-            </div>
+            <Center minH="80vh" p={4}>
+                <Box textAlign="center" p={8} borderWidth={1} borderRadius="lg" shadow="md">
+                    <Icon as={FaExclamationTriangle} boxSize={12} color="red.500" />
+                    <Heading as="h2" size="lg" mt={4} mb={2}>Erro: Link Inválido</Heading>
+                    <Text>Por favor, escaneie o QR Code novamente.</Text>
+                </Box>
+            </Center>
         );
     }
-    if (mensagem) {
+    
+    // Estado 2: Sucesso (mensagem de sucesso existe)
+    if (mensagem) { //
          return (
-            <div className={styles.areaCliente}>
-                <h2 className={styles.tituloPrincipal}>Sucesso!</h2>
-                <p style={{color: 'green', textAlign: 'center'}}>{mensagem}</p>
-            </div>
+            <Center minH="80vh" p={4}>
+                <Box textAlign="center" p={8} borderWidth={1} borderRadius="lg" shadow="md">
+                    <Icon as={FaCheckCircle} boxSize={12} color="green.500" />
+                    <Heading as="h2" size="lg" mt={4} mb={2}>Sucesso!</Heading>
+                    <Text>{mensagem}</Text>
+                </Box>
+            </Center>
         );
     }
 
+    // Estado 3: Formulário de Atualização
     return (
-        <div className={styles.areaCliente}>
-            <h2 className={styles.tituloPrincipal}>Atualizar Encomenda</h2>
-            <h3 style={{textAlign: 'center', marginTop: '-1rem'}}>Nº: {numeroEncomenda}</h3>
+        <Center minH="80vh" py={8} px={4}>
+            <Box
+                as="form"
+                onSubmit={handleSubmit} //
+                w={{ base: '90%', md: '450px' }}
+                p={8}
+                borderWidth={1}
+                borderRadius="lg"
+                boxShadow="lg"
+            >
+                <Heading as="h2" size="lg" textAlign="center">Atualizar Encomenda</Heading>
+                <Text textAlign="center" fontSize="xl" color="gray.600" mb={6}>Nº: {numeroEncomenda}</Text>
 
-            <form onSubmit={handleSubmit}>
-                <div className={styles.formGroup}>
-                    <label htmlFor="localizacao">Sua Localização Atual</label>
-                    <input 
-                        type="text" 
-                        id="localizacao" 
-                        value={localizacao}
-                        onChange={(e) => setLocalizacao(e.target.value)}
-                        placeholder="Ex: Sede Ouro Branco"
-                        required 
-                    />
-                </div>
-                <div className={styles.formGroup}>
-                    <label htmlFor="status">Marcar como:</label>
-                    <select 
-                        id="status" 
-                        value={status} 
-                        onChange={(e) => setStatus(e.target.value)}
-                        className={styles.formInput}
+                <VStack spacing={4}>
+                    <FormControl id="localizacao" isRequired>
+                        <FormLabel>Sua Localização Atual</FormLabel>
+                        <Input 
+                            type="text" 
+                            value={localizacao}
+                            onChange={(e) => setLocalizacao(e.target.value)} //
+                            placeholder="Ex: Sede Ouro Branco"
+                        />
+                    </FormControl>
+                    <FormControl id="status" isRequired>
+                        <FormLabel>Marcar como:</FormLabel>
+                        <Select 
+                            value={status} 
+                            onChange={(e) => setStatus(e.target.value)} //
+                        >
+                            <option value="COLETADO">Coletado (Retirado no cliente)</option>
+                            <option value="EM_TRANSITO">Em Trânsito (Chegou no CD)</option>
+                            <option value="EM_ROTA_ENTREGA">Em Rota de Entrega (Saiu para o destino)</option>
+                            <option value="CONCLUIDA">Entregue</option>
+                        </Select>
+                    </FormControl>
+
+                    {erro && (
+                        <Alert status="error" borderRadius="md">
+                            <AlertIcon />
+                            {erro}
+                        </Alert>
+                    )}
+
+                    <Button 
+                        type="submit" 
+                        colorScheme="blue" 
+                        width="100%"
+                        isLoading={isLoading} //
+                        loadingText="Atualizando..."
                     >
-                        <option value="COLETADO">Coletado (Retirado no cliente)</option>
-                        <option value="EM_TRANSITO">Em Trânsito (Chegou no CD)</option>
-                        <option value="EM_ROTA_ENTREGA">Em Rota de Entrega (Saiu para o destino)</option>
-                        <option value="CONCLUIDA">Entregue</option>
-                    </select>
-                </div>
-                <button type="submit" className={styles.formButton} disabled={isLoading}>
-                    {isLoading ? 'Atualizando...' : 'Atualizar Status'}
-                </button>
-                {erro && <p style={{ color: 'red', textAlign: 'center' }}>{erro}</p>}
-            </form>
-        </div>
+                        Atualizar Status
+                    </Button>
+                </VStack>
+            </Box>
+        </Center>
     );
 }
 export default DriverUpdatePage;

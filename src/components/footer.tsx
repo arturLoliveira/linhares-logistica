@@ -1,12 +1,19 @@
-import styles from '../styles/footer.module.css';
+// import styles from '../styles/footer.module.css'; // <-- Removido
+import { Box, Text } from '@chakra-ui/react';
 
 function Footer() {
     return(
-        <footer className={styles.footerContainer}>
-          <h3 className={styles.footerText}>
+        <Box 
+            as="footer" 
+            w="100%" 
+            py={6} 
+            bg="gray.800" 
+            color="gray.200"
+        >
+          <Text textAlign="center" fontSize="md">
             © Todos os direitos reservados | Transportes Linhares
-          </h3>
-        </footer>
+          </Text>
+        </Box>
     )
 }
 

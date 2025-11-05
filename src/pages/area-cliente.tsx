@@ -1,50 +1,61 @@
 import { useState } from 'react';
-import styles from '../styles/area-cliente.module.css'; 
 import { FaTruck, FaFileInvoice, FaPrint, FaBoxOpen, FaUndo } from 'react-icons/fa';
+import {
+    Box,
+    Heading,
+    Text,
+    FormControl,
+    FormLabel,
+    Input,
+    Button,
+    useToast,
+    VStack,
+    Accordion,
+    AccordionItem,
+    AccordionButton,
+    AccordionPanel,
+    AccordionIcon,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
+    List,
+    ListItem,
+    ListIcon,
+    SimpleGrid,
+    NumberInput,
+    NumberInputField,
+    InputGroup,
+    InputLeftAddon,
+    Flex // <-- ADICIONADO PARA CORRIGIR O ALINHAMENTO
+} from '@chakra-ui/react';
+import { MdCheckCircle } from 'react-icons/md';
 
-const handleDownloadPDF = async (url: string, filename: string, setLoading: (b: boolean) => void, setMensagem: (s: string) => void) => {
-    setLoading(true);
-    setMensagem('');
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.error || 'Falha ao buscar o documento.');
-        }
-        const blob = await response.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(downloadUrl);
-        setMensagem('Download iniciado com sucesso!');
-    } catch (error) {
-        setMensagem((error as Error).message);
-    } finally {
-        setLoading(false);
-    }
-};
+// --- (Todos os formulários internos: FormRastreioDestinatario, FormColetaEntrega, etc...
+// --- ...permanecem os mesmos de antes) ---
 
 function FormRastreioDestinatario() {
+    // ... (código do formulário)
     const [cpfCnpj, setCpfCnpj] = useState('');
     const [numeroEncomenda, setNumeroEncomenda] = useState(''); 
     const [isLoading, setIsLoading] = useState(false);
     const [resultado, setResultado] = useState<any | null>(null);
     const [erro, setErro] = useState('');
+    const toast = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setResultado(null);
         setErro('');
+        
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
         try {
-            const res = await fetch('https://linhares-logistica-backend.onrender.com/api/rastreamento/destinatario', {
+            const res = await fetch(`${API_URL}/api/rastreamento/destinatario`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ numeroEncomenda, cpfCnpj }) 
+                body: JSON.stringify({ numeroEncomenda, cpfCnpj })
             });
             if (!res.ok) {
                  const data = await res.json();
@@ -60,45 +71,60 @@ function FormRastreioDestinatario() {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <p>Acesse com seu CNPJ/CPF e Número da Encomenda.</p>
-             <div className={styles.formGroup}>
-                <label htmlFor="num_encomenda_dest">Número da Encomenda</label>
-                <input type="text" id="num_encomenda_dest" value={numeroEncomenda} onChange={e => setNumeroEncomenda(e.target.value)} placeholder="Ex: OC-1001" required />
-            </div>
-             <div className={styles.formGroup}>
-                <label htmlFor="cnpj_dest">Seu CNPJ/CPF (Destinatário)</label>
-                <input type="text" id="cnpj_dest" value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} required />
-            </div>
-            <button type="submit" className={styles.formButton} disabled={isLoading}>{isLoading ? "Buscando..." : "Acessar"}</button>
+        <Box as="form" onSubmit={handleSubmit}>
+            <Text mb={4}>Acesse com seu CNPJ/CPF e Número da Encomenda.</Text>
+            <VStack spacing={4}>
+                <FormControl isRequired>
+                    <FormLabel>Número da Encomenda</FormLabel>
+                    <Input type="text" value={numeroEncomenda} onChange={e => setNumeroEncomenda(e.target.value)} placeholder="Ex: OC-1001" />
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Seu CNPJ/CPF (Destinatário)</FormLabel>
+                    <Input type="text" value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} />
+                </FormControl>
+            </VStack>
+            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>{isLoading ? "Buscando..." : "Acessar"}</Button>
             
-            {erro && <p style={{ color: 'red', marginTop: '1rem' }}>{erro}</p>}
+            {erro && (
+                <Alert status="error" mt={6}>
+                    <AlertIcon />
+                    {erro}
+                </Alert>
+            )}
             
             {resultado && (
-                <div className={styles.rastreioResultado}>
-                    <div className={styles.statusAtual}><strong>Status Atual:</strong> {resultado.status.replace('_', ' ')}</div>
-                    {resultado.historico && resultado.historico.length > 0 && (
-                         <div className={styles.localAtual}><strong>Localização:</strong> {resultado.historico[0].localizacao}</div>
-                    )}
-                    <h5 className={styles.historicoTitulo}>Histórico de Rastreio</h5>
-                    <ul className={styles.historicoLista}>
+                <Box mt={6} borderWidth="1px" borderRadius="md" p={4}>
+                    <Alert status="success" variant="subtle" mb={4}>
+                        <AlertIcon />
+                        <Box>
+                            <AlertTitle>Status Atual: {resultado.status.replace('_', ' ')}</AlertTitle>
+                            {resultado.historico && resultado.historico.length > 0 && (
+                                <AlertDescription>Localização: {resultado.historico[0].localizacao}</AlertDescription>
+                            )}
+                        </Box>
+                    </Alert>
+                    
+                    <Heading as="h5" size="sm" mb={3}>Histórico de Rastreio</Heading>
+                    <List spacing={3}>
                         {resultado.historico && resultado.historico.map((evento: any) => (
-                             <li key={evento.id} className={styles.historicoItem}>
-                                <hr />
-                                <div className={styles.historicoData}>{new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}</div>
-                                <div className={styles.historicoStatus}>{evento.status.replace('_', ' ')}</div>
-                                <div className={styles.historicoLocal}>{evento.localizacao}</div>
-                            </li>
+                             <ListItem key={evento.id} borderBottomWidth="1px" pb={3}>
+                                <ListIcon as={MdCheckCircle} color="green.500" />
+                                <Text as="span" fontWeight="bold" mr={2}>
+                                    {new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}
+                                </Text>
+                                - {evento.status.replace('_', ' ')}
+                                <Text fontSize="sm" color="gray.600" ml={6}>{evento.localizacao}</Text>
+                            </ListItem>
                         ))}
-                    </ul>
-                    <hr />
-                </div>
+                    </List>
+                </Box>
             )}
-        </form>
+        </Box>
     );
 }
 
 function FormColetaEntrega() {
+    // ... (código do formulário)
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
     const [enderecoColeta, setEnderecoColeta] = useState('');
@@ -108,22 +134,25 @@ function FormColetaEntrega() {
     const [numeroNotaFiscal, setNumeroNotaFiscal] = useState('');
     const [valorFrete, setValorFrete] = useState('');
     const [pesoKg, setPesoKg] = useState('');
+    
     const [isLoading, setIsLoading] = useState(false);
-    const [mensagem, setMensagem] = useState('');
+    const toast = useToast();
 
     const handleSubmitColeta = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setMensagem('');
         const dadosColeta = {
             nomeCliente, emailCliente, enderecoColeta, tipoCarga,
             cpfCnpjRemetente, cpfCnpjDestinatario, numeroNotaFiscal,
             valorFrete: valorFrete,
-            pesoKg: pesoKg,
+            pesoKg: pesoKg || null,
             dataVencimento: null
         };
+        
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
         try {
-            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/coletas/solicitar', {
+            const response = await fetch(`${API_URL}/api/coletas/solicitar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),
@@ -133,49 +162,132 @@ function FormColetaEntrega() {
                  throw new Error(data.error || 'Falha ao solicitar a coleta.');
             }
             const novaColeta = await response.json();
-            setMensagem(`Coleta solicitada com sucesso! Seu N° de Encomenda é: ${novaColeta.numeroEncomenda}`);
+            
+            toast({
+                title: 'Solicitação recebida!',
+                description: `Sua coleta foi agendada. N° de Encomenda: ${novaColeta.numeroEncomenda}`,
+                status: 'success',
+                duration: 7000,
+                isClosable: true,
+            });
+
+            // Limpa o formulário
             setNomeCliente(''); setEmailCliente(''); setEnderecoColeta(''); setTipoCarga('');
             setCpfCnpjRemetente(''); setCpfCnpjDestinatario(''); setNumeroNotaFiscal('');
             setValorFrete(''); setPesoKg('');
         } catch (error) {
-            setMensagem((error as Error).message);
+            toast({
+                title: 'Erro ao solicitar.',
+                description: (error as Error).message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmitColeta}>
-            <p>Após o preenchimento do formulário será gerado o número da coleta.</p>
-            <div className={styles.formGroup}><label htmlFor="carga_valor">Valor do Frete (R$) (Conforme cotação)</label><input type="number" step="0.01" id="carga_valor" value={valorFrete} onChange={(e) => setValorFrete(e.target.value)} placeholder="Ex: 150.00" required /></div>
-            <div className={styles.formGroup}><label htmlFor="carga_peso">Peso (Kg) (Opcional)</label><input type="number" step="0.1" id="carga_peso" value={pesoKg} onChange={(e) => setPesoKg(e.target.value)} placeholder="Ex: 25.5"/></div>
-            <div className={styles.formGroup}><label htmlFor="nome_coleta">Seu Nome</label><input type="text" id="nome_coleta" value={nomeCliente} onChange={(e) => setNomeCliente(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="email_coleta">Seu E-mail</label><input type="email" id="email_coleta" value={emailCliente} onChange={(e) => setEmailCliente(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="end_coleta">Endereço de Coleta</label><input type="text" id="end_coleta" value={enderecoColeta} onChange={(e) => setEnderecoColeta(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="nf_coleta">Número da Nota Fiscal</label><input type="text" id="nf_coleta" value={numeroNotaFiscal} onChange={(e) => setNumeroNotaFiscal(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="rem_coleta">Seu CPF/CNPJ (Remetente)</label><input type="text" id="rem_coleta" value={cpfCnpjRemetente} onChange={(e) => setCpfCnpjRemetente(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="dest_coleta">CPF/CNPJ do Destinatário</label><input type="text" id="dest_coleta" value={cpfCnpjDestinatario} onChange={(e) => setCpfCnpjDestinatario(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="carga_coleta">Tipo da Carga (opcional)</label><input type="text" id="carga_coleta" value={tipoCarga} onChange={(e) => setTipoCarga(e.target.value)}/></div>
-            <button type="submit" className={styles.formButton} disabled={isLoading}>{isLoading ? 'Enviando...' : 'Solicitar Coleta'}</button>
-            {mensagem && <p style={{ marginTop: '1rem', textAlign: 'center' }}>{mensagem}</p>}
-        </form>
+        <Box as="form" onSubmit={handleSubmitColeta}>
+            <Text mb={4}>Após o preenchimento do formulário será gerado o número da coleta.</Text>
+            
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                {/* Coluna 1 */}
+                <VStack spacing={4}>
+                    <FormControl isRequired>
+                        <FormLabel>Valor do Frete (R$) (Conforme cotação)</FormLabel>
+                        <InputGroup>
+                            <InputLeftAddon>R$</InputLeftAddon>
+                            <NumberInput 
+                                value={valorFrete} 
+                                onChange={(valueString) => setValorFrete(valueString)}
+                                precision={2}
+                                min={0.01}
+                                w="100%"
+                            >
+                                <NumberInputField placeholder="Ex: 150.00" />
+                            </NumberInput>
+                        </InputGroup>
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>Seu Nome (Remetente)</FormLabel>
+                        <Input type="text" value={nomeCliente} onChange={(e) => setNomeCliente(e.target.value)} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>Seu E-mail</FormLabel>
+                        <Input type="email" value={emailCliente} onChange={(e) => setEmailCliente(e.target.value)} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>Seu CPF/CNPJ (Remetente)</FormLabel>
+                        <Input type="text" value={cpfCnpjRemetente} onChange={(e) => setCpfCnpjRemetente(e.target.value)} />
+                    </FormControl>
+                </VStack>
+                
+                {/* Coluna 2 */}
+                <VStack spacing={4}>
+                    <FormControl>
+                        <FormLabel>Peso (Kg) (Opcional)</FormLabel>
+                        <NumberInput 
+                            value={pesoKg} 
+                            onChange={(valueString) => setPesoKg(valueString)}
+                            precision={1}
+                            step={0.5}
+                            min={0}
+                        >
+                            <NumberInputField placeholder="Ex: 25.5" />
+                        </NumberInput>
+                    </FormControl>
+                    
+                    <FormControl isRequired>
+                        <FormLabel>Endereço de Coleta</FormLabel>
+                        <Input type="text" value={enderecoColeta} onChange={(e) => setEnderecoColeta(e.target.value)} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>Número da Nota Fiscal</FormLabel>
+                        <Input type="text" value={numeroNotaFiscal} onChange={(e) => setNumeroNotaFiscal(e.target.value)} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>CPF/CNPJ do Destinatário</FormLabel>
+                        <Input type="text" value={cpfCnpjDestinatario} onChange={(e) => setCpfCnpjDestinatario(e.target.value)} />
+                    </FormControl>
+                </VStack>
+            </SimpleGrid>
+            
+            <FormControl mt={4}>
+                <FormLabel>Tipo da Carga (Opcional)</FormLabel>
+                <Input type="text" value={tipoCarga} onChange={(e) => setTipoCarga(e.target.value)} placeholder="Ex: Caixas, Pallets"/>
+            </FormControl>
+            
+            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>
+                {isLoading ? 'Enviando...' : 'Solicitar Coleta'}
+            </Button>
+        </Box>
     );
 }
 
 function FormColetaDevolucao() {
+    // ... (código do formulário)
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
     const [numeroNFOriginal, setNumeroNFOriginal] = useState('');
     const [motivoDevolucao, setMotivoDevolucao] = useState('');
+    
     const [isLoading, setIsLoading] = useState(false);
-    const [mensagem, setMensagem] = useState('');
+    const toast = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setMensagem('');
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
         try {
-            const res = await fetch('https://linhares-logistica-backend.onrender.com/api/devolucoes/solicitar', {
+            const res = await fetch(`${API_URL}/api/devolucoes/solicitar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nomeCliente, emailCliente, numeroNFOriginal, motivoDevolucao })
@@ -184,75 +296,186 @@ function FormColetaDevolucao() {
                 const data = await res.json();
                 throw new Error(data.error || 'Falha ao enviar solicitação.');
             }
-            setMensagem('Solicitação de devolução enviada! Você receberá um e-mail de confirmação.');
+            
+            toast({
+                title: 'Solicitação enviada!',
+                description: 'Você receberá um e-mail de confirmação.',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+            
             setNomeCliente(''); setEmailCliente(''); setNumeroNFOriginal(''); setMotivoDevolucao('');
         } catch (err) {
-            setMensagem((err as Error).message);
+            toast({
+                title: 'Erro ao enviar.',
+                description: (err as Error).message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <p>Após o preenchimento, você receberá um e-mail de confirmação. O prazo é de até 3 dias.</p>
-            <div className={styles.formGroup}><label htmlFor="nome_dev">Seu Nome</label><input type="text" id="nome_dev" value={nomeCliente} onChange={e => setNomeCliente(e.target.value)} required /></div>
-            <div className={styles.formGroup}><label htmlFor="email_dev">Seu E-mail</label><input type="email" id="email_dev" value={emailCliente} onChange={e => setEmailCliente(e.target.value)} required /></div>
-            <div className={styles.formGroup}><label htmlFor="nf_dev">Nº da Nota Fiscal Original</label><input type="text" id="nf_dev" value={numeroNFOriginal} onChange={e => setNumeroNFOriginal(e.target.value)} required /></div>
-            <div className={styles.formGroup}><label htmlFor="motivo_dev">Motivo da Devolução (opcional)</label><input type="text" id="motivo_dev" value={motivoDevolucao} onChange={e => setMotivoDevolucao(e.target.value)} /></div>
-            <button type="submit" className={styles.formButton} disabled={isLoading}>{isLoading ? 'Enviando...' : 'Solicitar Devolução'}</button>
-            {mensagem && <p style={{ marginTop: '1rem', textAlign: 'center' }}>{mensagem}</p>}
-        </form>
+        <Box as="form" onSubmit={handleSubmit}>
+            <Text mb={4}>Após o preenchimento, você receberá um e-mail de confirmação. O prazo é de até 3 dias.</Text>
+            <VStack spacing={4}>
+                <FormControl isRequired>
+                    <FormLabel>Seu Nome</FormLabel>
+                    <Input type="text" value={nomeCliente} onChange={e => setNomeCliente(e.target.value)} />
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Seu E-mail</FormLabel>
+                    <Input type="email" value={emailCliente} onChange={e => setEmailCliente(e.target.value)} />
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Nº da Nota Fiscal Original</FormLabel>
+                    <Input type="text" value={numeroNFOriginal} onChange={e => setNumeroNFOriginal(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Motivo da Devolução (opcional)</FormLabel>
+                    <Input type="text" value={motivoDevolucao} onChange={e => setMotivoDevolucao(e.target.value)} />
+                </FormControl>
+            </VStack>
+            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>
+                {isLoading ? 'Enviando...' : 'Solicitar Devolução'}
+            </Button>
+        </Box>
     );
 }
 
 function FormEmissaoFatura() {
+    // ... (código do formulário)
     const [notaFiscal, setNotaFiscal] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [mensagem, setMensagem] = useState('');
+    const toast = useToast();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const url = 'https://linhares-logistica-backend.onrender.com/api/fatura/${notaFiscal}';
-        handleDownloadPDF(url, `fatura_${notaFiscal}.pdf`, setIsLoading, setMensagem);
+        setIsLoading(true);
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        
+        const url = `${API_URL}/api/fatura/${notaFiscal}`; 
+        const filename = `fatura_${notaFiscal}.pdf`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Falha ao buscar o documento.');
+            }
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+            
+            toast({
+                title: 'Sucesso!',
+                description: 'Download da fatura iniciado.',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            });
+            setNotaFiscal('');
+
+        } catch (error) {
+            toast({
+                title: 'Erro ao gerar fatura.',
+                description: (error as Error).message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <p>Preencha as informações para gerar sua fatura/boleto de forma on-line.</p>
-            <div className={styles.formGroup}>
-                <label htmlFor="nf_fatura">Número da Nota Fiscal</label>
-                <input type="text" id="nf_fatura" value={notaFiscal} onChange={e => setNotaFiscal(e.target.value)} required />
-            </div>
-            <button type="submit" className={styles.formButton} disabled={isLoading}>
+        <Box as="form" onSubmit={handleSubmit}>
+            <Text mb={4}>Preencha as informações para gerar sua fatura/boleto de forma on-line.</Text>
+            <FormControl isRequired>
+                <FormLabel>Número da Nota Fiscal</FormLabel>
+                <Input type="text" value={notaFiscal} onChange={e => setNotaFiscal(e.target.value)} />
+            </FormControl>
+            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>
                 {isLoading ? 'Gerando...' : 'Gerar Fatura'}
-            </button>
-            {mensagem && <p style={{ marginTop: '1rem', textAlign: 'center' }}>{mensagem}</p>}
-        </form>
+            </Button>
+        </Box>
     );
 }
 
 function FormImprimirEtiqueta() {
+    // ... (código do formulário)
     const [notaFiscal, setNotaFiscal] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [mensagem, setMensagem] = useState('');
+    const toast = useToast();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const url = 'https://linhares-logistica-backend.onrender.com/api/etiqueta/${notaFiscal}';
-        handleDownloadPDF(url, `etiqueta_${notaFiscal}.pdf`, setIsLoading, setMensagem);
+        setIsLoading(true);
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        
+        const url = `${API_URL}/api/etiqueta/${notaFiscal}`; 
+        const filename = `etiqueta_${notaFiscal}.pdf`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Falha ao buscar o documento.');
+            }
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+            
+            toast({
+                title: 'Sucesso!',
+                description: 'Download da etiqueta iniciado.',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            });
+            setNotaFiscal('');
+
+        } catch (error) {
+            toast({
+                title: 'Erro ao gerar etiqueta.',
+                description: (error as Error).message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <p>Realize aqui as impressões das etiquetas identificadoras de volumes.</p>
-            <div className={styles.formGroup}>
-                <label htmlFor="nf_etiqueta">Número da Nota Fiscal</label>
-                <input type="text" id="nf_etiqueta" value={notaFiscal} onChange={e => setNotaFiscal(e.target.value)} required />
-            </div>
-            <button type="submit" className={styles.formButton} disabled={isLoading}>{isLoading ? 'Gerando...' : 'Imprimir Etiqueta'}</button>
-            {mensagem && <p style={{ marginTop: '1rem', textAlign: 'center' }}>{mensagem}</p>}
-        </form>
+        <Box as="form" onSubmit={handleSubmit}>
+            <Text mb={4}>Realize aqui as impressões das etiquetas identificadoras de volumes.</Text>
+            <FormControl isRequired>
+                <FormLabel>Número da Nota Fiscal</FormLabel>
+                <Input type="text" value={notaFiscal} onChange={e => setNotaFiscal(e.target.value)} />
+            </FormControl>
+            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>
+                {isLoading ? 'Gerando...' : 'Imprimir Etiqueta'}
+            </Button>
+        </Box>
     );
 }
 
@@ -289,45 +512,58 @@ const secoes = [
     }
 ];
 
+// --- (Componente Principal - ATUALIZADO) ---
 function AreaCliente() {
-    const [secaoAberta, setSecaoAberta] = useState<string | null>(null);
-
-    const toggleSecao = (id: string) => {
-        if (secaoAberta === id) {
-            setSecaoAberta(null); 
-        } else {
-            setSecaoAberta(id);
-        }
-    };
 
     return (
-        <div className={styles.areaCliente}>
-            <h2 className={styles.tituloPrincipal}>Área do Cliente</h2>
+        <Box w="100%" maxW="960px" mx="auto" p={4} my={16}>
+            <Heading as="h2" size="lg" mb={6} textAlign="center">
+                Área do Cliente
+            </Heading>
             
-            <div className={styles.accordion}>
+            <Accordion allowToggle defaultIndex={[0]}>
                 {secoes.map((secao) => (
-                    <div key={secao.id} className={styles.accordionItem}>
-                        <button 
-                            className={styles.accordionHeader} 
-                            onClick={() => toggleSecao(secao.id)}
-                        >
-                            <span className={styles.headerIcon}>{secao.icon}</span>
-                            <span className={styles.headerTitulo}>{secao.titulo}</span>
-                            <span className={styles.headerSeta}>
-                                {secaoAberta === secao.id ? '−' : '+'}
-                            </span>
-                        </button>
-                        <div 
-                            className={`${styles.accordionContent} ${secaoAberta === secao.id ? styles.aberto : ''}`}
-                        >
-                            <div className={styles.contentPadding}>
-                                {secao.conteudo}
-                            </div>
-                        </div>
-                    </div>
+                    <AccordionItem 
+                        key={secao.id} 
+                        bg="white" 
+                        shadow="md" // Sombra mais forte
+                        mb={4} 
+                        borderRadius="md"
+                        // Estilo da borda azul (como em)
+                        borderLeftWidth="5px" 
+                        borderLeftColor="blue.500"
+                        overflow="hidden" // Para o borderRadius funcionar com a borda
+                    >
+                        <h2>
+                            <AccordionButton 
+                                _expanded={{ bg: 'blue.500', color: 'white' }} 
+                                borderRadius="md"
+                                py={4} // Aumenta o padding vertical
+                            >
+                                {/* --- Alinhamento Corrigido --- */}
+                                <Flex 
+                                    align="center" 
+                                    flex="1" 
+                                    textAlign="left"
+                                    // A cor do ícone muda quando expandido
+                                    color={undefined} // Permite que _expanded defina a cor
+                                >
+                                    <Box as="span" mr={3} color="blue.500" _expanded={{ color: 'white' }}>
+                                        {secao.icon}
+                                    </Box>
+                                    <Text fontWeight="medium">{secao.titulo}</Text>
+                                </Flex>
+                                {/* --- Fim da Correção --- */}
+                                <AccordionIcon />
+                            </AccordionButton>
+                        </h2>
+                        <AccordionPanel pb={6} p={6} borderTopWidth="1px" borderColor="gray.100">
+                            {secao.conteudo}
+                        </AccordionPanel>
+                    </AccordionItem>
                 ))}
-            </div>
-        </div>
+            </Accordion>
+        </Box>
     );
 }
 

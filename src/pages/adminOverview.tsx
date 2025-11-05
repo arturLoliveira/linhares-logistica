@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react';
-import styles from '../styles/area-cliente.module.css'; 
-
+// Importe os ícones E o tipo IconType
+import { FaTruck, FaUndo, FaCheckDouble } from 'react-icons/fa';
+import type { IconType } from 'react-icons'; 
+import {
+    Box,
+    Heading,
+    Text,
+    SimpleGrid,
+    Spinner,
+    Alert,
+    AlertIcon,
+    Center,
+    HStack,
+    VStack,
+    Icon,
+    // O 'As' foi removido desta importação
+} from '@chakra-ui/react';
 
 type StatsData = {
     coletasHoje: number;
@@ -18,9 +33,10 @@ function AdminOverview() {
             const token = localStorage.getItem('admin_token');
             setIsLoading(true);
             setError('');
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
             try {
-                const response = await fetch('https://linhares-logistica-backend.onrender.com/api/admin/stats', {
+                const response = await fetch(`${API_URL}/api/admin/stats`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -46,38 +62,65 @@ function AdminOverview() {
     }, []); 
 
     return (
-        <div>
-            <h2 className={styles.tituloPrincipal}>Dashboard</h2>
-            <p style={{ textAlign: 'center', fontSize: '1.2rem' }}>
+        <Box w="100%" p={4}>
+            <Heading as="h2" size="lg" mb={2}>
+                Dashboard
+            </Heading>
+            <Text fontSize="lg" color="gray.600" mb={6}>
                 Seja bem-vindo ao painel de administração.
-            </p>
-            <div className={styles.statsContainer}>
-                {isLoading ? (
-                    <p>Carregando estatísticas...</p>
-                ) : error ? (
-                    <p style={{ color: 'red' }}>{error}</p>
-                ) : stats ? (
-                    <>
-                        <div className={styles.statCard}>
-                            <span className={styles.statValue}>{stats.coletasHoje}</span>
-                            <span className={styles.statLabel}>Coletas Cadastradas Hoje</span>
-                        </div>
-                        <div className={styles.statCard}>
-                            <span className={styles.statValue}>{stats.devolucoesPendentes}</span>
-                            <span className={styles.statLabel}>Devoluções Pendentes</span>
-                        </div>
-                        <div className={styles.statCard}>
-                            <span className={styles.statValue}>{stats.coletasEntregues}</span>
-                            <span className={styles.statLabel}>Coletas Entregues (Total)</span>
-                        </div>
-                    </>
-                ) : null}
-            </div>
+            </Text>
             
-            <p style={{ textAlign: 'center', fontSize: '1.2rem', marginTop: '2rem' }}>
+            <Box>
+                {isLoading ? (
+                    <Center p={10}>
+                        <Spinner size="xl" />
+                    </Center>
+                ) : error ? (
+                    <Alert status="error">
+                        <AlertIcon />
+                        {error}
+                    </Alert>
+                ) : stats ? (
+                    <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+                        <StatBox
+                            label="Coletas Cadastradas Hoje"
+                            value={stats.coletasHoje}
+                            icon={FaTruck} 
+                        />
+                        <StatBox
+                            label="Devoluções Pendentes"
+                            value={stats.devolucoesPendentes}
+                            icon={FaUndo}
+                        />
+                        <StatBox
+                            label="Coletas Entregues (Total)"
+                            value={stats.coletasEntregues}
+                            icon={FaCheckDouble}
+                        />
+                    </SimpleGrid>
+                ) : null}
+            </Box>
+            
+            <Text fontSize="lg" color="gray.600" mt={8}>
                 Use o menu ao lado para gerenciar as operações do sistema.
-            </p>
-        </div>
+            </Text>
+        </Box>
+    );
+}
+
+// --- Componente auxiliar ATUALIZADO ---
+// O tipo do ícone foi corrigido de 'As' para 'IconType'
+function StatBox({ label, value, icon }: { label: string, value: number | string, icon: IconType }) {
+    return (
+        <Box p={5} shadow="md" borderWidth="1px" borderRadius="md" bg="white">
+            <HStack spacing={4} align="center">
+                <Icon as={icon} boxSize={12} color="blue.500" />
+                <VStack align="flex-start" spacing={0}>
+                    <Text fontSize="md" color="gray.500">{label}</Text>
+                    <Text fontSize="4xl" fontWeight="bold">{value}</Text>
+                </VStack>
+            </HStack>
+        </Box>
     );
 }
 

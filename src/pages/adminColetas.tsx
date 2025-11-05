@@ -1,8 +1,49 @@
 import { useState, useEffect } from 'react';
-import styles from '../styles/area-cliente.module.css';
 import { QRCodeSVG } from 'qrcode.react';
+import { FaSearch } from 'react-icons/fa'; 
 
+import { 
+    Box, 
+    Heading, 
+    FormControl, 
+    FormLabel, 
+    Input, 
+    Select, 
+    Button, 
+    useToast,
+    VStack,
+    HStack,
+    IconButton,
+    Text,
+    Spinner,
+    Alert,
+    AlertIcon,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th, // Th (cabeçalho)
+    Td, // Td (célula)
+    TableContainer,
+    Badge,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalCloseButton,
+    ModalBody,
+    ModalFooter,
+    SimpleGrid,
+    InputGroup,
+    InputLeftAddon,
+    NumberInput,
+    NumberInputField
+} from '@chakra-ui/react';
+
+// --- (COMPONENTE 1: Lista de Coletas - ATUALIZADO) ---
 function ListaColetas() {
+    
+    // --- 1. ATUALIZAÇÃO DO TIPO ---
     type Coleta = {
         id: number;
         numeroEncomenda: string;
@@ -12,126 +53,248 @@ function ListaColetas() {
         status: string;
         valorFrete: number;
         driverToken: string; 
+        pesoKg: number | null; // <-- ADICIONADO
+    };
+
+    type PaginationData = {
+        totalCount: number;
+        pageSize: number;
+        currentPage: number;
+        totalPages: number;
     };
 
     const [coletas, setColetas] = useState<Coleta[]>([]);
+    const [pagination, setPagination] = useState<PaginationData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [erro, setErro] = useState('');
+    
     const [filtroStatus, setFiltroStatus] = useState('PENDENTE');
+    const [currentPage, setCurrentPage] = useState(1);
+    
+    const [searchTerm, setSearchTerm] = useState(''); 
+    const [searchQuery, setSearchQuery] = useState(''); 
+
     const [qrCodeVisivel, setQrCodeVisivel] = useState<string | null>(null);
+    const [driverTokenVisivel, setDriverTokenVisivel] = useState<string | null>(null);
 
-    const fetchColetas = async () => {
-        const token = localStorage.getItem('admin_token');
-        setIsLoading(true);
-        setErro('');
-        const url = `https://linhares-logistica-backend.onrender.com/api/admin/coletas?status=${filtroStatus}`;
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
 
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
-            });
-            if (!response.ok) throw new Error('Falha ao buscar coletas.');
-            const data = await response.json();
-            setColetas(data);
-        } catch (err) {
-            setErro((err as Error).message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     useEffect(() => {
+        const fetchColetas = async () => {
+            const token = localStorage.getItem('admin_token');
+            setIsLoading(true);
+            setErro('');
+            
+            const url = `${API_URL}/api/admin/coletas?status=${filtroStatus}&page=${currentPage}&search=${searchQuery}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Falha ao buscar coletas.');
+                
+                const data = await response.json();
+                setColetas(data.coletas);
+                setPagination(data.pagination); 
+
+            } catch (err) {
+                setErro((err as Error).message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
         fetchColetas();
-    }, [filtroStatus]);
+    }, [filtroStatus, currentPage, searchQuery, API_URL]); 
 
     const handlePrint = () => {
         window.print();
     };
 
+    const handleFiltroStatusChange = (status: string) => {
+        setFiltroStatus(status);
+        setCurrentPage(1); 
+    };
+
+    const handleSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setCurrentPage(1); 
+        setSearchQuery(searchTerm); 
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'PENDENTE': return 'yellow';
+            case 'COLETADO': return 'blue';
+            case 'EM_TRANSITO': return 'cyan';
+            case 'EM_ROTA_ENTREGA': return 'orange';
+            case 'CONCLUIDA': return 'green';
+            case 'CANCELADA': return 'red';
+            case 'EM_DEVOLUCAO': return 'purple';
+            default: return 'gray';
+        }
+    };
+    
+    const handleOpenModal = (coleta: Coleta) => {
+        setQrCodeVisivel(coleta.numeroEncomenda);
+        setDriverTokenVisivel(coleta.driverToken);
+    };
+
+    const handleCloseModal = () => {
+        setQrCodeVisivel(null);
+        setDriverTokenVisivel(null);
+    };
 
     return (
-        <div style={{width: '100%'}}>
-            <h4>Visualizar Coletas</h4>
+        <Box w="100%">
+            <Heading as="h4" size="md" mb={4}>Visualizar Coletas</Heading>
             
-            <div className={styles.filtroContainer}>
-                <button className={filtroStatus === 'PENDENTE' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('PENDENTE')}>Pendentes</button>
-                <button className={filtroStatus === 'COLETADO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('COLETADO')}>Coletados</button>
-                <button className={filtroStatus === 'EM_TRANSITO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_TRANSITO')}>Em Trânsito</button>
-                <button className={filtroStatus === 'EM_ROTA_ENTREGA' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('EM_ROTA_ENTREGA')}>Em Rota</button>
-                <button className={filtroStatus === 'CONCLUIDA' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('CONCLUIDA')}>Concluídas</button>
-                <button className={filtroStatus === '' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('')}>Ver Todas</button>
-            </div>
+            <HStack spacing={2} wrap="wrap" mb={4}>
+                <Button variant={filtroStatus === 'PENDENTE' ? 'solid' : 'outline'} colorScheme="blue" onClick={() => handleFiltroStatusChange('PENDENTE')}>Pendentes</Button>
+                <Button variant={filtroStatus === 'COLETADO' ? 'solid' : 'outline'} colorScheme="blue" onClick={() => handleFiltroStatusChange('COLETADO')}>Coletados</Button>
+                <Button variant={filtroStatus === 'EM_TRANSITO' ? 'solid' : 'outline'} colorScheme="blue" onClick={() => handleFiltroStatusChange('EM_TRANSITO')}>Em Trânsito</Button>
+                <Button variant={filtroStatus === 'EM_ROTA_ENTREGA' ? 'solid' : 'outline'} colorScheme="blue" onClick={() => handleFiltroStatusChange('EM_ROTA_ENTREGA')}>Em Rota</Button>
+                <Button variant={filtroStatus === 'CONCLUIDA' ? 'solid' : 'outline'} colorScheme="blue" onClick={() => handleFiltroStatusChange('CONCLUIDA')}>Concluídas</Button>
+                <Button variant={filtroStatus === '' ? 'solid' : 'outline'} colorScheme="blue" onClick={() => handleFiltroStatusChange('')}>Ver Todas</Button>
+            </HStack>
 
-            {isLoading && <p>Carregando coletas...</p>}
-            {erro && <p style={{ color: 'red' }}>{erro}</p>}
+            <HStack as="form" onSubmit={handleSearchSubmit} mb={4} w="100%">
+                <Input 
+                    type="text" 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar por Nº Encomenda, NF, Cliente..."
+                />
+                <IconButton 
+                    aria-label="Buscar"
+                    icon={<FaSearch />}
+                    type="submit"
+                    colorScheme="blue"
+                    isLoading={isLoading}
+                />
+            </HStack>
+
+            {isLoading && (
+                <Box textAlign="center" p={10}>
+                    <Spinner size="xl" />
+                    <Text mt={2}>Carregando coletas...</Text>
+                </Box>
+            )}
+            
+            {erro && (
+                <Alert status="error" mb={4}>
+                    <AlertIcon />
+                    {erro}
+                </Alert>
+            )}
             
             {!isLoading && !erro && coletas.length === 0 && (
-                <p>Nenhuma coleta encontrada com este status.</p>
+                <Text>Nenhuma coleta encontrada.</Text>
             )}
 
             {!isLoading && !erro && coletas.length > 0 && (
-                <table className={styles.tabelaDevolucoes}>
-                    <thead>
-                        <tr>
-                            <th>Encomenda</th>
-                            <th>NF</th>
-                            <th>Cliente</th>
-                            <th>Valor (R$)</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {coletas.map((coleta) => (
-                            <tr key={coleta.id}>
-                                <td data-label="Encomenda">{coleta.numeroEncomenda}</td>
-                                <td data-label="NF">{coleta.numeroNotaFiscal}</td>
-                                <td data-label="Cliente">{coleta.nomeCliente}</td>
-                                <td data-label="Valor (R$)">{coleta.valorFrete.toFixed(2)}</td>
-                                <td data-label="Status">
-                                    <span className={`${styles.statusBadge} ${styles[coleta.status.toLowerCase()]}`}>
-                                        {coleta.status.replace(/_/g, ' ')}
-                                    </span>
-                                </td>
-                                <td data-label="Ações">
-                                    <button 
-                                        className={styles.botaoAcao}
-                                        onClick={() => setQrCodeVisivel(coleta.numeroEncomenda)}
-                                    >
-                                        Ver QR Code
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <TableContainer>
+                    <Table variant="simple" size="sm">
+                        {/* --- 2. ATUALIZAÇÃO DO HEADER --- */}
+                        <Thead>
+                            <Tr>
+                                <Th>Encomenda</Th>
+                                <Th>NF</Th>
+                                <Th>Cliente</Th>
+                                <Th isNumeric>Valor (R$)</Th>
+                                <Th isNumeric>Peso (Kg)</Th> {/* <-- ADICIONADO */}
+                                <Th>Status</Th>
+                                <Th>Ações</Th>
+                            </Tr>
+                        </Thead>
+                        {/* --- 3. ATUALIZAÇÃO DAS CÉLULAS --- */}
+                        <Tbody>
+                            {coletas.map((coleta) => (
+                                <Tr key={coleta.id}>
+                                    <Td>{coleta.numeroEncomenda}</Td>
+                                    <Td>{coleta.numeroNotaFiscal}</Td>
+                                    <Td>{coleta.nomeCliente}</Td>
+                                    <Td isNumeric>{coleta.valorFrete.toFixed(2)}</Td>
+                                    {/* --- CÉLULA DO PESO ADICIONADA --- */}
+                                    <Td isNumeric>
+                                        {coleta.pesoKg ? `${coleta.pesoKg.toFixed(1)}` : 'N/A'}
+                                    </Td>
+                                    <Td>
+                                        <Badge colorScheme={getStatusColor(coleta.status)}>
+                                            {coleta.status.replace(/_/g, ' ')}
+                                        </Badge>
+                                    </Td>
+                                    <Td>
+                                        <Button 
+                                            size="xs"
+                                            onClick={() => handleOpenModal(coleta)}
+                                        >
+                                            Ver QR Code
+                                        </Button>
+                                    </Td>
+                                </Tr>
+                            ))}
+                        </Tbody>
+                    </Table>
+                </TableContainer>
             )}
             
-            {qrCodeVisivel && (
-                <div className={styles.modalOverlay} onClick={() => setQrCodeVisivel(null)}>
-                    <div id="printable-qr-code" className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <h3>QR Code para Encomenda {qrCodeVisivel}</h3>
-                        <p>Imprima e cole na etiqueta. O motorista deve escanear este código.</p>
-                        
-                        <QRCodeSVG 
-                            value={`https://transportelinhares.vercel.app/driver/update?id=${qrCodeVisivel}&token=${coletas.find(c => c.numeroEncomenda === qrCodeVisivel)?.driverToken}`}
-                            size={256}
-                            style={{margin: '20px auto', display: 'block'}}
-                        />
-                        
-                        <div className={styles.modalActions}>
-                            <button onClick={() => setQrCodeVisivel(null)} className={styles.formButton}>Fechar</button>
-                            <button onClick={handlePrint} className={styles.formButton}>Imprimir</button>
-                        </div>
-                    </div>
-                </div>
+            {pagination && pagination.totalPages > 1 && (
+                <HStack justifyContent="space-between" mt={4}>
+                    <Button 
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage <= 1 || isLoading}
+                        size="sm"
+                    >
+                        Anterior
+                    </Button>
+                    <Text fontSize="sm">
+                        Página {pagination.currentPage} de {pagination.totalPages}
+                    </Text>
+                    <Button 
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage >= pagination.totalPages || isLoading}
+                        size="sm"
+                    >
+                        Próxima
+                    </Button>
+                </HStack>
             )}
-        </div>
+
+            <Modal isOpen={qrCodeVisivel !== null} onClose={handleCloseModal} isCentered>
+                <ModalOverlay />
+                <ModalContent>
+                    <Box id="printable-qr-code">
+                        <ModalHeader>QR Code para Encomenda {qrCodeVisivel}</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody textAlign="center">
+                            <Text mb={4}>Imprima e cole na etiqueta. O motorista deve escanear este código.</Text>
+                            
+                            <QRCodeSVG 
+                                value={`${FRONTEND_URL}/driver/update?id=${qrCodeVisivel}&token=${driverTokenVisivel}`}
+                                size={256}
+                                style={{margin: '0 auto', display: 'block'}}
+                            />
+                        </ModalBody>
+                    </Box>
+                    <ModalFooter>
+                        <Button variant="ghost" mr={3} onClick={handleCloseModal}>
+                            Fechar
+                        </Button>
+                        <Button colorScheme="blue" onClick={handlePrint}>Imprimir</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </Box>
     );
 }
 
 
+// --- (COMPONENTE 2: Formulário Admin Cadastra Coleta) ---
+// (Sem alterações, permanece o mesmo)
 function FormAdminCadastraColeta() {
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
@@ -143,20 +306,21 @@ function FormAdminCadastraColeta() {
     const [valorFrete, setValorFrete] = useState('');
     const [pesoKg, setPesoKg] = useState('');
     const [dataVencimento, setDataVencimento] = useState('');
+    
     const [isLoading, setIsLoading] = useState(false);
-    const [mensagem, setMensagem] = useState('');
+    const toast = useToast(); // Hook para notificações
 
     const handleSubmitColeta = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setMensagem('');
         const dadosColeta = {
             nomeCliente, emailCliente, enderecoColeta, tipoCarga,
             cpfCnpjRemetente, cpfCnpjDestinatario, numeroNotaFiscal,
-            valorFrete, pesoKg, dataVencimento
+            valorFrete, pesoKg: pesoKg || null, dataVencimento: dataVencimento || null
         };
         try {
-            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/coletas/solicitar', {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const response = await fetch(`${API_URL}/api/coletas/solicitar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosColeta),
@@ -166,56 +330,156 @@ function FormAdminCadastraColeta() {
                  throw new Error(data.error || 'Falha ao cadastrar a coleta.');
             }
             const novaColeta = await response.json();
-            setMensagem(`Coleta cadastrada com sucesso! Nº Encomenda: ${novaColeta.numeroEncomenda}`);
+            
+            toast({
+                title: 'Coleta cadastrada!',
+                description: `Nº Encomenda: ${novaColeta.numeroEncomenda}`,
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+
+            // Limpa o formulário
             setNomeCliente(''); setEmailCliente(''); setEnderecoColeta(''); setTipoCarga('');
             setCpfCnpjRemetente(''); setCpfCnpjDestinatario(''); setNumeroNotaFiscal('');
             setValorFrete(''); setPesoKg(''); setDataVencimento('');
+
         } catch (error) {
-            setMensagem((error as Error).message);
+            toast({
+                title: 'Erro ao cadastrar.',
+                description: (error as Error).message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmitColeta} style={{marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '40px'}}>
-            <h4>Cadastrar Nova Coleta</h4>
-            <p>O funcionário preenche estes dados quando a carga é recebida.</p>
+        <Box 
+            as="form" 
+            onSubmit={handleSubmitColeta} 
+            mt="40px" 
+            borderTopWidth="1px" 
+            borderColor="gray.200" 
+            pt="40px"
+        >
+            <Heading as="h4" size="md" mb={1}>Cadastrar Nova Coleta</Heading>
+            <Text mb={6}>O funcionário preenche estes dados quando a carga é recebida.</Text>
             
-            <div className={styles.formGroup}><label htmlFor="carga_valor">Valor do Frete (R$)</label><input type="number" step="0.01" id="carga_valor" value={valorFrete} onChange={(e) => setValorFrete(e.target.value)} placeholder="Ex: 150.00" required /></div>
-            <div className={styles.formGroup}><label htmlFor="nf_coleta">Número da Nota Fiscal</label><input type="text" id="nf_coleta" value={numeroNotaFiscal} onChange={(e) => setNumeroNotaFiscal(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="rem_coleta">CPF/CNPJ Remetente</label><input type="text" id="rem_coleta" value={cpfCnpjRemetente} onChange={(e) => setCpfCnpjRemetente(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="dest_coleta">CPF/CNPJ Destinatário</label><input type="text" id="dest_coleta" value={cpfCnpjDestinatario} onChange={(e) => setCpfCnpjDestinatario(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="nome_coleta">Nome do Cliente (Remetente)</label><input type="text" id="nome_coleta" value={nomeCliente} onChange={(e) => setNomeCliente(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="email_coleta">E-mail do Cliente (Remetente)</label><input type="email" id="email_coleta" value={emailCliente} onChange={(e) => setEmailCliente(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="end_coleta">Endereço de Coleta</label><input type="text" id="end_coleta" value={enderecoColeta} onChange={(e) => setEnderecoColeta(e.target.value)} required/></div>
-            <div className={styles.formGroup}><label htmlFor="carga_peso">Peso (Kg) (Opcional)</label><input type="number" step="0.1" id="carga_peso" value={pesoKg} onChange={(e) => setPesoKg(e.target.value)} placeholder="Ex: 25.5"/></div>
-             <div className={styles.formGroup}><label htmlFor="carga_vencimento">Data de Vencimento (Opcional)</label><input type="date" id="carga_vencimento" value={dataVencimento} onChange={(e) => setDataVencimento(e.target.value)} /></div>
-            <div className={styles.formGroup}><label htmlFor="carga_coleta">Tipo da Carga (Opcional)</label><input type="text" id="carga_coleta" value={tipoCarga} onChange={(e) => setTipoCarga(e.target.value)}/></div>
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                
+                {/* Coluna 1 */}
+                <VStack spacing={4}>
+                    <FormControl isRequired>
+                        <FormLabel>Valor do Frete (R$)</FormLabel>
+                        <InputGroup>
+                            <InputLeftAddon>R$</InputLeftAddon>
+                            <NumberInput 
+                                value={valorFrete} 
+                                onChange={(valueString) => setValorFrete(valueString)}
+                                precision={2}
+                                min={0.01}
+                                w="100%"
+                            >
+                                <NumberInputField placeholder="Ex: 150.00" />
+                            </NumberInput>
+                        </InputGroup>
+                    </FormControl>
+                    
+                    <FormControl isRequired>
+                        <FormLabel>Número da Nota Fiscal</FormLabel>
+                        <Input value={numeroNotaFiscal} onChange={(e) => setNumeroNotaFiscal(e.target.value)} />
+                    </FormControl>
+                    
+                    <FormControl isRequired>
+                        <FormLabel>CPF/CNPJ Remetente</FormLabel>
+                        <Input value={cpfCnpjRemetente} onChange={(e) => setCpfCnpjRemetente(e.target.value)} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>CPF/CNPJ Destinatário</FormLabel>
+                        <Input value={cpfCnpjDestinatario} onChange={(e) => setCpfCnpjDestinatario(e.target.value)} />
+                    </FormControl>
+
+                    <FormControl>
+                        <FormLabel>Peso (Kg) (Opcional)</FormLabel>
+                        <NumberInput 
+                            value={pesoKg} 
+                            onChange={(valueString) => setPesoKg(valueString)}
+                            precision={1}
+                            step={0.5}
+                            min={0}
+                        >
+                            <NumberInputField placeholder="Ex: 25.5" />
+                        </NumberInput>
+                    </FormControl>
+                </VStack>
+
+                {/* Coluna 2 */}
+                <VStack spacing={4}>
+                    <FormControl isRequired>
+                        <FormLabel>Nome do Cliente (Remetente)</FormLabel>
+                        <Input value={nomeCliente} onChange={(e) => setNomeCliente(e.target.value)} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>E-mail do Cliente (Remetente)</FormLabel>
+                        <Input type="email" value={emailCliente} onChange={(e) => setEmailCliente(e.target.value)} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>Endereço de Coleta</FormLabel>
+                        <Input value={enderecoColeta} onChange={(e) => setEnderecoColeta(e.target.value)} />
+                    </FormControl>
+                    
+                    <FormControl>
+                        <FormLabel>Tipo da Carga (Opcional)</FormLabel>
+                        <Input value={tipoCarga} onChange={(e) => setTipoCarga(e.target.value)} placeholder="Ex: Caixas, Pallets"/>
+                    </FormControl>
+
+                    <FormControl>
+                        <FormLabel>Data de Vencimento (Opcional)</FormLabel>
+                        <Input type="date" value={dataVencimento} onChange={(e) => setDataVencimento(e.target.value)} />
+                    </FormControl>
+                </VStack>
             
-            <button type="submit" className={styles.formButton} disabled={isLoading}>
-                {isLoading ? 'Salvando...' : 'Salvar Coleta'}
-            </button>
-            {mensagem && <p style={{ marginTop: '1rem', textAlign: 'center' }}>{mensagem}</p>}
-        </form>
+            </SimpleGrid>
+            
+            <Button 
+                type="submit" 
+                colorScheme="blue" 
+                mt={6}
+                isLoading={isLoading}
+                loadingText="Salvando..."
+            >
+                Salvar Coleta
+            </Button>
+        </Box>
     );
 }
 
+
+// --- (COMPONENTE 3: Formulário Admin Adiciona Histórico) ---
+// (Sem alterações, permanece o mesmo)
 function FormAdminAdicionaHistorico() {
     const [notaFiscal, setNotaFiscal] = useState('');
     const [localizacao, setLocalizacao] = useState('');
     const [novoStatus, setNovoStatus] = useState('EM_TRANSITO');
-    const [mensagem, setMensagem] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    
+    const toast = useToast(); 
 
     const handleAddHistorico = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setMensagem('');
         const token = localStorage.getItem('admin_token');
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
         try {
-            const response = await fetch(`https://linhares-logistica-backend.onrender.com/api/admin/coletas/${notaFiscal}/historico`, {
+            const response = await fetch(`${API_URL}/api/admin/coletas/${notaFiscal}/historico`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -229,76 +493,102 @@ function FormAdminAdicionaHistorico() {
                 throw new Error(data.error || 'Falha ao adicionar histórico.');
             }
 
-            setMensagem('Histórico adicionado com sucesso! (A lista será atualizada no próximo recarregamento)');
+            toast({
+                title: 'Sucesso!',
+                description: 'Histórico adicionado. (A lista será atualizada no próximo recarregamento)',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+            
             setNotaFiscal('');
             setLocalizacao('');
 
         } catch (err) {
-            setMensagem((err as Error).message);
+            toast({
+                title: 'Erro ao adicionar histórico.',
+                description: (err as Error).message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleAddHistorico} style={{marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '40px'}}>
-            <h4>Adicionar Evento de Rastreio</h4>
-            <div className={styles.formGroup}>
-                <label htmlFor="nf_status">Número da Nota Fiscal</label>
-                <input 
-                    type="text" 
-                    id="nf_status" 
+        <Box 
+            as="form" 
+            onSubmit={handleAddHistorico} 
+            mt="40px" 
+            borderTopWidth="1px" 
+            borderColor="gray.200" 
+            pt="40px"
+        >
+            <Heading as="h4" size="md" mb="20px">Adicionar Evento de Rastreio</Heading>
+            
+            <FormControl id="nf_status" isRequired mb="16px">
+                <FormLabel>Número da Nota Fiscal</FormLabel>
+                <Input 
                     value={notaFiscal}
                     onChange={(e) => setNotaFiscal(e.target.value)}
                     placeholder="NF da coleta que será atualizada"
-                    required 
                 />
-            </div>
-            <div className={styles.formGroup}>
-                <label htmlFor="localizacao">Localização Atual</label>
-                <input 
-                    type="text" 
-                    id="localizacao" 
+            </FormControl>
+            
+            <FormControl id="localizacao" isRequired mb="16px">
+                <FormLabel>Localização Atual</FormLabel>
+                <Input 
                     value={localizacao}
                     onChange={(e) => setLocalizacao(e.target.value)}
                     placeholder="Ex: Centro de Distribuição - BH/MG"
-                    required 
                 />
-            </div>
-            <div className={styles.formGroup}>
-                <label htmlFor="status">Novo Status</label>
-                <select 
-                    id="status" 
+            </FormControl>
+            
+            <FormControl id="status" isRequired mb="24px">
+                <FormLabel>Novo Status</FormLabel>
+                <Select 
                     value={novoStatus} 
                     onChange={(e) => setNovoStatus(e.target.value)}
-                    className={styles.formInput}
                 >
                     <option value="COLETADO">Coletado</option>
                     <option value="EM_TRANSITO">Em Trânsito</option>
                     <option value="EM_ROTA_ENTREGA">Em Rota de Entrega</option>
                     <option value="CONCLUIDA">Concluída</option>
                     <option value="CANCELADA">Cancelada</option>
-                </select>
-            </div>
-            <button type="submit" className={styles.formButton} disabled={isLoading}>
-                {isLoading ? 'Adicionando...' : 'Adicionar Evento'}
-            </button>
-            {mensagem && <p style={{ marginTop: '1rem', textAlign: 'center' }}>{mensagem}</p>}
-        </form>
+                    <option value="EM_DEVOLUCAO">Em Devolução</option>
+                </Select>
+            </FormControl>
+            
+            <Button 
+                type="submit" 
+                colorScheme="blue" 
+                isLoading={isLoading} 
+                loadingText="Adicionando..." 
+            >
+                Adicionar Evento
+            </Button>
+        </Box>
     );
 }
 
 
+// --- (Página Principal) ---
+// (Sem alterações, permanece o mesmo)
 function AdminColetas() {
     return (
-        <div style={{width: '100%'}}>
-            <h2 className={styles.tituloPrincipal}>Gerenciar Coletas</h2>
+        <Box w="100%" p={4}>
+            <Heading as="h2" size="lg" mb={6}>
+                Gerenciar Coletas
+            </Heading>
 
-            <ListaColetas />
-            
-            <FormAdminCadastraColeta />
-            <FormAdminAdicionaHistorico />
-        </div>
+            <VStack spacing={10} align="stretch">
+                <ListaColetas />
+                <FormAdminCadastraColeta />
+                <FormAdminAdicionaHistorico />
+            </VStack>
+        </Box>
     );
 }
 export default AdminColetas;

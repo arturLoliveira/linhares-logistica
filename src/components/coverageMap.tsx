@@ -1,8 +1,21 @@
 import { FaMapMarkerAlt } from 'react-icons/fa';
-import styles from '../styles/coverage-map.module.css';
 import MinasGeraisMap from '../assets/minas.svg?react';
+import {
+    Box,
+    Heading,
+    Icon,
+    Text,
+    Tooltip,
+    Grid, 
+    GridItem, 
+    VStack, 
+    Stat,
+    StatLabel,
+    StatNumber
+} from '@chakra-ui/react';
 
 const todasAsCidades = [
+    
     { nome: 'Ouro Branco', top: '48%', left: '52%', isFeatured: true },
     { nome: 'Carandaí', top: '55%', left: '50%' },
     { nome: 'Cristiano Otoni', top: '66%', left: '49%' },
@@ -31,46 +44,87 @@ const todasAsCidades = [
     { nome: 'Cachoeira do Campo', top: '32%', left: '50%' },
 ];
 
-
 function CoverageMap() {
     return (
-        <section className={styles.coverageSection}>
-            <h2 className={styles.title}>Nossa Cobertura Regional</h2>
+        
+        <Box as="section" w="100%" py={16} bg="#F0F4FA"> 
+            <Heading as="h2" size="xl" textAlign="center" color="blue.700" mb={10}>
+                Nossa Cobertura Regional
+            </Heading>
 
-            <div className={styles.mapContainer}>
+            <Grid
+                templateColumns={{ base: '1fr', lg: '2fr 1fr' }} 
+                gap={8}
+                maxW="1400px" 
+                mx="auto"
+                px={4}
+            >
+                <GridItem 
+                    h={{ base: '500px', lg: 'auto' }}
+                >
+                    <Box position="relative" w="100%" h="100%" minH="450px"> 
+                        <MinasGeraisMap 
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                top: 0,
+                                left: 0
+                            }}
+                        />
 
-                <div className={styles.mapZoomWrapper}>
+                        {todasAsCidades.map((cidade) => (
+                            <Tooltip key={cidade.nome} label={cidade.nome} hasArrow>
+                                <Box
+                                    position="absolute"
+                                    
+                                    style={{ left: cidade.left, top: cidade.top }} 
+                                    transform="translate(-50%, -50%)"
+                                    zIndex={cidade.isFeatured ? 10 : 1}
+                                    color={cidade.isFeatured ? 'white' : 'gray.800'}
+                                    fontSize="1.5rem"
+                                    cursor="pointer"
+                                    _hover={{
+                                        transform: "translate(-50%, -50%) scale(1.5)",
+                                        color: 'blue.500'
+                                    }}
+                                    filter={cidade.isFeatured ? 'drop-shadow(0px 0px 3px rgba(0,0,0,0.7))' : 'none'}
+                                >
+                                    <Icon as={FaMapMarkerAlt} />
+                                </Box>
+                            </Tooltip>
+                        ))}
+                    </Box>
+                </GridItem>
 
-                    <MinasGeraisMap className={styles.mapImage} />
+                <GridItem>
+                    <VStack spacing={6} align="stretch">
+                        <StatBox label="Cidades Atendidas" value="+25 Municípios" />
+                        <StatBox label="Regiões Cobertas" value="Metropolitana de BH, Campo das Vertentes e região central de Minas Gerais" />
+                        <StatBox label="Entregas Mensais" value="+10.000 Entregas" />
+                    </VStack>
+                </GridItem>
+            </Grid>
+        </Box>
+    );
+}
 
-                    {todasAsCidades.map((cidade) => (
-                        <div
-                            key={cidade.nome}
-                            className={`${styles.marker} ${cidade.isFeatured ? styles.markerFeatured : ''}`} style={{ left: cidade.left, top: cidade.top }}
-                        >
-                            <FaMapMarkerAlt />
-                            <span className={styles.tooltip} translate="no">{cidade.nome}</span>
-                        </div>
-                    ))}
 
-                </div>
-            </div>
-
-            <div className={styles.infoCardsContainer}>
-                <div className={styles.infoCard}>
-                    <p className={styles.label}>Cidades Atendidas</p>
-                    <h3 className={styles.value}>+25 Municípios</h3>
-                </div>
-                <div className={styles.infoCard}>
-                    <p className={styles.label}>Regiões Cobertas</p>
-                    <h3 className={styles.value}>Metropolitana de BH, Campo das Vertentes e região central de Minas Gerais</h3>
-                </div>
-                <div className={styles.infoCard}>
-                    <p className={styles.label}>Entregas Mensais</p>
-                    <h3 className={styles.value}>+10.000 Entregas</h3>
-                </div>
-            </div>
-        </section>
+function StatBox({ label, value }: { label: string, value: string }) {
+    return (
+        <Box 
+            p={6} 
+            shadow="md" 
+            borderRadius="md" 
+            bg="white"
+            borderLeftWidth="5px" 
+            borderLeftColor="blue.500"
+        > 
+            <Stat>
+                <StatLabel fontSize="sm" color="gray.600">{label}</StatLabel>
+                <StatNumber fontSize="xl" fontWeight="bold" color="blue.600">{value}</StatNumber>
+            </Stat>
+        </Box>
     );
 }
 

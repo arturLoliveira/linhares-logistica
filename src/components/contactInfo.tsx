@@ -1,7 +1,9 @@
-import styles from '../styles/contact-info.module.css';
+
+import { Box, HStack, Icon, Text, Link } from '@chakra-ui/react'; 
+import type { ReactNode } from 'react'; 
 
 interface ContactInfoProps {
-    icon: React.ReactNode;
+    icon: ReactNode; 
     info: string;
     isLink?: boolean;
 }
@@ -11,26 +13,31 @@ function ContactInfo({ icon, info, isLink = false }: ContactInfoProps) {
     const InfoContent = () => {
         if (isLink) {
             return (
-                <h4 className={styles.infoText}>
-                    <a href={`mailto:${info}`} className={styles.link}>
+                <Text as="h4" fontSize="md" fontWeight="medium">
+                    <Link 
+                        href={`mailto:${info}`} 
+                        color="gray.700"
+                        
+                        _hover={{ textDecoration: 'none' }} 
+                    >
                         {info}
-                    </a>
-                </h4>
+                    </Link>
+                </Text>
             );
         }
 
         return (
-            <h4 className={styles.infoText}>
+            <Text as="h4" fontSize="md" fontWeight="medium" color="gray.700">
                 {info}
-            </h4>
+            </Text>
         );
     };
     
     return (
-        <div className={styles.contactInfo} translate="no">
-            {icon}
+        <HStack spacing={3} align="center">
+            <Box color="blue.500" fontSize="xl">{icon}</Box>
             <InfoContent />
-        </div>
+        </HStack>
     )
 }
 

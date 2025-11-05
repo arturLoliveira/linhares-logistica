@@ -1,5 +1,16 @@
 import { useState } from 'react';
-import styles from '../styles/area-cliente.module.css';
+// import styles from '../styles/area-cliente.module.css'; // <-- Removido
+import {
+    Box,
+    Heading,
+    FormControl,
+    FormLabel,
+    Input,
+    Button,
+    useToast,
+    VStack,
+    Text
+} from '@chakra-ui/react';
 
 function FormAdminCadastraCliente() {
     const [cpfCnpj, setCpfCnpj] = useState('');
@@ -7,22 +18,25 @@ function FormAdminCadastraCliente() {
     const [email, setEmail] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
-    const [mensagem, setMensagem] = useState('');
+    // const [mensagem, setMensagem] = useState(''); // <-- Substituído pelo useToast
+    const toast = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setMensagem('');
+        // setMensagem(''); // <-- Removido
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch('https://linhares-logistica-backend.onrender.com/api/admin/clientes/registrar', {
+            // A URL da API
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const response = await fetch(`${API_URL}/api/admin/clientes/registrar`, { //
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ cpfCnpj, nome, email })
+                body: JSON.stringify({ cpfCnpj, nome, email }) //
             });
 
             const data = await response.json();
@@ -30,49 +44,96 @@ function FormAdminCadastraCliente() {
                 throw new Error(data.error || 'Falha ao cadastrar.');
             }
 
-            setMensagem(`Cliente ${data.nome || data.cpfCnpj} cadastrado com sucesso!`);
+            // setMensagem(`Cliente ${data.nome || data.cpfCnpj} cadastrado com sucesso!`); // <-- Substituído
+            toast({
+                title: 'Cliente cadastrado!',
+                description: `Cliente ${data.nome || data.cpfCnpj} foi cadastrado com sucesso.`,
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
             
-            setCpfCnpj(''); setNome(''); setEmail('');
+            setCpfCnpj(''); setNome(''); setEmail(''); //
 
         } catch (err) {
-            setMensagem((err as Error).message);
+            // setMensagem((err as Error).message); // <-- Substituído
+            toast({
+                title: 'Erro ao cadastrar.',
+                description: (err as Error).message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h4>Cadastrar Novo Cliente (Destinatário)</h4>
-            <p>Cadastre um cliente e sua senha de acesso ao rastreamento.</p>
+        <Box 
+            as="form" 
+            onSubmit={handleSubmit} 
+            w={{ base: '100%', md: '70%', lg: '50%' }} // Limita a largura em telas maiores
+        >
+            <Heading as="h4" size="md" mb={1}>
+                Cadastrar Novo Cliente (Destinatário)
+            </Heading>
+            <Text mb={6}>
+                Cadastre um cliente (destinatário) para vincular às coletas.
+            </Text>
             
-            <div className={styles.formGroup}>
-                <label htmlFor="cliente_cpfcnpj">CPF/CNPJ do Cliente (Destinatário)</label>
-                <input type="text" id="cliente_cpfcnpj" value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} required />
-            </div>
-            <div className={styles.formGroup}>
-                <label htmlFor="cliente_nome">Nome do Cliente (Opcional)</label>
-                <input type="text" id="cliente_nome" value={nome} onChange={e => setNome(e.target.value)} />
-            </div>
-            <div className={styles.formGroup}>
-                <label htmlFor="cliente_email">Email do Cliente (Opcional)</label>
-                <input type="email" id="cliente_email" value={email} onChange={e => setEmail(e.target.value)} />
-            </div>
+            <VStack spacing={4}>
+                <FormControl id="cliente_cpfcnpj" isRequired>
+                    <FormLabel>CPF/CNPJ do Cliente (Destinatário)</FormLabel>
+                    <Input 
+                        type="text" 
+                        value={cpfCnpj} 
+                        onChange={e => setCpfCnpj(e.target.value)} //
+                    />
+                </FormControl>
+                
+                <FormControl id="cliente_nome">
+                    <FormLabel>Nome do Cliente (Opcional)</FormLabel>
+                    <Input 
+                        type="text" 
+                        value={nome} 
+                        onChange={e => setNome(e.target.value)} //
+                    />
+                </FormControl>
+
+                <FormControl id="cliente_email">
+                    <FormLabel>Email do Cliente (Opcional)</FormLabel>
+                    <Input 
+                        type="email" 
+                        value={email} 
+                        onChange={e => setEmail(e.target.value)} //
+                    />
+                </FormControl>
+            </VStack>
             
-            <button type="submit" className={styles.formButton} disabled={isLoading}>
-                {isLoading ? 'Cadastrando...' : 'Cadastrar Cliente'}
-            </button>
-            {mensagem && <p style={{ marginTop: '1rem', textAlign: 'center' }}>{mensagem}</p>}
-        </form>
+            <Button 
+                type="submit" 
+                colorScheme="blue"
+                mt={6}
+                isLoading={isLoading} //
+                loadingText="Cadastrando..."
+            >
+                Cadastrar Cliente
+            </Button>
+            
+            {/* {mensagem && <p>...</p>} // <-- Removido */ }
+        </Box>
     );
 }
 
 function AdminClientes() {
     return (
-        <div>
-            <h2 className={styles.tituloPrincipal}>Gerenciar Clientes</h2>
+        <Box w="100%" p={4}>
+            <Heading as="h2" size="lg" mb={6}>
+                Gerenciar Clientes
+            </Heading>
             <FormAdminCadastraCliente />
-        </div>
+        </Box>
     );
 }
 export default AdminClientes;

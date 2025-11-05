@@ -1,17 +1,19 @@
 import { Outlet } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
-import styles from '../styles/app.module.css';
+
+import { Flex, Box } from '@chakra-ui/react';
 
 function Layout() {
   return (
-    <div className={styles.globalContainer}>
+    
+    <Flex direction="column" minH="100vh">
       <Header />
-      <main className={styles.mainContainer}>
+      <Box as="main" flex="1">
         <Outlet />
-      </main>
+      </Box>
       <Footer />
-    </div>
+    </Flex>
   );
 }
 

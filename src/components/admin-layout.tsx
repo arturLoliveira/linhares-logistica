@@ -1,26 +1,55 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import styles from '../styles/admin-layout.module.css';
-
 import { 
     FaTachometerAlt, FaTruckLoading, FaUndo, 
     FaUsers, FaSignOutAlt 
 } from 'react-icons/fa';
 import type { JSX } from 'react';
+import {
+    Box,
+    Flex,
+    VStack,
+    Heading,
+    Text,
+    Spacer,
+    Button,
+} from '@chakra-ui/react';
 
 
 const NavItem = ({ to, icon, label }: { to: string, icon: JSX.Element, label: string }) => {
     return (
         <NavLink 
             to={to} 
-            className={({ isActive }) => 
-                `${styles.sidebarLink} ${isActive ? styles.active : ''}`
-            }
         >
-            {icon}
-            <span>{label}</span>
+            {({ isActive }) => (
+                <Flex
+                    align="center"
+                    p={3}
+                    mx={4}
+                    borderRadius="md"
+                    cursor="pointer"
+                    
+                    color={isActive ? "white" : "gray.400"}
+                    bg={isActive ? "blue.500" : "transparent"}
+                    _hover={{
+                        bg: isActive ? "blue.600" : "gray.700",
+                        color: "white"
+                    }}
+                    role="group" 
+                >
+                    <Box 
+                        mr={3} 
+                        color={isActive ? "white" : "gray.500"}
+                        _groupHover={{ color: "white" }}
+                    >
+                        {icon}
+                    </Box>
+                    <Text fontWeight="medium">{label}</Text>
+                </Flex>
+            )}
         </NavLink>
     );
 };
+
 
 function AdminLayout() {
     const navigate = useNavigate();
@@ -31,25 +60,58 @@ function AdminLayout() {
     };
 
     return (
-        <div className={styles.adminLayout}>
-            <nav className={styles.sidebar}>
-                <h2 className={styles.sidebarTitle}>Painel Admin</h2>
-                <div className={styles.sidebarNav}>
+        <Flex>
+            <VStack
+                as="nav"
+                w="250px"
+                h="100vh"
+                position="fixed"
+                top="0"
+                left="0"
+                bg="gray.900" 
+                color="white"
+                spacing={4}
+                align="stretch"
+                py={6}
+            >
+                <Heading as="h2" size="lg" textAlign="center" mb={6}>
+                    Painel Admin
+                </Heading>
+                
+                <VStack spacing={2} align="stretch">
                     <NavItem to="/admin/dashboard" icon={<FaTachometerAlt />} label="Dashboard" />
                     <NavItem to="/admin/coletas" icon={<FaTruckLoading />} label="Coletas" />
                     <NavItem to="/admin/devolucoes" icon={<FaUndo />} label="Devoluções" />
                     <NavItem to="/admin/clientes" icon={<FaUsers />} label="Clientes" />
-                </div>
+                </VStack>
                 
-                <button onClick={handleLogout} className={styles.logoutButton}>
-                    <FaSignOutAlt />
-                    <span style={{marginLeft: '0.75rem'}}>Sair</span>
-                </button>
-            </nav>
-            <main className={styles.contentArea}>
+                <Spacer /> 
+                
+                <Button 
+                    onClick={handleLogout} 
+                    colorScheme="red"
+                    variant="ghost" 
+                    leftIcon={<FaSignOutAlt />}
+                    justifyContent="flex-start" 
+                    m={4} 
+                    _hover={{ bg: "red.500", color: "white" }}
+                    fontSize="2xl"
+                >
+                    Sair
+                </Button>
+            </VStack>
+            
+            <Box 
+                as="main" 
+                ml="250px" 
+                w="full" 
+                p={8} 
+                bg="gray.50" 
+                minH="100vh"
+            >
                 <Outlet />
-            </main>
-        </div>
+            </Box>
+        </Flex>
     );
 }
 

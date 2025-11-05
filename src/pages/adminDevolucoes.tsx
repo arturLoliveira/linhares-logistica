@@ -1,5 +1,20 @@
 import { useState, useEffect } from 'react';
-import styles from '../styles/area-cliente.module.css';
+// import styles from '../styles/area-cliente.module.css'; // <-- Removido
+import {
+    Box,
+    Heading,
+    Text,
+    Spinner,
+    Alert,
+    AlertIcon,
+    TableContainer,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td
+} from '@chakra-ui/react';
 
 function ListaDevolucoes() {
     type Devolucao = {
@@ -18,21 +33,23 @@ function ListaDevolucoes() {
     useEffect(() => {
         const fetchDevolucoes = async () => {
             const token = localStorage.getItem('admin_token');
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            
             try {
-                const response = await fetch('https://linhares-logistica-backend.onrender.com/api/admin/devolucoes', {
+                const response = await fetch(`${API_URL}/api/admin/devolucoes`, { //
                     method: 'GET',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } //
                 });
 
                 if (!response.ok) throw new Error('Falha ao buscar solicitações.');
                 
                 const data: Devolucao[] = await response.json();
-                setDevolucoes(data);
+                setDevolucoes(data); //
 
             } catch (err) {
-                setErro((err as Error).message);
+                setErro((err as Error).message); //
             } finally {
-                setIsLoading(false);
+                setIsLoading(false); //
             }
         };
 
@@ -40,52 +57,66 @@ function ListaDevolucoes() {
     }, []);
 
     if (isLoading) {
-        return <p>Carregando solicitações de devolução...</p>;
+        return (
+            <Box textAlign="center" p={10}>
+                <Spinner size="xl" />
+                <Text mt={2}>Carregando solicitações de devolução...</Text>
+            </Box>
+        );
     }
 
     if (erro) {
-        return <p style={{ color: 'red' }}>{erro}</p>;
+        return (
+            <Alert status="error">
+                <AlertIcon />
+                {erro}
+            </Alert>
+        );
     }
 
     return (
-        <div style={{width: '100%'}}>
-            <h4>Solicitações de Devolução Pendentes</h4>
+        <Box w="100%">
+            <Heading as="h4" size="md" mb={4}>Solicitações de Devolução Pendentes</Heading>
             {devolucoes.length === 0 ? (
-                <p>Nenhuma solicitação de devolução encontrada.</p>
+                <Text>Nenhuma solicitação de devolução encontrada.</Text>
             ) : (
-                <table className={styles.tabelaDevolucoes}>
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Cliente</th>
-                            <th>Email</th>
-                            <th>NF Original</th>
-                            <th>Motivo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {devolucoes.map((dev) => (
-                            <tr key={dev.id}>
-                                <td data-label="Data">{new Date(dev.dataSolicitacao).toLocaleDateString()}</td>
-                                <td data-label="Cliente">{dev.nomeCliente}</td>
-                                <td data-label="Email">{dev.emailCliente}</td>
-                                <td data-label="NF Original">{dev.numeroNFOriginal}</td>
-                                <td data-label="Motivo">{dev.motivoDevolucao || 'N/A'}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <TableContainer>
+                    <Table variant="simple">
+                        <Thead>
+                            <Tr>
+                                <Th>Data</Th>
+                                <Th>Cliente</Th>
+                                <Th>Email</Th>
+                                <Th>NF Original</Th>
+                                <Th>Motivo</Th>
+                            </Tr>
+                        </Thead>
+                        <Tbody>
+                            {devolucoes.map((dev) => (
+                                <Tr key={dev.id}>
+                                    <Td>{new Date(dev.dataSolicitacao).toLocaleDateString()}</Td>
+                                    <Td>{dev.nomeCliente}</Td>
+                                    <Td>{dev.emailCliente}</Td>
+                                    <Td>{dev.numeroNFOriginal}</Td>
+                                    <Td>{dev.motivoDevolucao || 'N/A'}</Td>
+                                </Tr>
+                            ))}
+                        </Tbody>
+                    </Table>
+                </TableContainer>
             )}
-        </div>
+        </Box>
     );
 }
 
 function AdminDevolucoes() {
     return (
-        <div>
-            <h2 className={styles.tituloPrincipal}>Solicitações de Devolução</h2>
+        <Box w="100%" p={4}>
+            <Heading as="h2" size="lg" mb={6}>
+                Solicitações de Devolução
+            </Heading>
             <ListaDevolucoes />
-        </div>
+        </Box>
     );
 }
 export default AdminDevolucoes;

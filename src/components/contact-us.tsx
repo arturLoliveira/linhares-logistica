@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
+// ... (configuração do Leaflet)
 let DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow, 
@@ -17,9 +18,27 @@ import { AiFillInstagram, AiOutlineMail } from "react-icons/ai";
 import { MdLocationOn } from "react-icons/md";
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import ContactInfo from "./contactInfo";
-import styles from '../styles/contact-us.module.css';
 
 import { useForm, ValidationError } from '@formspree/react';
+import {
+    Box,
+    Heading,
+    Text,
+    SimpleGrid,
+    VStack,
+    Divider,
+    Link,
+    Button,
+    FormControl,
+    FormLabel,
+    Input,
+    Textarea,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
+    Spacer // <-- 1. IMPORTAR O SPACER
+} from '@chakra-ui/react';
 
 const posicaoGalpao = [-20.525125, -43.701911] as [number, number];
 const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${posicaoGalpao[0]},${posicaoGalpao[1]}`; 
@@ -29,24 +48,56 @@ function ContactUs() {
     const [state, handleSubmit] = useForm("xldoynye");
 
     if (state.succeeded) {
+        // ... (bloco de sucesso)
         return (
-            <div className={styles.contactUs}>
-                <h2 className={styles.sectionTitle}>Mensagem Enviada!</h2>
-                <p style={{textAlign: 'center', fontSize: '1.2rem'}}>
-                    Obrigado por entrar em contato. Responderemos em breve!
-                </p>
-            </div>
+            <Box as="section" w="100%" py={16} bg="#F0F4FA">
+                <Alert
+                    status="success"
+                    variant="subtle"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    textAlign="center"
+                    height="200px"
+                    maxW="lg"
+                    mx="auto"
+                >
+                    <AlertIcon boxSize="40px" mr={0} />
+                    <AlertTitle mt={4} mb={1} fontSize="lg">
+                        Mensagem Enviada!
+                    </AlertTitle>
+                    <AlertDescription maxWidth="sm">
+                        Obrigado por entrar em contato. Responderemos em breve!
+                    </AlertDescription>
+                </Alert>
+            </Box>
         );
     }
 
     return (
-        <div className={styles.contactUs}>
-            <h2 className={styles.sectionTitle}>Contatos</h2>
+        <Box as="section" w="100%" py={16} bg="#F0F4FA" id="contato">
+            <Heading as="h2" size="xl" textAlign="center" mb={10}>
+                Contatos
+            </Heading>
 
-            <div className={styles.contactCardsContainer}>
-   
-                <div className={styles.mapContact}>
-                    <MapContainer center={posicaoGalpao} zoom={16} scrollWheelZoom={true}>
+            {/* 2. FORÇAR A MESMA ALTURA NOS CARDS */}
+            <SimpleGrid 
+                columns={{ base: 1, lg: 3 }} 
+                spacing={8} 
+                maxW="1400px" 
+                mx="auto" 
+                px={4}
+                alignItems="stretch" 
+            >
+                {/* --- Coluna 1: Mapa --- */}
+                <Box bg="white" borderRadius="md" overflow="hidden" shadow="lg">
+                    <MapContainer 
+                        center={posicaoGalpao} 
+                        zoom={16} 
+                        scrollWheelZoom={true} 
+                        // Altura 100% para preencher o card
+                        style={{ height: '100%', minHeight: '500px', width: '100%' }}
+                    >
                         <TileLayer
                             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -54,9 +105,7 @@ function ContactUs() {
                         <Marker position={posicaoGalpao}>
                             <Popup>
                                 <div>
-                                    <b>Galpão de distribuição</b>
-                                    <br />
-                                    <br />
+                                    <b>Galpão de distribuição</b><br /><br />
                                     <a href={googleMapsUrl} target='_blank' rel='noopener noreferrer'>
                                         Abrir no Google Maps
                                     </a>
@@ -64,127 +113,106 @@ function ContactUs() {
                             </Popup>
                         </Marker>
                     </MapContainer>
-                </div>
+                </Box>
 
-                <div className={styles.contact}>
-                    <h3 className={styles.contactTitle}>Estamos aqui para lhe atender!</h3>
-                    
-                    <hr className={styles.divider} />
-                    <ContactInfo
-                        icon={<FaPhone />}
-                        info="31 993751683"
-                    />
-                    <ContactInfo
-                        icon={<AiOutlineMail />} 
-                        info="transporteslinhares7@gmail.com"
-                        isLink={true} 
-                    />
-                    <ContactInfo
-                        icon={<FaMapMarkerAlt />}
-                        info="Rua Santo Antônio, 1372, Centro, Ouro Branco"
-                    />
-                    <a 
+                {/* --- Coluna 2: Informações --- */}
+                <VStack 
+                    spacing={5} 
+                    align="flex-start" 
+                    p={6} 
+                    bg="white" 
+                    borderRadius="md" 
+                    shadow="lg"
+                    flex="1" // 3. FAZER O VSTACK CRESCER
+                >
+                    <Heading as="h3" size="lg">
+                        Estamos aqui para lhe atender!
+                    </Heading>
+                    <Divider />
+                    <ContactInfo icon={<FaPhone />} info="31 993751683" />
+                    <ContactInfo icon={<AiOutlineMail />} info="transporteslinhares7@gmail.com" isLink={true} />
+                    <ContactInfo icon={<FaMapMarkerAlt />} info="Rua Santo Antônio, 1372, Centro, Ouro Branco" />
+                    <Link 
                       href="https://www.instagram.com/transportes.linhares"
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className={styles.contactInfoLink}
-                      translate="no"
+                      _hover={{ textDecoration: 'none' }}
                     >
-                        <ContactInfo
-                        icon={<AiFillInstagram /> }
-                        info="@transportes.linhares"
-                    />
-
-                    </a>
-                    <a
+                        <ContactInfo icon={<AiFillInstagram />} info="@transportes.linhares" />
+                    </Link>
+                    
+                    <Spacer /> {/* 4. ADICIONAR O SPACER */}
+                    
+                    <Button 
+                        as={Link}
                         href={googleMapsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={styles.contactMapButton}
+                        leftIcon={<MdLocationOn />}
+                        colorScheme="blue"
+                        variant="outline" 
+                        w="100%"
                     >
-                        <MdLocationOn className={styles.buttonIcon} />
-                        <span className={styles.buttonText}>Ver no Google Maps</span>
-                    </a>
-                    </div>
-                <div className={styles.contactForm}>
-                    <h3 className={styles.contactTitle}>
-                        Ou envie uma mensagem
-                    </h3>
-                    <p className={styles.contactSubtitle}>
-                        Diversos canais de comunicação para que você se sinta mais à vontade para nos contactar quando quiser.
-                    </p>
+                        Ver no Google Maps
+                    </Button>
+                </VStack>
 
-                    <form className={styles.form} onSubmit={handleSubmit}>
-                        <div className={styles.formGroup}>
-                            <label htmlFor="nome" className={styles.formLabel}>Nome</label>
-                            <input 
-                              type="text" 
-                              id="nome" 
-                              name="nome" 
-                              className={styles.formInput} 
-                              placeholder="Seu nome completo" 
-                              required 
-                            />
-                        </div>
+                {/* --- Coluna 3: Formulário --- */}
+                <Box 
+                    as="form" 
+                    onSubmit={handleSubmit}
+                    p={6} 
+                    bg="white" 
+                    borderRadius="md" 
+                    shadow="lg"
+                    display="flex" // 3. FAZER O FORM CRESCER
+                    flexDirection="column"
+                >
+                    <VStack spacing={4} flex="1"> {/* 3. FAZER O VSTACK CRESCER */}
+                        <Heading as="h3" size="lg" w="100%">
+                            Ou envie uma mensagem
+                        </Heading>
+                        <Text w="100%">
+                            Diversos canais de comunicação para que você se sinta mais à vontade.
+                        </Text>
+                        
+                        <SimpleGrid columns={2} spacing={4} w="100%">
+                            <FormControl isRequired>
+                                <FormLabel>Nome</FormLabel>
+                                <Input type="text" id="nome" name="nome" placeholder="Seu nome" />
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel>Telefone</FormLabel>
+                                <Input type="tel" id="telefone" name="telefone" placeholder="(XX) 9XXXX-XXXX" />
+                            </FormControl>
+                        </SimpleGrid>
+                        
+                        <FormControl isRequired>
+                            <FormLabel>E-mail</FormLabel>
+                            <Input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" />
+                            <ValidationError prefix="Email" field="email" errors={state.errors} />
+                        </FormControl>
+                        
+                        <FormControl isRequired>
+                            <FormLabel>Mensagem</FormLabel>
+                            <Textarea id="mensagem" name="mensagem" rows={4} placeholder="Digite sua cotação ou dúvida..." />
+                            <ValidationError prefix="Mensagem" field="mensagem" errors={state.errors} />
+                        </FormControl>
+                        
+                        <Spacer /> {/* 4. ADICIONAR O SPACER */}
 
-                        <div className={styles.formGroup}>
-                            <label htmlFor="email" className={styles.formLabel}>E-mail</label>
-                            <input 
-                              type="email" 
-                              id="email" 
-                              name="email" 
-                              className={styles.formInput} 
-                              placeholder="seu.email@exemplo.com" 
-                              required 
-                            />
-                            <ValidationError 
-                              prefix="Email" 
-                              field="email"
-                              errors={state.errors}
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label htmlFor="telefone" className={styles.formLabel}>Telefone</label>
-                            <input 
-                              type="tel" 
-                              id="telefone" 
-                              name="telefone" 
-                              className={styles.formInput} 
-                              placeholder="(XX) 9XXXX-XXXX" 
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label htmlFor="mensagem" className={styles.formLabel}>Mensagem</label>
-                            <textarea 
-                              id="mensagem" 
-                              name="mensagem" 
-                              className={styles.formTextarea} 
-                              rows={4} 
-                              placeholder="Digite sua cotação ou dúvida..." 
-                              required
-                            ></textarea>
-
-                            <ValidationError 
-                              prefix="Mensagem" 
-                              field="mensagem"
-                              errors={state.errors}
-                            />
-                        </div>
-
-                        <button 
+                        <Button 
                           type="submit" 
-                          className={styles.formButton}
-                          disabled={state.submitting}
+                          colorScheme="blue"
+                          w="100%"
+                          isLoading={state.submitting}
                         >
-                          {state.submitting ? "Enviando..." : "Enviar Mensagem"}
-                        </button>
-                    </form>
-
-                </div>
-            </div>
-        </div>
+                          Enviar Mensagem
+                        </Button>
+                    </VStack>
+                </Box>
+            </SimpleGrid>
+        </Box>
     )
 }
 
