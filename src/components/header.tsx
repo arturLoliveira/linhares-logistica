@@ -41,7 +41,7 @@ function Header() {
                 <Image 
                   src={logoDaEmpresa} 
                   alt="Logo Transportes Linhares" 
-                  h={{ base: '60px', md: '80px' }} 
+                  h={{ base: '120px', md: '140px' }} 
                   objectFit="contain"
                 />
             </RouterLink>

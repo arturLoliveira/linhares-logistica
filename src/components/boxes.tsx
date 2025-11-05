@@ -26,6 +26,7 @@ function Boxes({ icon, title, description }: BoxItemProps) {
             display="flex"
             alignItems="center"
             py={{ base: 8, md: 8 }}
+            mt={{base: 0, md:-120}}
         >
             <VStack 
                 spacing={3} 

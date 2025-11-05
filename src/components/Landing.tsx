@@ -15,12 +15,11 @@ function Landing() {
          <Box
             as="section"
             w="100%"
-            h={{ base: '55vh', md: '65vh' }} 
-            minH="600px" 
+            h={{ base: '75vh', md: '80vh' }} 
             position="relative" 
             bgImage={HERO_IMAGE_URL}
             bgSize="cover"
-            bgPosition="center"
+            bgPosition={{ base: 'top center', md: 'center' }}
             bgRepeat="no-repeat"
             display="flex"
             alignItems="center"
@@ -53,12 +52,14 @@ function Landing() {
                         as="h1" 
                         size={{ base: 'xl', md: '3xl' }}
                         color="white"
+                        textShadow="2px 2px 4px rgba(0,0,0,0.8)"
                     >
                         Sua carga, nossa prioridade.
                     </Heading>
                     <Text 
                         fontSize={{ base: 'lg', md: 'xl' }}
                         color="gray.200"
+                        textShadow="1px 1px 3px rgba(0,0,0,0.8)"
                     >
                       Mais do que uma transportadora, somos o parceiro logístico 
                       que sua empresa precisa para crescer. Entregas em toda 
