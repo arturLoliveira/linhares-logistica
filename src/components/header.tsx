@@ -17,7 +17,7 @@ import {
     DrawerContent,
     DrawerCloseButton,
     VStack,
-    DrawerHeader
+    DrawerHeader,  
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -53,14 +53,14 @@ function Header() {
 
             <Flex 
                 flex={{ base: 1, md: 'none' }} 
-                justifyContent={{ base: 'center', md: 'flex-start' }} 
+                justifyContent={{ base: 'center', md: 'flex-start' }}
                 align="center"
             >
                 <RouterLink to="/">
                     <Image 
                       src={logoDaEmpresa} 
                       alt="Logo Transportes Linhares" 
-                      h={{ base: '90px', md: '110px' }} 
+                      h={{ base: '60px', md: '80px' }} 
                       objectFit="contain"
                     />
                 </RouterLink>
@@ -109,14 +109,8 @@ function Header() {
                 </Button>
             </HStack>
 
-            <IconButton
-                aria-label="Abrir menu"
-                icon={<FaBars />}
-                display={{ base: 'flex', md: 'none' }} 
-                onClick={onOpen} 
-                variant="ghost"
-                fontSize="2xl"
-            />
+            <Box display={{ base: 'block', md: 'none' }} w="40px" /> 
+
 
             <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
                 <DrawerOverlay />

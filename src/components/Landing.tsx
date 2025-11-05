@@ -15,7 +15,7 @@ function Landing() {
          <Box
             as="section"
             w="100%"
-            h={{ base: '65vh', md: '80vh' }} 
+            h={{ base: '60vh', md: '80vh' }} 
             position="relative" 
             bgImage={HERO_IMAGE_URL}
             bgSize="cover"
@@ -24,7 +24,8 @@ function Landing() {
             display="flex"
             alignItems="center"
             justifyContent="center" 
-            bgAttachment="fixed" 
+            
+            bgAttachment={{ base: 'scroll', md: 'fixed' }} 
          >
             <Box
                 position="absolute"
@@ -40,7 +41,7 @@ function Landing() {
                 maxW={{ base: '90%', md: 'container.lg' }}
                 position="relative" 
                 zIndex={2} 
-                px={{ base: 4, md: 0 }} 
+                px={{ base: 4, md: 0 }}
             >
                 <VStack 
                     spacing={6} 
@@ -51,14 +52,14 @@ function Landing() {
                 >
                     <Heading 
                         as="h1" 
-                        size={{ base: '2xl', md: '3xl' }} 
+                        size={{ base: '2xl', md: '3xl' }}
                         color="white"
                         textShadow="2px 2px 4px rgba(0,0,0,0.8)"
                     >
                         Sua carga, nossa prioridade.
                     </Heading>
                     <Text 
-                        fontSize={{ base: 'lg', md: 'xl' }} 
+                        fontSize={{ base: 'lg', md: 'xl' }}
                         color="gray.200"
                         textShadow="1px 1px 3px rgba(0,0,0,0.8)"
                     >
