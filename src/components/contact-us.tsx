@@ -22,7 +22,7 @@ import styles from '../styles/contact-us.module.css';
 import { useForm, ValidationError } from '@formspree/react';
 
 const posicaoGalpao = [-20.525125, -43.701911] as [number, number];
-const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${posicaoGalpao[0]},${posicaoGalpao[1]}`; // Corrigido o link do Google Maps
+const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${posicaoGalpao[0]},${posicaoGalpao[1]}`; 
 
 function ContactUs() {
 

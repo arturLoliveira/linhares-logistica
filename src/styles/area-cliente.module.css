@@ -1,4 +1,4 @@
-/* ---------- BASE: MOBILE FIRST ---------- */
+
 .areaCliente {
     width: 100%;
     margin: 20px auto;
@@ -13,7 +13,7 @@
     margin-bottom: 1.5rem;
 }
 
-/* Accordion */
+
 .accordion {
     border: 1px solid var(--cor-borda);
     border-radius: var(--raio-borda);
@@ -80,7 +80,7 @@
     padding: 1.25rem;
 }
 
-/* Formulários */
+
 .form {
     width: 100%;
 }
@@ -140,7 +140,7 @@
     background-color: var(--cor-principal-dark);
 }
 
-/* Tabelas */
+
 .tabelaDevolucoes {
     width: 100%;
     border-collapse: collapse;
@@ -166,7 +166,7 @@
     background-color: var(--cor-fundo-elemento);
 }
 
-/* Cards de estatísticas */
+
 .statsContainer {
     display: flex;
     flex-direction: column;
@@ -198,7 +198,7 @@
     margin-top: 0.5rem;
 }
 
-/* Filtros */
+
 .filtroContainer {
     display: flex;
     flex-wrap: wrap;
@@ -227,7 +227,7 @@
     border-color: var(--cor-principal);
 }
 
-/* Status */
+
 .statusBadge,
 .statusSelect {
     padding: 0.25rem 0.6rem;
@@ -237,7 +237,7 @@
     text-transform: uppercase;
 }
 
-/* Cores de status */
+
 .statusBadge.pendente, .statusSelect.pendente {
     background-color: #fee440;
     color: #574802;
@@ -255,7 +255,7 @@
     color: white;
 }
 
-/* Modal */
+
 .modalActions {
     display: flex;
     flex-direction: column;
@@ -282,7 +282,7 @@
     background-color: #5a6268;
 }
 
-/* ---------- MEDIA QUERIES (para manter layout DESKTOP) ---------- */
+
 @media (min-width: 768px) {
     .areaCliente {
         padding: 20px 30px;

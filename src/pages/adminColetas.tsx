@@ -54,7 +54,6 @@ function ListaColetas() {
         <div style={{width: '100%'}}>
             <h4>Visualizar Coletas</h4>
             
-            {/* Botões de Filtro */}
             <div className={styles.filtroContainer}>
                 <button className={filtroStatus === 'PENDENTE' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('PENDENTE')}>Pendentes</button>
                 <button className={filtroStatus === 'COLETADO' ? styles.filtroAtivo : ''} onClick={() => setFiltroStatus('COLETADO')}>Coletados</button>
@@ -122,7 +121,7 @@ function ListaColetas() {
                         />
                         
                         <div className={styles.modalActions}>
-                            <button onClick={() => setQrCodeVisivel(null)} className={styles.formButtonSecondary}>Fechar</button>
+                            <button onClick={() => setQrCodeVisivel(null)} className={styles.formButton}>Fechar</button>
                             <button onClick={handlePrint} className={styles.formButton}>Imprimir</button>
                         </div>
                     </div>
