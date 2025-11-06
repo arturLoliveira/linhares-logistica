@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { FaTruck, FaFileInvoice, FaPrint, FaBoxOpen, FaUndo } from 'react-icons/fa';
+import { useState, useEffect, useCallback } from 'react';
+import { FaTruck, FaFileInvoice, FaPrint, FaBoxOpen, FaUndo, FaSignOutAlt } from 'react-icons/fa';
 import {
     Box,
     Heading,
@@ -27,7 +27,8 @@ import {
     NumberInputField,
     InputGroup,
     InputLeftAddon,
-    Flex 
+    Flex,
+    HStack
 } from '@chakra-ui/react';
 import { MdCheckCircle } from 'react-icons/md';
 
@@ -504,12 +505,65 @@ const secoes = [
 ];
 
 function AreaCliente() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [clienteNome, setClienteNome] = useState('Cliente');
+    const toast = useToast();
+
+    const checkAuthStatus = useCallback(() => {
+        const token = localStorage.getItem('cliente_token');
+        if (token) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        checkAuthStatus();
+    }, [checkAuthStatus]);
+
+
+    const handleLogout = () => {
+        localStorage.removeItem('cliente_token');
+        setIsLoggedIn(false);
+        setClienteNome('Cliente');
+        toast({
+            title: 'Sessão encerrada.',
+            description: 'Você saiu da Área do Cliente.',
+            status: 'info',
+            duration: 3000,
+            isClosable: true,
+        });
+    };
+    
+    if (!isLoggedIn) {
+        return (
+            <Box w="100%" minH="100vh" bg="#F0F4FA" py={12}>
+                <Box maxW="sm" mx="auto" p={8} borderWidth="1px" borderRadius="lg" bg="white" boxShadow="lg">
+                    <Heading size="lg" textAlign="center">Acesso Cliente</Heading>
+                    <Text mt={4} textAlign="center">O formulário de Login/Cadastro deve ir aqui.</Text>
+                    <Button mt={4} colorScheme='blue' w="100%" onClick={checkAuthStatus}>Tentar Login (Placeholder)</Button>
+                </Box> 
+            </Box>
+        );
+    }
+    
     return (
         <Box w="100%" maxW="960px" mx="auto" p={4} my={16}>
-            <Heading as="h2" size="lg" mb={6} textAlign="center">
-                Área do Cliente
-            </Heading>
-            
+            <HStack justifyContent="space-between" mb={6}>
+                <Heading as="h1" size="lg">
+                    Área do Cliente: {clienteNome}
+                </Heading>
+                <Button 
+                    leftIcon={<FaSignOutAlt />} 
+                    colorScheme="red" 
+                    variant="outline"
+                    onClick={handleLogout}
+                >
+                    Sair
+                </Button>
+            </HStack>
+
             <Accordion allowToggle defaultIndex={[0]}>
                 {secoes.map((secao) => (
                     <AccordionItem 
@@ -532,7 +586,6 @@ function AreaCliente() {
                                     align="center" 
                                     flex="1" 
                                     textAlign="left"
-                                    
                                     color={undefined}
                                 >
                                     <Box as="span" mr={3} color="blue.500" _expanded={{ color: 'white' }}>
