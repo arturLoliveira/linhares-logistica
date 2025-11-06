@@ -17,7 +17,7 @@ interface ClienteAuthProps {
     onLoginSuccess: () => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
 const LoginForm: React.FC<{ onSwitchToRegister: () => void, onLoginSuccess: () => void }> = ({ onSwitchToRegister, onLoginSuccess }) => {
     const [cpfCnpj, setCpfCnpj] = useState('');

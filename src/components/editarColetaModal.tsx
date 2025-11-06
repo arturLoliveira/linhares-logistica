@@ -56,7 +56,7 @@ const EditarColetaModal: React.FC<EditarColetaModalProps> = ({ isOpen, coleta, o
     const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
     
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;

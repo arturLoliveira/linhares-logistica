@@ -443,7 +443,7 @@ function FormAdminCadastraColeta() {
             valorFrete, pesoKg: pesoKg || null, dataVencimento: dataVencimento || null
         };
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
             const response = await fetch(`${API_URL}/api/coletas/solicitar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -596,7 +596,7 @@ function FormAdminAdicionaHistorico() {
         e.preventDefault();
         setIsLoading(true);
         const token = localStorage.getItem('admin_token');
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
         try {
             const response = await fetch(`${API_URL}/api/admin/coletas/${notaFiscal}/historico`, {

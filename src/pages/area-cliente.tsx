@@ -147,7 +147,7 @@ function FormColetaEntrega() {
             dataVencimento: null
         };
         
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
         try {
             const response = await fetch(`${API_URL}/api/coletas/solicitar`, {
@@ -278,7 +278,7 @@ function FormColetaDevolucao() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         
         try {
             const res = await fetch(`${API_URL}/api/devolucao/solicitar`, { 
@@ -351,7 +351,7 @@ function FormEmissaoFatura() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         
         const url = `${API_URL}/api/fatura/${notaFiscal}`; 
         const filename = `fatura_${notaFiscal}.pdf`;
@@ -416,7 +416,7 @@ function FormImprimirEtiqueta() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         
         const url = `${API_URL}/api/etiqueta/${notaFiscal}`; 
         const filename = `etiqueta_${notaFiscal}.pdf`;
