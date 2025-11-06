@@ -1,4 +1,4 @@
-import  { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Heading,
@@ -19,8 +19,19 @@ import {
     VStack,
     HStack,
     Tag,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalCloseButton,
+    ModalBody,
+    ModalFooter,
+    FormControl,
+    FormLabel,
+    Select,
+    useDisclosure,
 } from '@chakra-ui/react';
-import { FaUndo, FaEye } from 'react-icons/fa';
+import { FaUndo } from 'react-icons/fa';
 
 interface SolicitacaoDevolucao {
     id: number;
@@ -29,10 +40,128 @@ interface SolicitacaoDevolucao {
     numeroNFOriginal: string;
     motivoDevolucao: string | null;
     dataSolicitacao: string;
-    // statusProcessamento: string; <-- (Campo a ser adicionado futuramente para gestão)
+    statusProcessamento: string | null; 
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+
+const STATUS_PROCESSAMENTO = [
+    { value: 'PENDENTE', label: 'Pendente (Aguardando Análise)', color: 'gray' },
+    { value: 'EM_PROCESSO', label: 'Em Processamento / Coleta Agendada', color: 'orange' },
+    { value: 'REJEITADA', label: 'Rejeitada (Motivo Inválido)', color: 'red' },
+    { value: 'CONCLUIDA', label: 'Concluída (Estorno/Solução)', color: 'green' },
+];
+
+const getStatusTagColor = (status: string | null): string => {
+    return STATUS_PROCESSAMENTO.find(s => s.value === status)?.color || 'gray';
+};
+
+
+
+function AtualizaDevolucaoModal({ 
+    isOpen, 
+    onClose, 
+    devolucao, 
+    onUpdateSuccess 
+}: { 
+    isOpen: boolean, 
+    onClose: () => void, 
+    devolucao: SolicitacaoDevolucao, 
+    onUpdateSuccess: () => void 
+}) {
+    
+    const [statusProcessamento, setStatusProcessamento] = useState(devolucao.statusProcessamento || 'PENDENTE');
+    const [isLoading, setIsLoading] = useState(false);
+    const toast = useToast();
+
+    useEffect(() => {
+        setStatusProcessamento(devolucao.statusProcessamento || 'PENDENTE');
+    }, [devolucao]);
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        const token = localStorage.getItem('admin_token');
+
+        try {
+            const response = await fetch(`${API_URL}/api/admin/devolucoes/${devolucao.id}/status`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ statusProcessamento }),
+            });
+
+            if (!response.ok) {
+                 const data = await response.json().catch(() => ({ error: 'Resposta do servidor inválida.' }));
+                 throw new Error(data.error || 'Falha ao atualizar o status.');
+            }
+            
+            toast({
+                title: 'Status Atualizado!',
+                description: `Devolução NF ${devolucao.numeroNFOriginal} movida para ${statusProcessamento}.`,
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+
+            onUpdateSuccess();
+            onClose();
+
+        } catch (error) {
+            toast({
+                title: 'Erro de Atualização.',
+                description: (error as Error).message,
+                status: 'error',
+                duration: 7000,
+                isClosable: true,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent as="form" onSubmit={handleSubmit}>
+                <ModalHeader>Processar Devolução NF: {devolucao.numeroNFOriginal}</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <Text mb={4}>
+                        <Text as="span" fontWeight="bold">Motivo Original:</Text> {devolucao.motivoDevolucao || 'Não informado.'}
+                    </Text>
+                    <Text mb={6} color="red.500" fontSize="sm">
+                        *Lembre-se: Este é o status interno da devolução. A coleta original (se aplicável) deve ser atualizada para 'EM_DEVOLUCAO' no painel de Coletas.
+                    </Text>
+
+                    <FormControl isRequired>
+                        <FormLabel>Novo Status Interno</FormLabel>
+                        <Select 
+                            value={statusProcessamento} 
+                            onChange={(e) => setStatusProcessamento(e.target.value)}
+                            isDisabled={isLoading}
+                        >
+                            {STATUS_PROCESSAMENTO.map(status => (
+                                <option key={status.value} value={status.value}>{status.label}</option>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </ModalBody>
+                <ModalFooter>
+                    <Button variant="ghost" mr={3} onClick={onClose} disabled={isLoading}>
+                        Cancelar
+                    </Button>
+                    <Button colorScheme="blue" type="submit" isLoading={isLoading}>
+                        Salvar Status
+                    </Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+    );
+}
 
 
 const AdminDevolucoes = () => {
@@ -40,6 +169,9 @@ const AdminDevolucoes = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [erro, setErro] = useState('');
     const toast = useToast();
+    
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [devolucaoParaProcessar, setDevolucaoParaProcessar] = useState<SolicitacaoDevolucao | null>(null);
 
     const fetchDevolucoes = useCallback(async () => {
         setIsLoading(true);
@@ -79,27 +211,41 @@ const AdminDevolucoes = () => {
         fetchDevolucoes();
     }, [fetchDevolucoes]);
     
+    const handleProcessar = (devolucao: SolicitacaoDevolucao) => {
+        setDevolucaoParaProcessar(devolucao);
+        onOpen();
+    };
 
-    const handleView = (devolucao: SolicitacaoDevolucao) => {
-        toast({
+    const handleUpdateSuccess = () => {
+        fetchDevolucoes(); 
+        setDevolucaoParaProcessar(null);
+    };
+
+    const handleCloseModal = () => {
+        onClose();
+        setDevolucaoParaProcessar(null); 
+    }
+    
+
+    const handleViewDetails = (devolucao: SolicitacaoDevolucao) => {
+         toast({
             title: "Detalhes da Devolução",
-            description: `NF: ${devolucao.numeroNFOriginal}. Motivo: ${devolucao.motivoDevolucao || 'Não especificado'}`,
+            description: (
+                <VStack align="start" spacing={1}>
+                    <Text fontWeight="bold">NF Original:</Text><Text>{devolucao.numeroNFOriginal}</Text>
+                    <Text fontWeight="bold">Cliente:</Text><Text>{devolucao.nomeCliente} ({devolucao.emailCliente})</Text>
+                    <Text fontWeight="bold">Data:</Text><Text>{new Date(devolucao.dataSolicitacao).toLocaleDateString('pt-BR')}</Text>
+                    <Text fontWeight="bold">Motivo:</Text><Text>{devolucao.motivoDevolucao || 'Não especificado'}</Text>
+                    <Text fontWeight="bold">Status Interno:</Text><Text>{STATUS_PROCESSAMENTO.find(s => s.value === devolucao.statusProcessamento)?.label || 'Não Iniciado'}</Text>
+                </VStack>
+            ),
             status: "info",
-            duration: 5000,
+            duration: 9000,
             isClosable: true,
+            position: 'top-right'
         });
     };
     
-    const handleUpdateStatus = (devolucao: SolicitacaoDevolucao) => {
-         toast({
-            title: "Ação de Processamento",
-            description: `Atualizar status de NF ${devolucao.numeroNFOriginal}.`,
-            status: "warning",
-            duration: 2000,
-            isClosable: true,
-        });
-    };
-
 
     return (
         <Box w="100%" p={4}>
@@ -130,6 +276,7 @@ const AdminDevolucoes = () => {
                                     <Th>Nota Fiscal</Th>
                                     <Th>Cliente / E-mail</Th>
                                     <Th>Motivo (Resumo)</Th>
+                                    <Th>Status</Th>
                                     <Th textAlign="center">Ações</Th>
                                 </Tr>
                             </Thead>
@@ -146,16 +293,25 @@ const AdminDevolucoes = () => {
                                             </VStack>
                                         </Td>
                                         <Td>
-                                            <Tag size="sm" variant="subtle" colorScheme="purple">
+                                            <Text fontSize="sm">
                                                 {devolucao.motivoDevolucao ? (devolucao.motivoDevolucao.substring(0, 30) + '...') : 'Não Informado'}
+                                            </Text>
+                                        </Td>
+                                        <Td>
+                                            <Tag size="sm" variant="subtle" colorScheme={getStatusTagColor(devolucao.statusProcessamento)}>
+                                                {STATUS_PROCESSAMENTO.find(s => s.value === devolucao.statusProcessamento)?.label || 'Não Iniciado'}
                                             </Tag>
                                         </Td>
                                         <Td textAlign="center">
                                             <HStack spacing={2} justifyContent="center">
-                                                <Button size="xs" colorScheme="blue" leftIcon={<FaEye />} onClick={() => handleView(devolucao)}>
-                                                    Ver Detalhes
+                                                <Button size="xs" colorScheme="blue" onClick={() => handleViewDetails(devolucao)}>
+                                                    Detalhes
                                                 </Button>
-                                                <Button size="xs" colorScheme="orange" onClick={() => handleUpdateStatus(devolucao)}>
+                                                <Button 
+                                                    size="xs" 
+                                                    colorScheme="orange" 
+                                                    onClick={() => handleProcessar(devolucao)}
+                                                >
                                                     Processar
                                                 </Button>
                                             </HStack>
@@ -163,7 +319,7 @@ const AdminDevolucoes = () => {
                                     </Tr>
                                 )) : (
                                     <Tr>
-                                        <Td colSpan={6} textAlign="center">Nenhuma solicitação de devolução pendente.</Td>
+                                        <Td colSpan={7} textAlign="center">Nenhuma solicitação de devolução pendente.</Td>
                                     </Tr>
                                 )}
                             </Tbody>
@@ -172,6 +328,15 @@ const AdminDevolucoes = () => {
                 )}
 
             </VStack>
+            
+            {devolucaoParaProcessar && (
+                <AtualizaDevolucaoModal 
+                    isOpen={isOpen}
+                    onClose={handleCloseModal}
+                    devolucao={devolucaoParaProcessar}
+                    onUpdateSuccess={handleUpdateSuccess}
+                />
+            )}
         </Box>
     );
 };
