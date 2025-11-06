@@ -100,7 +100,7 @@ function AdminOverview() {
                         {error}
                     </Alert>
                 ) : stats ? (
-                    <SimpleGrid columns={{ base: 1, md: 4, sm:2, lg:4 }} spacing={6}>
+                    <SimpleGrid columns={{ base: 1, md: 3, sm:2, lg:3 }} spacing={6}>
                         
                         <StatBox
                             label="Coletas Cadastradas no Mês"
