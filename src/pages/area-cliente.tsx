@@ -32,6 +32,8 @@ import {
 } from '@chakra-ui/react';
 import { MdCheckCircle } from 'react-icons/md';
 
+import ClienteAuth from '../components/clienteAuth'; 
+
 
 function FormRastreioDestinatario() {
     const [cpfCnpj, setCpfCnpj] = useState('');
@@ -541,7 +543,7 @@ function AreaCliente() {
             <Box w="100%" minH="100vh" bg="#F0F4FA" py={12}>
                 <Box maxW="sm" mx="auto" p={8} borderWidth="1px" borderRadius="lg" bg="white" boxShadow="lg">
                     <Heading size="lg" textAlign="center">Acesso Cliente</Heading>
-                    <Text mt={4} textAlign="center">O formulário de Login/Cadastro deve ir aqui.</Text>
+                    <ClienteAuth onLoginSuccess={checkAuthStatus}/>
                     <Button mt={4} colorScheme='blue' w="100%" onClick={checkAuthStatus}>Tentar Login (Placeholder)</Button>
                 </Box> 
             </Box>
