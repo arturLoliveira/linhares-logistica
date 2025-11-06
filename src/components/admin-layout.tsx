@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { 
     FaTachometerAlt, FaTruckLoading, FaUndo, 
-    FaUsers, FaSignOutAlt, FaBars 
+    FaUsers, FaSignOutAlt 
 } from 'react-icons/fa';
 import type { JSX } from 'react';
 import {
@@ -12,15 +12,8 @@ import {
     Text,
     Spacer,
     Button,
-    Drawer, 
-    DrawerBody,
-    DrawerHeader,
-    DrawerOverlay,
-    DrawerContent,
-    DrawerCloseButton,
-    useDisclosure, 
-    IconButton 
 } from '@chakra-ui/react';
+
 
 const NavItem = ({ to, icon, label }: { to: string, icon: JSX.Element, label: string }) => {
     return (
@@ -34,6 +27,7 @@ const NavItem = ({ to, icon, label }: { to: string, icon: JSX.Element, label: st
                     mx={4}
                     borderRadius="md"
                     cursor="pointer"
+                    
                     color={isActive ? "white" : "gray.400"}
                     bg={isActive ? "blue.500" : "transparent"}
                     _hover={{
@@ -56,52 +50,18 @@ const NavItem = ({ to, icon, label }: { to: string, icon: JSX.Element, label: st
     );
 };
 
-const SidebarContent = ({ onLogout }: { onLogout: () => void }) => (
-    <VStack
-        h="full" 
-        py={6}
-        spacing={4}
-        align="stretch"
-    >
-        <Heading as="h2" size="lg" textAlign="center" mb={6}>
-            Painel Admin
-        </Heading>
-        
-        <VStack spacing={2} align="stretch">
-            <NavItem to="/admin/dashboard" icon={<FaTachometerAlt />} label="Dashboard" />
-            <NavItem to="/admin/coletas" icon={<FaTruckLoading />} label="Coletas" />
-            <NavItem to="/admin/devolucoes" icon={<FaUndo />} label="Devoluções" />
-            <NavItem to="/admin/clientes" icon={<FaUsers />} label="Clientes" />
-        </VStack>
-        
-        <Spacer /> 
-        
-        <Button 
-            onClick={onLogout} 
-            colorScheme="red"
-            variant="ghost" 
-            leftIcon={<FaSignOutAlt />}
-            justifyContent="flex-start" 
-            m={4} 
-            _hover={{ bg: "red.500", color: "white" }}
-        >
-            Sair
-        </Button>
-    </VStack>
-);
 
 function AdminLayout() {
     const navigate = useNavigate();
-    const { isOpen, onOpen, onClose } = useDisclosure(); 
 
     const handleLogout = () => {
         localStorage.removeItem('admin_token');
-        navigate('/admin/login');
+        navigate('/');
     };
 
     return (
         <Flex>
-            <Box
+            <VStack
                 as="nav"
                 w="250px"
                 h="100vh"
@@ -110,51 +70,46 @@ function AdminLayout() {
                 left="0"
                 bg="gray.900" 
                 color="white"
-                display={{ base: 'none', md: 'block' }}
+                spacing={4}
+                align="stretch"
+                py={6}
             >
-                <SidebarContent onLogout={handleLogout} />
-            </Box>
-
-            <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
-                <DrawerOverlay />
-                <DrawerContent bg="gray.900" color="white">
-                    <DrawerCloseButton />
-                    <DrawerHeader>Painel Admin</DrawerHeader>
-                    <DrawerBody p={0}>
-                        <SidebarContent onLogout={handleLogout} />
-                    </DrawerBody>
-                </DrawerContent>
-            </Drawer>
+                <Heading as="h2" size="lg" textAlign="center" mb={6}>
+                    Painel Admin
+                </Heading>
+                
+                <VStack spacing={2} align="stretch">
+                    <NavItem to="/admin/dashboard" icon={<FaTachometerAlt />} label="Dashboard" />
+                    <NavItem to="/admin/coletas" icon={<FaTruckLoading />} label="Coletas" />
+                    <NavItem to="/admin/devolucoes" icon={<FaUndo />} label="Devoluções" />
+                    <NavItem to="/admin/clientes" icon={<FaUsers />} label="Clientes" />
+                </VStack>
+                
+                <Spacer /> 
+                
+                <Button 
+                    onClick={handleLogout} 
+                    colorScheme="red"
+                    variant="ghost" 
+                    leftIcon={<FaSignOutAlt />}
+                    justifyContent="flex-start" 
+                    m={4} 
+                    _hover={{ bg: "red.500", color: "white" }}
+                    fontSize="2xl"
+                >
+                    Sair
+                </Button>
+            </VStack>
             
             <Box 
                 as="main" 
-                ml={{ base: 0, md: '250px' }} 
+                ml="250px" 
                 w="full" 
+                p={8} 
                 bg="gray.50" 
                 minH="100vh"
             >
-                <Flex
-                    as="header"
-                    display={{ base: 'flex', md: 'none' }}
-                    align="center"
-                    justify="space-between"
-                    p={4}
-                    bg="white"
-                    borderBottomWidth="1px"
-                >
-                    <IconButton
-                        aria-label="Abrir menu"
-                        icon={<FaBars />}
-                        onClick={onOpen} 
-                        variant="ghost"
-                    />
-                    <Heading as="h2" size="md">Painel</Heading>
-                    <Box w="40px" /> 
-                </Flex>
-
-                <Box p={{ base: 4, md: 8 }}>
-                    <Outlet />
-                </Box>
+                <Outlet />
             </Box>
         </Flex>
     );

@@ -31,6 +31,7 @@ import {
 } from '@chakra-ui/react';
 import { MdCheckCircle } from 'react-icons/md';
 
+
 function FormRastreioDestinatario() {
     const [cpfCnpj, setCpfCnpj] = useState('');
     const [numeroEncomenda, setNumeroEncomenda] = useState(''); 
@@ -143,7 +144,7 @@ function FormColetaEntrega() {
             dataVencimento: null
         };
         
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
         try {
             const response = await fetch(`${API_URL}/api/coletas/solicitar`, {
@@ -274,34 +275,36 @@ function FormColetaDevolucao() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
-
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        
         try {
-            const res = await fetch(`${API_URL}/api/devolucoes/solicitar`, {
+            const res = await fetch(`${API_URL}/api/devolucao/solicitar`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nomeCliente, emailCliente, numeroNFOriginal, motivoDevolucao })
             });
+            
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.error || 'Falha ao enviar solicitação.');
             }
             
+            const data = await res.json();
             toast({
-                title: 'Solicitação enviada!',
-                description: 'Você receberá um e-mail de confirmação.',
+                title: 'Solicitação de Devolução Enviada!',
+                description: `O status da encomenda ${data.coleta.numeroEncomenda} foi atualizado para Em Devolução.`,
                 status: 'success',
-                duration: 5000,
+                duration: 7000,
                 isClosable: true,
             });
             
             setNomeCliente(''); setEmailCliente(''); setNumeroNFOriginal(''); setMotivoDevolucao('');
         } catch (err) {
             toast({
-                title: 'Erro ao enviar.',
+                title: 'Erro ao Solicitar Devolução.',
                 description: (err as Error).message,
                 status: 'error',
-                duration: 5000,
+                duration: 7000,
                 isClosable: true,
             });
         } finally {
@@ -311,7 +314,7 @@ function FormColetaDevolucao() {
 
     return (
         <Box as="form" onSubmit={handleSubmit}>
-            <Text mb={4}>Após o preenchimento, você receberá um e-mail de confirmação. O prazo é de até 3 dias.</Text>
+            <Text mb={4}>Após o preenchimento, o status da sua coleta será atualizado para 'Em Devolução'.</Text>
             <VStack spacing={4}>
                 <FormControl isRequired>
                     <FormLabel>Seu Nome</FormLabel>
@@ -345,7 +348,7 @@ function FormEmissaoFatura() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
         
         const url = `${API_URL}/api/fatura/${notaFiscal}`; 
         const filename = `fatura_${notaFiscal}.pdf`;
@@ -410,7 +413,7 @@ function FormImprimirEtiqueta() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
         
         const url = `${API_URL}/api/etiqueta/${notaFiscal}`; 
         const filename = `etiqueta_${notaFiscal}.pdf`;
@@ -501,7 +504,6 @@ const secoes = [
 ];
 
 function AreaCliente() {
-
     return (
         <Box w="100%" maxW="960px" mx="auto" p={4} my={16}>
             <Heading as="h2" size="lg" mb={6} textAlign="center">
@@ -524,13 +526,14 @@ function AreaCliente() {
                             <AccordionButton 
                                 _expanded={{ bg: 'blue.500', color: 'white' }} 
                                 borderRadius="md"
-                                py={4} 
+                                py={4}
                             >
                                 <Flex 
                                     align="center" 
                                     flex="1" 
                                     textAlign="left"
-                                    color={undefined} 
+                                    
+                                    color={undefined}
                                 >
                                     <Box as="span" mr={3} color="blue.500" _expanded={{ color: 'white' }}>
                                         {secao.icon}

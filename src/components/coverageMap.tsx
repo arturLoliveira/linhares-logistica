@@ -1,17 +1,145 @@
-import { FaMapMarkerAlt } from 'react-icons/fa';
+import { useState } from 'react'; 
+import { FaMapMarkerAlt, FaSearch } from 'react-icons/fa'; 
 import MinasGeraisMap from '../assets/minas.svg?react';
 import {
     Box,
     Heading,
     Icon,
+    Text,
     Tooltip,
     Grid, 
     GridItem, 
     VStack, 
     Stat,
     StatLabel,
-    StatNumber
+    StatNumber,
+    InputGroup,      
+    InputRightElement, 
+    Input,
+    IconButton,
+    FormControl,
+    Center,
+    Spinner
 } from '@chakra-ui/react';
+
+function RastreioIntegradoBox() {
+    const [searchId, setSearchId] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [erro, setErro] = useState('');
+    const [resultado, setResultado] = useState<any>(null); 
+    const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setResultado(null);
+        setErro('');
+        
+        if (!searchId) {
+            setErro('Digite o número da encomenda ou NF.');
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const url = `${API_URL}/api/rastreamento/publico/${searchId.trim()}`;
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            
+            if (!res.ok) {
+                 const data = await res.json();
+                 throw new Error(data.error || 'Encomenda/NF não encontrada.');
+            }
+            
+            const data = await res.json();
+            setResultado(data);
+            setErro('');
+            
+        } catch (err) {
+            setErro((err as Error).message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Box 
+            p={6} 
+            shadow="md" 
+            borderRadius="md" 
+            bg="white"
+            borderLeftWidth="5px" 
+            borderLeftColor="blue.500" 
+            as="form" 
+            onSubmit={handleSubmit}
+        > 
+            <VStack spacing={4} align="stretch">
+                <Stat>
+                    <StatLabel fontSize="sm" color="gray.600">Busca Rápida de Status</StatLabel>
+                    <StatNumber fontSize="xl" fontWeight="bold" color="blue.700">Acompanhe sua Entrega</StatNumber>
+                </Stat>
+
+                <FormControl isRequired>
+                    <InputGroup size="md">
+                        <Input 
+                            type="text" 
+                            value={searchId} 
+                            onChange={e => setSearchId(e.target.value)} 
+                            placeholder="Nº da NF ou Encomenda"
+                            pr="3rem" 
+                        />
+                        <InputRightElement width="3rem">
+                            <IconButton 
+                                aria-label="Rastrear"
+                                icon={<FaSearch />}
+                                type="submit"
+                                colorScheme="blue"
+                                size="sm"
+                                isLoading={isLoading}
+                            />
+                        </InputRightElement>
+                    </InputGroup>
+                </FormControl>
+
+                {isLoading && <Center><Spinner size="sm" color="blue.500" /></Center>}
+                {erro && <Text color="red.500" fontSize="sm">{erro}</Text>}
+                
+                {resultado && (
+                    <Box pt={1} borderTopWidth="1px" borderColor="gray.100">
+                        <Text fontSize="md" fontWeight="bold" color="gray.700">
+                            Status: <Text as="span" color="green.600">{resultado.status.replace(/_/g, ' ')}</Text>
+                        </Text>
+                        {resultado.historico && resultado.historico.length > 0 && (
+                            <Text fontSize="sm" color="gray.600">
+                                Último Local: {resultado.historico[0].localizacao}
+                            </Text>
+                        )}
+                    </Box>
+                )}
+            </VStack>
+        </Box>
+    );
+}
+
+function StatBox({ label, value }: { label: string, value: string }) {
+    return (
+        <Box 
+            p={6} 
+            shadow="md" 
+            borderRadius="md" 
+            bg="white"
+            borderLeftWidth="5px" 
+            borderLeftColor="blue.500"
+        > 
+            <Stat>
+                <StatLabel fontSize="sm" color="gray.600">{label}</StatLabel>
+                <StatNumber fontSize="xl" fontWeight="bold" color="blue.600">{value}</StatNumber>
+            </Stat>
+        </Box>
+    );
+}
 
 const todasAsCidades = [
     
@@ -98,6 +226,8 @@ function CoverageMap() {
 
                 <GridItem>
                     <VStack spacing={6} align="stretch">
+                        <RastreioIntegradoBox /> 
+                        
                         <StatBox label="Cidades Atendidas" value="+25 Municípios" />
                         <StatBox label="Regiões Cobertas" value="Metropolitana de BH, Campo das Vertentes e região central de Minas Gerais" />
                         <StatBox label="Entregas Mensais" value="+10.000 Entregas" />
@@ -108,23 +238,5 @@ function CoverageMap() {
     );
 }
 
-
-function StatBox({ label, value }: { label: string, value: string }) {
-    return (
-        <Box 
-            p={6} 
-            shadow="md" 
-            borderRadius="md" 
-            bg="white"
-            borderLeftWidth="5px" 
-            borderLeftColor="blue.500"
-        > 
-            <Stat>
-                <StatLabel fontSize="sm" color="gray.600">{label}</StatLabel>
-                <StatNumber fontSize="xl" fontWeight="bold" color="blue.600">{value}</StatNumber>
-            </Stat>
-        </Box>
-    );
-}
 
 export default CoverageMap;
