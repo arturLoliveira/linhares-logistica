@@ -28,97 +28,180 @@ import {
     InputGroup,
     InputLeftAddon,
     Flex,
-    HStack
+    HStack,
+    Badge,
+    Spinner,
+    Collapse,
 } from '@chakra-ui/react';
-import { MdCheckCircle } from 'react-icons/md';
+import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
 
 import ClienteAuth from '../components/clienteAuth'; 
 
+type Historico = {
+    id: number;
+    data: string;
+    status: string;
+    localizacao: string;
+};
 
-function FormRastreioDestinatario() {
-    const [cpfCnpj, setCpfCnpj] = useState('');
-    const [numeroEncomenda, setNumeroEncomenda] = useState(''); 
-    const [isLoading, setIsLoading] = useState(false);
-    const [resultado, setResultado] = useState<any | null>(null);
-    const [erro, setErro] = useState('');
+type Coleta = {
+    id: number;
+    numeroEncomenda: string;
+    numeroNotaFiscal: string;
+    status: string;
+    dataSolicitacao: string;
+    historico: Historico[];
+};
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setResultado(null);
-        setErro('');
-        
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+function MinhasColetas() {
+    const [coletas, setColetas] = useState<Coleta[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [expandedColetaId, setExpandedColetaId] = useState<number | null>(null);
 
-        try {
-            const res = await fetch(`${API_URL}/api/rastreamento/destinatario`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ numeroEncomenda, cpfCnpj })
-            });
-            if (!res.ok) {
-                 const data = await res.json();
-                 throw new Error(data.error || 'Coleta não encontrada.');
+    const toast = useToast();
+
+    const toggleHistorico = (id: number) => {
+        setExpandedColetaId(expandedColetaId === id ? null : id);
+    };
+
+    useEffect(() => {
+        const fetchColetas = async () => {
+            const token = localStorage.getItem('cliente_token');
+            setIsLoading(true);
+            setError('');
+            const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+
+            if (!token) {
+                setError('Token de autenticação não encontrado.');
+                setIsLoading(false);
+                return;
             }
-            const data = await res.json();
-            setResultado(data);
-        } catch (err) {
-            setErro((err as Error).message);
-        } finally {
-            setIsLoading(false);
+
+            try {
+                const response = await fetch(`${API_URL}/api/cliente/minhas-coletas`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (response.status === 403) {
+                     throw new Error('Permissão negada. Seu login não tem acesso a esta lista.');
+                }
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Falha ao carregar coletas do cliente.');
+                }
+
+                const data: Coleta[] = await response.json();
+                setColetas(data);
+            } catch (err) {
+                setError((err as Error).message);
+                toast({
+                    title: 'Erro de Busca',
+                    description: (err as Error).message,
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchColetas();
+    }, [toast]);
+
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'CONCLUIDA': return 'green';
+            case 'EM_TRANSITO': return 'blue';
+            case 'EM_ROTA_ENTREGA': return 'orange';
+            case 'CANCELADA': return 'red';
+            case 'EM_DEVOLUCAO': return 'red';
+            default: return 'gray';
         }
     };
 
+    if (isLoading) {
+        return <VStack p={5}><Spinner size="lg" color="blue.500" /><Text>Carregando suas coletas...</Text></VStack>;
+    }
+
+    if (error) {
+        return (
+            <Alert status="error" mt={4}>
+                <AlertIcon as={MdErrorOutline} />
+                <AlertTitle mr={2}>Erro de Acesso:</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        );
+    }
+
+    if (coletas.length === 0) {
+        return <Text mt={4}>Nenhuma coleta encontrada vinculada ao seu CNPJ/CPF.</Text>;
+    }
+
     return (
-        <Box as="form" onSubmit={handleSubmit}>
-            <Text mb={4}>Acesse com seu CNPJ/CPF e Número da Encomenda.</Text>
-            <VStack spacing={4}>
-                <FormControl isRequired>
-                    <FormLabel>Número da Encomenda</FormLabel>
-                    <Input type="text" value={numeroEncomenda} onChange={e => setNumeroEncomenda(e.target.value)} placeholder="Ex: OC-1001" />
-                </FormControl>
-                <FormControl isRequired>
-                    <FormLabel>Seu CNPJ/CPF (Destinatário)</FormLabel>
-                    <Input type="text" value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} />
-                </FormControl>
-            </VStack>
-            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>{isLoading ? "Buscando..." : "Acessar"}</Button>
-            
-            {erro && (
-                <Alert status="error" mt={6}>
-                    <AlertIcon />
-                    {erro}
-                </Alert>
-            )}
-            
-            {resultado && (
-                <Box mt={6} borderWidth="1px" borderRadius="md" p={4}>
-                    <Alert status="success" variant="subtle" mb={4}>
-                        <AlertIcon />
-                        <Box>
-                            <AlertTitle>Status Atual: {resultado.status.replace('_', ' ')}</AlertTitle>
-                            {resultado.historico && resultado.historico.length > 0 && (
-                                <AlertDescription>Localização: {resultado.historico[0].localizacao}</AlertDescription>
-                            )}
-                        </Box>
-                    </Alert>
+        <VStack spacing={4} align="stretch" mt={4}>
+            {coletas.map((coleta) => (
+                <Box 
+                    key={coleta.id} 
+                    p={4} 
+                    borderWidth="1px" 
+                    borderRadius="lg" 
+                    bg="white" 
+                    shadow="sm"
+                    _hover={{ shadow: 'md' }}
+                >
+                    <HStack justifyContent="space-between" align="flex-start">
+                        <VStack align="flex-start" spacing={1}>
+                            <Heading as="h4" size="md" color="blue.700">
+                                Encomenda: {coleta.numeroEncomenda}
+                            </Heading>
+                            <Text fontSize="sm" color="gray.600">NF: {coleta.numeroNotaFiscal}</Text>
+                            <Text fontSize="sm" color="gray.500">
+                                Solicitação em: {new Date(coleta.dataSolicitacao).toLocaleDateString('pt-BR')}
+                            </Text>
+                        </VStack>
+                        <Badge colorScheme={getStatusColor(coleta.status)} p={2} borderRadius="md" fontSize="sm">
+                            {coleta.status.replace(/_/g, ' ')}
+                        </Badge>
+                    </HStack>
+
+                    <Button 
+                        size="sm" 
+                        mt={4} 
+                        onClick={() => toggleHistorico(coleta.id)}
+                        variant="ghost"
+                        colorScheme="blue"
+                    >
+                        {expandedColetaId === coleta.id ? 'Ocultar Histórico' : 'Ver Histórico Detalhado'}
+                    </Button>
                     
-                    <Heading as="h5" size="sm" mb={3}>Histórico de Rastreio</Heading>
-                    <List spacing={3}>
-                        {resultado.historico && resultado.historico.map((evento: any) => (
-                             <ListItem key={evento.id} borderBottomWidth="1px" pb={3}>
-                                <ListIcon as={MdCheckCircle} color="green.500" />
-                                <Text as="span" fontWeight="bold" mr={2}>
-                                    {new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}
-                                </Text>
-                                - {evento.status.replace('_', ' ')}
-                                <Text fontSize="sm" color="gray.600" ml={6}>{evento.localizacao}</Text>
-                            </ListItem>
-                        ))}
-                    </List>
+                    <Collapse in={expandedColetaId === coleta.id} animateOpacity>
+                        <Box mt={4} pt={4} borderTopWidth="1px" borderColor="gray.100">
+                            <Heading as="h5" size="sm" mb={3}>Eventos</Heading>
+                            <List spacing={3}>
+                                {coleta.historico.map((evento) => (
+                                     <ListItem key={evento.id} borderBottomWidth="1px" pb={3}>
+                                        <ListIcon as={MdCheckCircle} color="green.500" />
+                                        <Text as="span" fontWeight="bold" mr={2}>
+                                            {new Date(evento.data).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}
+                                        </Text>
+                                        - {evento.status.replace(/_/g, ' ')}
+                                        <Text fontSize="sm" color="gray.600" ml={6}>{evento.localizacao}</Text>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Box>
+                    </Collapse>
+
                 </Box>
-            )}
-        </Box>
+            ))}
+        </VStack>
     );
 }
 
@@ -473,16 +556,17 @@ function FormImprimirEtiqueta() {
     );
 }
 
+
 const secoes = [
     { 
-        id: 'rastreio_destinatario', 
-        titulo: 'Rastreamento (Destinatário)', 
+        id: 'minhas_coletas', 
+        titulo: 'Minhas Coletas e Rastreamento', 
         icon: <FaTruck />,
-        conteudo: <FormRastreioDestinatario />
+        conteudo: <MinhasColetas />
     },
     { 
         id: 'coleta_entrega', 
-        titulo: 'Solicitar Coleta de Entrega', 
+        titulo: 'Solicitar Nova Coleta de Entrega', 
         icon: <FaBoxOpen />,
         conteudo: <FormColetaEntrega />
     },
@@ -541,11 +625,7 @@ function AreaCliente() {
     if (!isLoggedIn) {
         return (
             <Box w="100%" minH="100vh" bg="#F0F4FA" py={12}>
-                <Box maxW="sm" mx="auto" p={8} borderWidth="1px" borderRadius="lg" bg="white" boxShadow="lg">
-                    <Heading size="lg" textAlign="center">Acesso Cliente</Heading>
-                    <ClienteAuth onLoginSuccess={checkAuthStatus}/>
-                    <Button mt={4} colorScheme='blue' w="100%" onClick={checkAuthStatus}>Tentar Login (Placeholder)</Button>
-                </Box> 
+                <ClienteAuth onLoginSuccess={checkAuthStatus} /> 
             </Box>
         );
     }
@@ -553,7 +633,7 @@ function AreaCliente() {
     return (
         <Box w="100%" maxW="960px" mx="auto" p={4} my={16}>
             <HStack justifyContent="space-between" mb={6}>
-                <Heading as="h1" size="lg">
+                <Heading as="h1" size="lg" color="blue.700">
                     Área do Cliente: {clienteNome}
                 </Heading>
                 <Button 
