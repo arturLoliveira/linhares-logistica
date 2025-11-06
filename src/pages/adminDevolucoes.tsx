@@ -181,6 +181,7 @@ const AdminDevolucoes = () => {
         try {
             const response = await fetch(`${API_URL}/api/admin/devolucoes`, {
                 headers: {
+                    method: 'PUT',
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
