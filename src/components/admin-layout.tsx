@@ -79,6 +79,7 @@ function AdminLayout() {
         navigate('/');
     };
 
+    // --- Componente 1: Sidebar Fixa (Desktop) ---
     const Sidebar = () => (
         <VStack
             as="nav"
@@ -92,7 +93,7 @@ function AdminLayout() {
             spacing={4}
             align="stretch"
             py={6}
-            display={{ base: 'none', md: 'flex' }}
+            display={{ base: 'none', md: 'flex' }} // Visível apenas no Desktop
             boxShadow="xl"
         >
             <Heading as="h2" size="lg" textAlign="center" mb={6}>
@@ -118,6 +119,7 @@ function AdminLayout() {
         </VStack>
     );
 
+    // --- Componente 2: Barra de Navegação Mobile e Drawer ---
     const MobileNav = () => (
         <>
             <Flex
@@ -128,7 +130,7 @@ function AdminLayout() {
                 bg="white"
                 borderBottom="1px solid"
                 borderColor="gray.200"
-                display={{ base: 'flex', md: 'none' }}
+                display={{ base: 'flex', md: 'none' }} // Visível apenas no Mobile
                 position="sticky"
                 top="0"
                 zIndex="sticky"
@@ -168,25 +170,28 @@ function AdminLayout() {
         </>
     );
 
+    // --- Componente 3: Layout Principal (Junção) ---
     return (
-        <Box as="main" w="full"
-            p={8}
-            bg="gray.50"
-            minH="100vh">
-            <Sidebar />
+        <Flex minH="100vh" direction={{ base: 'column', md: 'row' }}>
+            
+            {/* Sidebar (Fixo em Desktop, Oculto em Mobile) */}
+            <Sidebar /> 
+            
+            {/* Navbar Mobile e Drawer */}
             <MobileNav />
 
+            {/* CONTEÚDO PRINCIPAL (Main) */}
             <Box
                 as="main"
-                ml={{ base: '0', md: '250px' }}
+                // CORREÇÃO: Aplica a margem de 250px para compensar a sidebar fixa APENAS em Desktop
+                ml={{ base: '0', md: '250px' }} 
                 w="full"
                 p={8}
                 bg="gray.50"
-                minH="100vh"
             >
                 <Outlet />
             </Box>
-        </Box>
+        </Flex>
     );
 }
 
