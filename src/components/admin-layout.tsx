@@ -24,7 +24,7 @@ const NavItem = ({ to, icon, label }: { to: string, icon: JSX.Element, label: st
                 <Flex
                     align="center"
                     p={3}
-                    mx={4}
+                    m={{ base: 1, md: 4 }} 
                     borderRadius="md"
                     cursor="pointer"
                     
@@ -43,7 +43,8 @@ const NavItem = ({ to, icon, label }: { to: string, icon: JSX.Element, label: st
                     >
                         {icon}
                     </Box>
-                    <Text fontWeight="medium">{label}</Text>
+                    <Text fontWeight="medium" display={{ base: 'none', sm: 'block' }}>{label}</Text>
+                    <Text fontWeight="medium" display={{ base: 'block', sm: 'none' }}>{icon}</Text>
                 </Flex>
             )}
         </NavLink>
@@ -60,35 +61,39 @@ function AdminLayout() {
     };
 
     return (
-        <Flex>
+        <Flex direction={{ base: 'column', md: 'row' }}>
             <VStack
                 as="nav"
-                w="250px"
-                h="100vh"
-                position={{ base: 'relative', md: 'fixed' }} 
-                display={{ base: 'none', md: 'flex' }} 
-                // -----------------------------------------------------------
+                w={{ base: 'full', md: '250px' }}
+                h={{ base: 'auto', md: '100vh' }}
+                position={{ base: 'relative', md: 'fixed' }}
                 top="0"
                 left="0"
                 bg="gray.900" 
                 color="white"
                 spacing={4}
                 align="stretch"
-                py={6}
-                boxShadow={{ base: 'none', md: 'xl' }} 
+                py={{ base: 2, md: 6 }} 
             >
-                <Heading as="h2" size="lg" textAlign="center" mb={6}>
+                <Heading as="h2" size="lg" textAlign="center" mb={6} display={{ base: 'none', md: 'block' }}>
                     Painel Admin
                 </Heading>
                 
-                <VStack spacing={2} align="stretch">
-                    <NavItem to="/admin/dashboard" icon={<FaTachometerAlt />} label="Dashboard" />
+                <Flex 
+                    direction={{ base: 'row', md: 'column' }} 
+                    wrap="wrap" 
+                    justify={{ base: 'space-around', md: 'flex-start' }}
+                    align="center"
+                    py={{ base: 0, md: 2 }} 
+                    px={{ base: 2, md: 0 }} 
+                >
+                    <NavItem to="/admin/dashboard" icon={<FaTachometerAlt />} label="Dash" />
                     <NavItem to="/admin/coletas" icon={<FaTruckLoading />} label="Coletas" />
-                    <NavItem to="/admin/devolucoes" icon={<FaUndo />} label="Devoluções" />
+                    <NavItem to="/admin/devolucoes" icon={<FaUndo />} label="Devs" />
                     <NavItem to="/admin/clientes" icon={<FaUsers />} label="Clientes" />
-                </VStack>
+                </Flex>
                 
-                <Spacer /> 
+                <Spacer display={{ base: 'none', md: 'block' }} /> 
                 
                 <Button 
                     onClick={handleLogout} 
@@ -99,6 +104,7 @@ function AdminLayout() {
                     m={4} 
                     _hover={{ bg: "red.500", color: "white" }}
                     fontSize="2xl"
+                    display={{ base: 'none', md: 'flex' }} 
                 >
                     Sair
                 </Button>
@@ -112,17 +118,6 @@ function AdminLayout() {
                 bg="gray.50" 
                 minH="100vh"
             >
-                <Box 
-                    display={{ base: 'block', md: 'none' }} 
-                    mb={4} 
-                    pb={2} 
-                    borderBottom="1px solid" 
-                    borderColor="gray.300"
-                >
-                    <Heading as="h3" size="md">Admin</Heading>
-                    <Text fontSize="sm" color="gray.600">Acesso via Desktop para menu completo</Text>
-                </Box>
-                
                 <Outlet />
             </Box>
         </Flex>
