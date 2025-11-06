@@ -18,6 +18,7 @@ import AdminColetas from './pages/adminColetas';
 import AdminDevolucoes from './pages/adminDevolucoes';
 import AdminClientes from './pages/adminClientes';
 import DriverUpdatePage from './pages/driverUpdatePage';
+import AdminFuncionarios from './components/adminFuncionarios';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
           <Route path="coletas" element={<AdminColetas />} />
           <Route path="devolucoes" element={<AdminDevolucoes />} />
           <Route path="clientes" element={<AdminClientes />} />
+          <Route path="funcionarios" element={<AdminFuncionarios />} />
           
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
