@@ -85,7 +85,7 @@ function AtualizaDevolucaoModal({
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch(`${API_URL}/api/admin/devolucoes/${devolucao.id}/status`, {
+            const response = await fetch(`https://linhares-logistica-backend.onrender.com/api/admin/devolucoes/${devolucao.id}/status`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -179,7 +179,7 @@ const AdminDevolucoes = () => {
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch(`${API_URL}/api/admin/devolucoes`, {
+            const response = await fetch(`https://linhares-logistica-backend.onrender.com/api/admin/devolucoes`, {
                 headers: {
                     method: 'PUT',
                     'Content-Type': 'application/json',
