@@ -184,6 +184,9 @@ function MinhasColetas() {
                             <Badge colorScheme={getStatusColor(coleta.status)} p={2} borderRadius="md" fontSize="sm">
                                 {coleta.status.replace(/_/g, ' ')}
                             </Badge>
+                            <Badge colorScheme={colorScheme} p={2} borderRadius="md" fontSize="sm">
+                                {statusDisplay}
+                            </Badge>
 
 
                         </HStack>
