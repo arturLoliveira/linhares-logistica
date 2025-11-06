@@ -71,7 +71,7 @@ function RastreioIntegradoBox() {
         }
 
         try {
-            const url = `https://linhares-logistica-backend.onrender.com/rastreamento/publico/${searchId.trim()}`;
+            const url = `https://linhares-logistica-backend.onrender.com/api/rastreamento/publico/${searchId.trim()}`;
             const res = await fetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
