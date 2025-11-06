@@ -65,7 +65,9 @@ function AdminLayout() {
                 as="nav"
                 w="250px"
                 h="100vh"
-                position="fixed"
+                position={{ base: 'relative', md: 'fixed' }} 
+                display={{ base: 'none', md: 'flex' }} 
+                // -----------------------------------------------------------
                 top="0"
                 left="0"
                 bg="gray.900" 
@@ -73,6 +75,7 @@ function AdminLayout() {
                 spacing={4}
                 align="stretch"
                 py={6}
+                boxShadow={{ base: 'none', md: 'xl' }} 
             >
                 <Heading as="h2" size="lg" textAlign="center" mb={6}>
                     Painel Admin
@@ -103,12 +106,23 @@ function AdminLayout() {
             
             <Box 
                 as="main" 
-                ml="250px" 
+                ml={{ base: '0', md: '250px' }} 
                 w="full" 
                 p={8} 
                 bg="gray.50" 
                 minH="100vh"
             >
+                <Box 
+                    display={{ base: 'block', md: 'none' }} 
+                    mb={4} 
+                    pb={2} 
+                    borderBottom="1px solid" 
+                    borderColor="gray.300"
+                >
+                    <Heading as="h3" size="md">Admin</Heading>
+                    <Text fontSize="sm" color="gray.600">Acesso via Desktop para menu completo</Text>
+                </Box>
+                
                 <Outlet />
             </Box>
         </Flex>
