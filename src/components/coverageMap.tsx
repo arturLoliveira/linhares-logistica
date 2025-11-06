@@ -19,16 +19,45 @@ import {
     IconButton,
     FormControl,
     Center,
-    Spinner
+    Spinner,
+    List, 
+    ListItem, 
+    ListIcon, 
 } from '@chakra-ui/react';
+import { MdCheckCircle } from 'react-icons/md'; 
+
+
+interface EventoHistorico {
+    data: string;
+    status: string;
+    localizacao: string;
+}
+
+interface ResultadoRastreio {
+    numeroEncomenda: string;
+    status: string;
+    historico: EventoHistorico[];
+}
 
 function RastreioIntegradoBox() {
     const [searchId, setSearchId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [erro, setErro] = useState('');
-    const [resultado, setResultado] = useState<any>(null); 
-    const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+    const [resultado, setResultado] = useState<ResultadoRastreio | null>(null);
 
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'PENDENTE': return 'yellow';
+            case 'COLETADO': return 'blue';
+            case 'EM_TRANSITO': return 'cyan';
+            case 'EM_ROTA_ENTREGA': return 'orange';
+            case 'CONCLUIDA': return 'green';
+            case 'CANCELADA': return 'red';
+            case 'EM_DEVOLUCAO': return 'purple';
+            default: return 'gray';
+        }
+    };
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -42,7 +71,7 @@ function RastreioIntegradoBox() {
         }
 
         try {
-            const url = `${API_URL}/rastreamento/publico/${searchId.trim()}`;
+            const url = `https://linhares-logistica-backend.onrender.com/api/rastreamento/publico/${searchId.trim()}`;
             const res = await fetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -53,7 +82,7 @@ function RastreioIntegradoBox() {
                  throw new Error(data.error || 'Encomenda/NF não encontrada.');
             }
             
-            const data = await res.json();
+            const data: ResultadoRastreio = await res.json(); 
             setResultado(data);
             setErro('');
             
@@ -109,13 +138,21 @@ function RastreioIntegradoBox() {
                 {resultado && (
                     <Box pt={1} borderTopWidth="1px" borderColor="gray.100">
                         <Text fontSize="md" fontWeight="bold" color="gray.700">
-                            Status: <Text as="span" color="green.600">{resultado.status.replace(/_/g, ' ')}</Text>
+                            Status: <Text as="span" color={`${getStatusColor(resultado.status)}.600`}>{resultado.status.replace(/_/g, ' ')}</Text>
                         </Text>
-                        {resultado.historico && resultado.historico.length > 0 && (
-                            <Text fontSize="sm" color="gray.600">
-                                Último Local: {resultado.historico[0].localizacao}
-                            </Text>
-                        )}
+                        
+                        <Heading as="h5" size="xs" mt={3} mb={1} color="gray.600">Histórico de Eventos</Heading>
+                        <List spacing={1} fontSize="sm">
+                            {resultado.historico && resultado.historico.map((evento, index) => (
+                                 <ListItem key={index} >
+                                    <ListIcon as={MdCheckCircle} color={getStatusColor(evento.status) === 'green' ? 'green.500' : 'blue.500'} />
+                                    <Text as="span" fontWeight="medium" mr={1}>
+                                        {new Date(evento.data).toLocaleDateString('pt-BR')} - 
+                                    </Text>
+                                    {evento.localizacao} ({evento.status.replace(/_/g, ' ')})
+                                </ListItem>
+                            ))}
+                        </List>
                     </Box>
                 )}
             </VStack>
