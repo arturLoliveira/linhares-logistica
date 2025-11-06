@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { 
-    FaTachometerAlt, FaTruckLoading, FaUndo, 
-    FaUsers, FaSignOutAlt, FaBars // Importar FaBars para o menu hamburger
+import {
+    FaTachometerAlt, FaTruckLoading, FaUndo,
+    FaUsers, FaSignOutAlt, FaBars
 } from 'react-icons/fa';
 import type { JSX } from 'react';
 import {
@@ -12,8 +12,8 @@ import {
     Text,
     Spacer,
     Button,
-    IconButton, 
-    useDisclosure, 
+    IconButton,
+    useDisclosure,
     Drawer,
     DrawerBody,
     DrawerHeader,
@@ -25,8 +25,8 @@ import {
 
 const NavItem = ({ to, icon, label, onClose }: { to: string, icon: JSX.Element, label: string, onClose?: () => void }) => {
     return (
-        <NavLink 
-            to={to} 
+        <NavLink
+            to={to}
             onClick={onClose}
         >
             {({ isActive }) => (
@@ -36,17 +36,17 @@ const NavItem = ({ to, icon, label, onClose }: { to: string, icon: JSX.Element, 
                     mx={4}
                     borderRadius="md"
                     cursor="pointer"
-                    
+
                     color={isActive ? "white" : "gray.400"}
                     bg={isActive ? "blue.500" : "transparent"}
                     _hover={{
                         bg: isActive ? "blue.600" : "gray.700",
                         color: "white"
                     }}
-                    role="group" 
+                    role="group"
                 >
-                    <Box 
-                        mr={3} 
+                    <Box
+                        mr={3}
                         color={isActive ? "white" : "gray.500"}
                         _groupHover={{ color: "white" }}
                     >
@@ -65,14 +65,14 @@ const NavigationLinks = ({ onClose }: { onClose?: () => void }) => (
         <NavItem to="/admin/coletas" icon={<FaTruckLoading />} label="Coletas" onClose={onClose} />
         <NavItem to="/admin/devolucoes" icon={<FaUndo />} label="Devoluções" onClose={onClose} />
         <NavItem to="/admin/clientes" icon={<FaUsers />} label="Clientes" onClose={onClose} />
-        <NavItem to="/admin/funcionarios" icon={<FaUsers />} label="Motoristas" onClose={onClose} /> 
+        <NavItem to="/admin/funcionarios" icon={<FaUsers />} label="Motoristas" onClose={onClose} />
     </VStack>
 );
 
 
 function AdminLayout() {
     const navigate = useNavigate();
-    const { isOpen, onOpen, onClose } = useDisclosure(); 
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const handleLogout = () => {
         localStorage.removeItem('admin_token');
@@ -87,29 +87,29 @@ function AdminLayout() {
             position="fixed"
             top="0"
             left="0"
-            bg="gray.900" 
+            bg="gray.900"
             color="white"
             spacing={4}
             align="stretch"
             py={6}
-            display={{ base: 'none', md: 'flex' }} 
+            display={{ base: 'none', md: 'flex' }}
             boxShadow="xl"
         >
             <Heading as="h2" size="lg" textAlign="center" mb={6}>
                 Painel Admin
             </Heading>
-            
+
             <NavigationLinks />
-            
-            <Spacer /> 
-            
-            <Button 
-                onClick={handleLogout} 
+
+            <Spacer />
+
+            <Button
+                onClick={handleLogout}
                 colorScheme="red"
-                variant="ghost" 
+                variant="ghost"
                 leftIcon={<FaSignOutAlt />}
-                justifyContent="flex-start" 
-                m={4} 
+                justifyContent="flex-start"
+                m={4}
                 _hover={{ bg: "red.500", color: "white" }}
                 fontSize="xl"
             >
@@ -120,7 +120,7 @@ function AdminLayout() {
 
     const MobileNav = () => (
         <>
-            <Flex 
+            <Flex
                 px={4}
                 py={3}
                 alignItems="center"
@@ -128,7 +128,7 @@ function AdminLayout() {
                 bg="white"
                 borderBottom="1px solid"
                 borderColor="gray.200"
-                display={{ base: 'flex', md: 'none' }} 
+                display={{ base: 'flex', md: 'none' }}
                 position="sticky"
                 top="0"
                 zIndex="sticky"
@@ -142,11 +142,11 @@ function AdminLayout() {
                 <Heading as="h3" size="md" color="gray.800">
                     Admin
                 </Heading>
-                <Button 
-                    onClick={handleLogout} 
-                    colorScheme="red" 
+                <Button
+                    onClick={handleLogout}
+                    colorScheme="red"
                     size="sm"
-                    variant="ghost" 
+                    variant="ghost"
                     leftIcon={<FaSignOutAlt />}
                 >
                     Sair
@@ -169,16 +169,19 @@ function AdminLayout() {
     );
 
     return (
-        <Box>
+        <Box as="main" w="full"
+            p={8}
+            bg="gray.50"
+            minH="100vh">
             <Sidebar />
             <MobileNav />
-            
-            <Box 
-                as="main" 
+
+            <Box
+                as="main"
                 ml={{ base: '0', md: '250px' }}
-                w="full" 
-                p={8} 
-                bg="gray.50" 
+                w="full"
+                p={8}
+                bg="gray.50"
                 minH="100vh"
             >
                 <Outlet />
