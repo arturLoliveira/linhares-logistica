@@ -42,7 +42,7 @@ function RastreioIntegradoBox() {
         }
 
         try {
-            const url = `${API_URL}/api/rastreamento/publico/${searchId.trim()}`;
+            const url = `${API_URL}/rastreamento/publico/${searchId.trim()}`;
             const res = await fetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
