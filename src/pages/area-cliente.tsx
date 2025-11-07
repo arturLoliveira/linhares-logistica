@@ -56,8 +56,8 @@ type Coleta = {
     historico: Historico[];
     statusDevolucaoProcessamento: 'PENDENTE' | 'APROVADA' | 'REJEITADA' | null;
     motivoRejeicaoDevolucao: string | null;
-    statusPagamento: 'PENDENTE' | 'PAGO' | 'ATRASADO' | null; 
-    boletoUrl: string | null; 
+    statusPagamento: 'PENDENTE' | 'PAGO' | 'ATRASADO' | null;
+    boletoUrl: string | null;
     valorFrete: number;
 };
 
@@ -85,7 +85,7 @@ const getStatusColor = (status: string) => {
         case 'EM_ROTA_ENTREGA': return 'yellow';
         case 'COLETADO':
         case 'EM_TRANSITO':
-        case 'EM_DEVOLUCAO': 
+        case 'EM_DEVOLUCAO':
             return 'blue';
         default: return 'gray';
     }
@@ -106,6 +106,11 @@ function MinhasColetas() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
+    const [expandedColetaId, setExpandedColetaId] = useState<number | null>(null);
+    const toggleHistorico = (id: number) => {
+        setExpandedColetaId(expandedColetaId === id ? null : id);
+    };
+
     const fetchColetas = useCallback(async () => {
         const token = localStorage.getItem('cliente_token');
         if (!token) {
@@ -116,7 +121,7 @@ function MinhasColetas() {
 
         setIsLoading(true);
         setError('');
-        
+
         try {
             const response = await fetch(`${API_URL}/api/cliente/minhas-coletas`, {
                 method: 'GET',
@@ -131,7 +136,7 @@ function MinhasColetas() {
                 throw new Error(errorData.error || 'Falha ao buscar coletas.');
             }
 
-            const data: Coleta[] = await response.json(); 
+            const data: Coleta[] = await response.json();
             setColetas(data.sort((a, b) => new Date(b.dataSolicitacao).getTime() - new Date(a.dataSolicitacao).getTime()));
         } catch (err) {
             setError(`Erro ao carregar suas coletas: ${err instanceof Error ? err.message : String(err)}`);
@@ -149,7 +154,7 @@ function MinhasColetas() {
         if (!status) return null;
 
         const baseProps = { mt: 4, borderRadius: 'md', alignItems: 'flex-start', w: '100%' };
-        
+
         switch (status) {
             case 'REJEITADA':
                 return (
@@ -210,22 +215,22 @@ function MinhasColetas() {
     return (
         <VStack spacing={4} align="stretch" mt={4}>
             {coletas.map((coleta) => {
-                
+
                 let statusDisplay = coleta.status.replace(/_/g, ' ');
                 let colorScheme = getStatusColor(coleta.status);
 
                 if (coleta.statusDevolucaoProcessamento === 'REJEITADA') {
                     colorScheme = 'red';
                     statusDisplay = 'DEVOLUÇÃO REJEITADA';
-                } 
-                
-                return ( 
-                    <Box 
-                        key={coleta.id} 
-                        p={5} 
-                        shadow="md" 
-                        borderWidth="1px" 
-                        borderRadius="lg" 
+                }
+
+                return (
+                    <Box
+                        key={coleta.id}
+                        p={5}
+                        shadow="md"
+                        borderWidth="1px"
+                        borderRadius="lg"
                         bg="white"
                     >
                         <HStack justifyContent="space-between" align="flex-start">
@@ -239,15 +244,27 @@ function MinhasColetas() {
                                 <Text fontSize="sm" color="gray.600">
                                     Solicitado em: {formatDate(coleta.dataSolicitacao)}
                                 </Text>
+                                <Button
+                                    size="sm"
+                                    mt={3} 
+                                    variant="link"
+                                    colorScheme="blue"
+                                    onClick={() => toggleHistorico(coleta.id)} 
+                                >
+                                    {expandedColetaId === coleta.id ? 'Ocultar Histórico' : 'Ver Histórico Detalhado'}
+                                </Button>
+
+                                <Collapse in={expandedColetaId === coleta.id} animateOpacity>
+                                </Collapse>
                             </VStack>
-                            
+
                             <Badge colorScheme={colorScheme} p={2} borderRadius="md" fontSize="sm" whiteSpace="nowrap">
                                 {statusDisplay}
                             </Badge>
                         </HStack>
-                        
-                        <DevolucaoStatusAlert 
-                            status={coleta.statusDevolucaoProcessamento} 
+
+                        <DevolucaoStatusAlert
+                            status={coleta.statusDevolucaoProcessamento}
                             nf={coleta.numeroNotaFiscal}
                             motivo={coleta.motivoRejeicaoDevolucao}
                         />
@@ -290,14 +307,14 @@ function ListaFaturasPendentes() {
             const response = await fetch(`${API_URL}/api/cliente/minhas-coletas`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
-            
+
             if (!response.ok) throw new Error('Falha ao buscar faturas.');
-            
+
             const allColetas: Coleta[] = await response.json();
-            const pendentes = allColetas.filter(c => 
-                (c.statusPagamento === 'PENDENTE' || c.statusPagamento === 'ATRASADO') 
+            const pendentes = allColetas.filter(c =>
+                (c.statusPagamento === 'PENDENTE' || c.statusPagamento === 'ATRASADO')
             );
-            
+
             setFaturas(pendentes);
 
         } catch (err) {
@@ -329,15 +346,15 @@ function ListaFaturasPendentes() {
                                 <Text fontWeight="bold">NF: {fatura.numeroNotaFiscal}</Text>
                                 <Text fontSize="sm" color="gray.700">Valor: {formatCurrency(fatura.valorFrete)}</Text>
                             </VStack>
-                            
+
                             <HStack spacing={2}>
                                 <Tag colorScheme={getPaymentColor(fatura.statusPagamento)}>{fatura.statusPagamento}</Tag>
-                                
-                                <Button 
-                                    size="sm" 
-                                    colorScheme="blue" 
-                                    as={Link} 
-                                    href={`${API_URL}/api/fatura/${fatura.numeroNotaFiscal}`} 
+
+                                <Button
+                                    size="sm"
+                                    colorScheme="blue"
+                                    as={Link}
+                                    href={`${API_URL}/api/fatura/${fatura.numeroNotaFiscal}`}
                                     target="_blank"
                                 >
                                     Ver Fatura
@@ -653,7 +670,7 @@ const secoes = [
         conteudo: <MinhasColetas />
     },
     {
-        id: 'faturas_pendentes', 
+        id: 'faturas_pendentes',
         titulo: 'Faturas e Boletos Pendentes',
         icon: <FaFileInvoice />,
         conteudo: <ListaFaturasPendentes />,
