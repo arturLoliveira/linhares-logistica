@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FaTruck, FaFileInvoice, FaPrint, FaBoxOpen, FaUndo, FaSignOutAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Heading,
@@ -761,6 +762,7 @@ function AreaCliente() {
 
 
     const handleLogout = () => {
+        const navigate = useNavigate();
         localStorage.removeItem('cliente_token');
         setIsLoggedIn(false);
         setClienteNome('Cliente');
@@ -771,6 +773,7 @@ function AreaCliente() {
             duration: 3000,
             isClosable: true,
         });
+        navigate('/');
     };
 
     if (!isLoggedIn) {
