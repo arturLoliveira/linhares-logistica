@@ -49,7 +49,7 @@ const STATUS_PROCESSAMENTO = [
     { value: 'PENDENTE', label: 'Pendente (Aguardando Análise)', color: 'gray' },
     { value: 'EM_PROCESSO', label: 'Em Processamento / Coleta Agendada', color: 'orange' },
     { value: 'REJEITADA', label: 'Rejeitada (Motivo Inválido)', color: 'red' },
-    { value: 'CONCLUIDA', label: 'Concluída (Estorno/Solução)', color: 'green' },
+    { value: 'APROVADA', label: 'Concluída (Estorno/Solução)', color: 'green' },
 ];
 
 const getStatusTagColor = (status: string | null): string => {
