@@ -51,7 +51,7 @@ type Coleta = {
     status: string;
     dataSolicitacao: string;
     historico: Historico[];
-    statusDevolucaoProcessamento: 'PENDENTE' | 'APROVADA' | 'REJEITADA' | null;
+    statusDevolucaoProcessamento: 'PENDENTE' | 'ACEITA' | 'REJEITADA' | null;
     motivoRejeicaoDevolucao: string | null;
 };
 
@@ -171,24 +171,50 @@ function MinhasColetas() {
                         <Badge colorScheme={getStatusColor(coleta.status)} p={2} borderRadius="md" fontSize="sm">
                             {coleta.status.replace(/_/g, ' ')}
                         </Badge>
-                        {
-                        coleta.statusDevolucaoProcessamento === 'REJEITADA' && (
-                        <Alert status="error" mt={4} borderRadius="md">
-                            <AlertIcon />
-                            <Box flex="1">
-                                <AlertTitle fontSize="md">Devolução Rejeitada</AlertTitle>
-                                <AlertDescription fontSize="sm">
-                                    Sua solicitação de devolução com NF {coleta.numeroNotaFiscal} foi **REJEITADA** pela administração.
-                                    {coleta.motivoRejeicaoDevolucao && (
-                                        <Text mt={2} fontWeight="bold">
-                                            Motivo: {coleta.motivoRejeicaoDevolucao}
-                                        </Text>
-                                    )}
-                                </AlertDescription>
-                            </Box>
-                        </Alert>
-                        )
-                    }
+                        {coleta.statusDevolucaoProcessamento && (
+                            <Alert
+                                status={
+                                    coleta.statusDevolucaoProcessamento === 'REJEITADA' ? 'error' :
+                                        coleta.statusDevolucaoProcessamento === 'ACEITA' ? 'success' :
+                                            'warning' 
+                                }
+                                mt={4}
+                                borderRadius="md"
+                                alignItems="flex-start"
+                            >
+                                <AlertIcon />
+                                <Box flex="1">
+                                    <AlertTitle fontSize="md">
+                                        {coleta.statusDevolucaoProcessamento === 'REJEITADA' && 'Devolução Rejeitada'}
+                                        {coleta.statusDevolucaoProcessamento === 'ACEITA' && 'Devolução Aceita'}
+                                        {coleta.statusDevolucaoProcessamento === 'PENDENTE' && 'Devolução Pendente'}
+                                    </AlertTitle>
+
+                                    <AlertDescription fontSize="sm">
+                                        {coleta.statusDevolucaoProcessamento === 'REJEITADA' && (
+                                            <>
+                                                Sua solicitação de devolução com NF {coleta.numeroNotaFiscal} foi **REJEITADA** pela administração.
+                                                {coleta.motivoRejeicaoDevolucao && (
+                                                    <Text mt={2} fontWeight="bold" color="red.700">
+                                                        Motivo: {coleta.motivoRejeicaoDevolucao}
+                                                    </Text>
+                                                )}
+                                            </>
+                                        )}
+                                        {coleta.statusDevolucaoProcessamento === 'ACEITA' && (
+                                            <>
+                                                Sua solicitação de devolução com NF {coleta.numeroNotaFiscal} foi **ACEITA** pela administração. Aguarde o contato do motorista para o recolhimento.
+                                            </>
+                                        )}
+                                        {coleta.statusDevolucaoProcessamento === 'PENDENTE' && (
+                                            <>
+                                                Sua solicitação de devolução com NF {coleta.numeroNotaFiscal} está **PENDENTE** de análise pela administração.
+                                            </>
+                                        )}
+                                    </AlertDescription>
+                                </Box>
+                            </Alert>
+                        )}
                     </HStack>
 
                     <Button
