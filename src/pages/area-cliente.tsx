@@ -51,7 +51,7 @@ type Coleta = {
     status: string;
     dataSolicitacao: string;
     historico: Historico[];
-    statusDevolucaoProcessamento: 'PENDENTE' | 'ACEITA' | 'REJEITADA' | null;
+    statusDevolucaoProcessamento: 'PENDENTE' | 'APROVADA' | 'REJEITADA' | null;
     motivoRejeicaoDevolucao: string | null;
 };
 
@@ -170,7 +170,7 @@ function MinhasColetas() {
                         </Box>
                     </Alert>
                 );
-            case 'ACEITA':
+            case 'APROVADA':
                 return (
                     <Alert status="success" {...baseProps}>
                         <AlertIcon />
