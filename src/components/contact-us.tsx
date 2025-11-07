@@ -192,23 +192,27 @@ function ContactUs() {
                         <SimpleGrid columns={2} spacing={4} w="100%">
                             <FormControl isRequired>
                                 <FormLabel>Nome</FormLabel>
-                                <Input type="text" id="nome" name="nome" placeholder="Seu nome" />
+                                <Input type="text" id="nome" name="nome" placeholder="Seu nome" value={nome}
+                                    onChange={(e) => setNome(e.target.value)} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Telefone</FormLabel>
-                                <Input type="tel" id="telefone" name="telefone" placeholder="(XX) 9XXXX-XXXX" />
+                                <Input type="tel" id="telefone" name="telefone" placeholder="(XX) 9XXXX-XXXX" value={telefone}
+                            onChange={(e) => setTelefone(e.target.value)} />
                             </FormControl>
                         </SimpleGrid>
 
                         <FormControl isRequired>
                             <FormLabel>E-mail</FormLabel>
-                            <Input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" />
+                            <Input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" value={email}
+                            onChange={(e) => setEmail(e.target.value)}/>
                             <ValidationError prefix="Email" field="email" errors={state.errors} />
                         </FormControl>
 
                         <FormControl isRequired>
                             <FormLabel>Mensagem</FormLabel>
-                            <Textarea id="mensagem" name="mensagem" rows={4} placeholder="Digite sua cotação ou dúvida..." />
+                            <Textarea id="mensagem" name="mensagem" rows={4} placeholder="Digite sua cotação ou dúvida..." value={mensagem}
+                            onChange={(e) => setMensagem(e.target.value)}/>
                             <ValidationError prefix="Mensagem" field="mensagem" errors={state.errors} />
                         </FormControl>
 
