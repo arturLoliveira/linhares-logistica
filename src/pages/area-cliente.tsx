@@ -171,7 +171,7 @@ function MinhasColetas() {
                         <Badge colorScheme={getStatusColor(coleta.status)} p={2} borderRadius="md" fontSize="sm">
                             {coleta.status.replace(/_/g, ' ')}
                         </Badge>
-
+                        {
                         coleta.statusDevolucaoProcessamento === 'REJEITADA' && (
                         <Alert status="error" mt={4} borderRadius="md">
                             <AlertIcon />
@@ -188,6 +188,7 @@ function MinhasColetas() {
                             </Box>
                         </Alert>
                         )
+                    }
                     </HStack>
 
                     <Button
