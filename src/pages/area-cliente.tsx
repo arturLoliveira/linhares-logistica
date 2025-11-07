@@ -146,6 +146,56 @@ function MinhasColetas() {
         return <Text mt={4}>Nenhuma coleta encontrada vinculada ao seu CNPJ/CPF.</Text>;
     }
 
+
+    const DevolucaoStatusAlert = ({ status, nf, motivo }: { status: Coleta['statusDevolucaoProcessamento'], nf: string, motivo: string | null }) => {
+        if (!status) return null;
+
+        const baseProps = { mt: 4, borderRadius: 'md', alignItems: 'flex-start', w: '100%' };
+
+        switch (status) {
+            case 'REJEITADA':
+                return (
+                    <Alert status="error" {...baseProps}>
+                        <AlertIcon />
+                        <Box flex="1">
+                            <AlertTitle fontSize="md">Devolução Rejeitada</AlertTitle>
+                            <AlertDescription fontSize="sm">
+                                Sua solicitação de devolução com NF {nf} foi **REJEITADA** pela administração.
+                                {motivo && (
+                                    <Text mt={2} fontWeight="bold" color="red.700">
+                                        Motivo: {motivo}
+                                    </Text>
+                                )}
+                            </AlertDescription>
+                        </Box>
+                    </Alert>
+                );
+            case 'ACEITA':
+                return (
+                    <Alert status="success" {...baseProps}>
+                        <AlertIcon />
+                        <AlertTitle fontSize="md">Devolução Aprovada!</AlertTitle>
+                        <AlertDescription fontSize="sm">
+                            Sua solicitação de devolução foi **APROVADA**. Aguarde o contato da logística para agendar o recolhimento.
+                        </AlertDescription>
+                    </Alert>
+                );
+            case 'PENDENTE':
+                return (
+                    <Alert status="warning" {...baseProps}>
+                        <AlertIcon />
+                        <AlertTitle fontSize="md">Devolução Pendente</AlertTitle>
+                        <AlertDescription fontSize="sm">
+                            Sua solicitação de devolução está sob **análise** pela administração.
+                        </AlertDescription>
+                    </Alert>
+                );
+            default:
+                return null;
+        }
+    };
+
+
     return (
         <VStack spacing={4} align="stretch" mt={4}>
             {coletas.map((coleta) => (
@@ -171,50 +221,11 @@ function MinhasColetas() {
                         <Badge colorScheme={getStatusColor(coleta.status)} p={2} borderRadius="md" fontSize="sm">
                             {coleta.status.replace(/_/g, ' ')}
                         </Badge>
-                        {coleta.statusDevolucaoProcessamento && (
-                            <Alert
-                                status={
-                                    coleta.statusDevolucaoProcessamento === 'REJEITADA' ? 'error' :
-                                        coleta.statusDevolucaoProcessamento === 'ACEITA' ? 'success' :
-                                            'warning' 
-                                }
-                                mt={4}
-                                borderRadius="md"
-                                alignItems="flex-start"
-                            >
-                                <AlertIcon />
-                                <Box flex="1">
-                                    <AlertTitle fontSize="md">
-                                        {coleta.statusDevolucaoProcessamento === 'REJEITADA' && 'Devolução Rejeitada'}
-                                        {coleta.statusDevolucaoProcessamento === 'ACEITA' && 'Devolução Aceita'}
-                                        {coleta.statusDevolucaoProcessamento === 'PENDENTE' && 'Devolução Pendente'}
-                                    </AlertTitle>
-
-                                    <AlertDescription fontSize="sm">
-                                        {coleta.statusDevolucaoProcessamento === 'REJEITADA' && (
-                                            <>
-                                                Sua solicitação de devolução com NF {coleta.numeroNotaFiscal} foi **REJEITADA** pela administração.
-                                                {coleta.motivoRejeicaoDevolucao && (
-                                                    <Text mt={2} fontWeight="bold" color="red.700">
-                                                        Motivo: {coleta.motivoRejeicaoDevolucao}
-                                                    </Text>
-                                                )}
-                                            </>
-                                        )}
-                                        {coleta.statusDevolucaoProcessamento === 'ACEITA' && (
-                                            <>
-                                                Sua solicitação de devolução com NF {coleta.numeroNotaFiscal} foi **ACEITA** pela administração. Aguarde o contato do motorista para o recolhimento.
-                                            </>
-                                        )}
-                                        {coleta.statusDevolucaoProcessamento === 'PENDENTE' && (
-                                            <>
-                                                Sua solicitação de devolução com NF {coleta.numeroNotaFiscal} está **PENDENTE** de análise pela administração.
-                                            </>
-                                        )}
-                                    </AlertDescription>
-                                </Box>
-                            </Alert>
-                        )}
+                        <DevolucaoStatusAlert 
+                            status={coleta.statusDevolucaoProcessamento} 
+                            nf={coleta.numeroNotaFiscal}
+                            motivo={coleta.motivoRejeicaoDevolucao}
+                        />
                     </HStack>
 
                     <Button
