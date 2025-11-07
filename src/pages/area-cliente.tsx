@@ -32,6 +32,9 @@ import {
     Badge,
     Spinner,
     Collapse,
+    Center,
+    Link,
+    Tag,
 } from '@chakra-ui/react';
 import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
 
@@ -53,105 +56,100 @@ type Coleta = {
     historico: Historico[];
     statusDevolucaoProcessamento: 'PENDENTE' | 'APROVADA' | 'REJEITADA' | null;
     motivoRejeicaoDevolucao: string | null;
+    statusPagamento: 'PENDENTE' | 'PAGO' | 'ATRASADO' | null; 
+    boletoUrl: string | null; 
+    valorFrete: number;
 };
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+};
+
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+};
+
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case 'CONCLUIDA': return 'green';
+        case 'PENDENTE': return 'gray';
+        case 'CANCELADA': return 'red';
+        case 'EM_ROTA_ENTREGA': return 'yellow';
+        case 'COLETADO':
+        case 'EM_TRANSITO':
+        case 'EM_DEVOLUCAO': 
+            return 'blue';
+        default: return 'gray';
+    }
+};
+
+const getPaymentColor = (status: Coleta['statusPagamento']) => {
+    switch (status) {
+        case 'PAGO': return 'green';
+        case 'ATRASADO': return 'red';
+        case 'PENDENTE': return 'orange';
+        default: return 'gray';
+    }
+};
+
 
 function MinhasColetas() {
     const [coletas, setColetas] = useState<Coleta[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
-    const [expandedColetaId, setExpandedColetaId] = useState<number | null>(null);
 
-    const toast = useToast();
+    const fetchColetas = useCallback(async () => {
+        const token = localStorage.getItem('cliente_token');
+        if (!token) {
+            setError('Faça login para ver suas coletas.');
+            setIsLoading(false);
+            return;
+        }
 
-    const toggleHistorico = (id: number) => {
-        setExpandedColetaId(expandedColetaId === id ? null : id);
-    };
+        setIsLoading(true);
+        setError('');
+        
+        try {
+            const response = await fetch(`${API_URL}/api/cliente/minhas-coletas`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Falha ao buscar coletas.');
+            }
+
+            const data: Coleta[] = await response.json(); 
+            setColetas(data.sort((a, b) => new Date(b.dataSolicitacao).getTime() - new Date(a.dataSolicitacao).getTime()));
+        } catch (err) {
+            setError(`Erro ao carregar suas coletas: ${err instanceof Error ? err.message : String(err)}`);
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [API_URL]);
 
     useEffect(() => {
-        const fetchColetas = async () => {
-            const token = localStorage.getItem('cliente_token');
-            setIsLoading(true);
-            setError('');
-            const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
-
-            if (!token) {
-                setError('Token de autenticação não encontrado.');
-                setIsLoading(false);
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/api/cliente/minhas-coletas`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-
-                if (response.status === 403) {
-                    throw new Error('Permissão negada. Seu login não tem acesso a esta lista.');
-                }
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Falha ao carregar coletas do cliente.');
-                }
-
-                const data: Coleta[] = await response.json();
-                setColetas(data);
-            } catch (err) {
-                setError((err as Error).message);
-                toast({
-                    title: 'Erro de Busca',
-                    description: (err as Error).message,
-                    status: 'error',
-                    duration: 5000,
-                    isClosable: true,
-                });
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchColetas();
-    }, [toast]);
-
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'CONCLUIDA': return 'green';
-            case 'EM_TRANSITO': return 'blue';
-            case 'EM_ROTA_ENTREGA': return 'orange';
-            case 'CANCELADA': return 'red';
-            case 'EM_DEVOLUCAO': return 'red';
-            default: return 'gray';
-        }
-    };
-
-    if (isLoading) {
-        return <VStack p={5}><Spinner size="lg" color="blue.500" /><Text>Carregando suas coletas...</Text></VStack>;
-    }
-
-    if (error) {
-        return (
-            <Alert status="error" mt={4}>
-                <AlertIcon as={MdErrorOutline} />
-                <AlertTitle mr={2}>Erro de Acesso:</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-            </Alert>
-        );
-    }
-
-    if (coletas.length === 0) {
-        return <Text mt={4}>Nenhuma coleta encontrada vinculada ao seu CNPJ/CPF.</Text>;
-    }
-
+    }, [fetchColetas]);
 
     const DevolucaoStatusAlert = ({ status, nf, motivo }: { status: Coleta['statusDevolucaoProcessamento'], nf: string, motivo: string | null }) => {
         if (!status) return null;
 
         const baseProps = { mt: 4, borderRadius: 'md', alignItems: 'flex-start', w: '100%' };
-
+        
         switch (status) {
             case 'REJEITADA':
                 return (
@@ -196,71 +194,169 @@ function MinhasColetas() {
     };
 
 
+    if (isLoading) {
+        return <VStack p={5}><Spinner size="lg" color="blue.500" /><Text>Carregando suas coletas...</Text></VStack>;
+    }
+
+    if (error) {
+        return <Alert status="error"><AlertIcon />{error}</Alert>;
+    }
+
+    if (coletas.length === 0) {
+        return <Text>Nenhuma coleta ou entrega encontrada para este cliente.</Text>;
+    }
+
+
     return (
         <VStack spacing={4} align="stretch" mt={4}>
-            {coletas.map((coleta) => (
-                <Box
-                    key={coleta.id}
-                    p={4}
-                    borderWidth="1px"
-                    borderRadius="lg"
-                    bg="white"
-                    shadow="sm"
-                    _hover={{ shadow: 'md' }}
-                >
-                    <HStack justifyContent="space-between" align="flex-start">
-                        <VStack align="flex-start" spacing={1}>
-                            <Heading as="h4" size="md" color="blue.700">
-                                Encomenda: {coleta.numeroEncomenda}
-                            </Heading>
-                            <Text fontSize="sm" color="gray.600">NF: {coleta.numeroNotaFiscal}</Text>
-                            <Text fontSize="sm" color="gray.500">
-                                Solicitação em: {new Date(coleta.dataSolicitacao).toLocaleDateString('pt-BR')}
-                            </Text>
-                        </VStack>
-                        <Badge colorScheme={getStatusColor(coleta.status)} p={2} borderRadius="md" fontSize="sm">
-                            {coleta.status.replace(/_/g, ' ')}
-                        </Badge>
+            {coletas.map((coleta) => {
+                
+                let statusDisplay = coleta.status.replace(/_/g, ' ');
+                let colorScheme = getStatusColor(coleta.status);
+
+                if (coleta.statusDevolucaoProcessamento === 'REJEITADA') {
+                    colorScheme = 'red';
+                    statusDisplay = 'DEVOLUÇÃO REJEITADA';
+                } 
+                
+                return ( 
+                    <Box 
+                        key={coleta.id} 
+                        p={5} 
+                        shadow="md" 
+                        borderWidth="1px" 
+                        borderRadius="lg" 
+                        bg="white"
+                    >
+                        <HStack justifyContent="space-between" align="flex-start">
+                            <VStack align="flex-start" spacing={1}>
+                                <Text fontWeight="bold" fontSize="lg">
+                                    NF: {coleta.numeroNotaFiscal}
+                                </Text>
+                                <Text fontSize="sm" color="gray.600">
+                                    Encomenda: {coleta.numeroEncomenda}
+                                </Text>
+                                <Text fontSize="sm" color="gray.600">
+                                    Solicitado em: {formatDate(coleta.dataSolicitacao)}
+                                </Text>
+                            </VStack>
+                            
+                            <Badge colorScheme={colorScheme} p={2} borderRadius="md" fontSize="sm" whiteSpace="nowrap">
+                                {statusDisplay}
+                            </Badge>
+                        </HStack>
+                        
                         <DevolucaoStatusAlert 
                             status={coleta.statusDevolucaoProcessamento} 
                             nf={coleta.numeroNotaFiscal}
                             motivo={coleta.motivoRejeicaoDevolucao}
                         />
-                    </HStack>
 
-                    <Button
-                        size="sm"
-                        mt={4}
-                        onClick={() => toggleHistorico(coleta.id)}
-                        variant="ghost"
-                        colorScheme="blue"
-                    >
-                        {expandedColetaId === coleta.id ? 'Ocultar Histórico' : 'Ver Histórico Detalhado'}
-                    </Button>
+                        <Collapse startingHeight={20} in={false} animateOpacity>
+                            <Box pt={4}>
+                                <Text fontWeight="medium" mb={2}>Histórico:</Text>
+                                <List spacing={2}>
+                                    {coleta.historico.map((h) => (
+                                        <ListItem key={h.id}>
+                                            <ListIcon as={h.status === 'CONCLUIDA' ? MdCheckCircle : MdErrorOutline} color={getStatusColor(h.status) + '.500'} />
+                                            {formatDate(h.data)} - **{h.status.replace(/_/g, ' ')}** em {h.localizacao}
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Box>
+                        </Collapse>
 
-                    <Collapse in={expandedColetaId === coleta.id} animateOpacity>
-                        <Box mt={4} pt={4} borderTopWidth="1px" borderColor="gray.100">
-                            <Heading as="h5" size="sm" mb={3}>Eventos</Heading>
-                            <List spacing={3}>
-                                {coleta.historico.map((evento) => (
-                                    <ListItem key={evento.id} borderBottomWidth="1px" pb={3}>
-                                        <ListIcon as={MdCheckCircle} color="green.500" />
-                                        <Text as="span" fontWeight="bold" mr={2}>
-                                            {new Date(evento.data).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                                        </Text>
-                                        - {evento.status.replace(/_/g, ' ')}
-                                        <Text fontSize="sm" color="gray.600" ml={6}>{evento.localizacao}</Text>
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </Box>
-                    </Collapse>
-
-                </Box>
-            ))}
+                    </Box>
+                );
+            })}
         </VStack>
     );
 }
+
+
+function ListaFaturasPendentes() {
+    const [faturas, setFaturas] = useState<Coleta[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+    const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+
+    const fetchFaturasPendentes = useCallback(async () => {
+        const token = localStorage.getItem('cliente_token');
+        if (!token) return;
+
+        setIsLoading(true);
+        setError('');
+        try {
+            const response = await fetch(`${API_URL}/api/cliente/minhas-coletas`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            
+            if (!response.ok) throw new Error('Falha ao buscar faturas.');
+            
+            const allColetas: Coleta[] = await response.json();
+            const pendentes = allColetas.filter(c => 
+                (c.statusPagamento === 'PENDENTE' || c.statusPagamento === 'ATRASADO') 
+            );
+            
+            setFaturas(pendentes);
+
+        } catch (err) {
+            setError((err as Error).message);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [API_URL]);
+
+    useEffect(() => {
+        fetchFaturasPendentes();
+    }, [fetchFaturasPendentes]);
+
+
+    if (isLoading) return <Center py={5}><Spinner size="md" /></Center>;
+    if (error) return <Alert status="error"><AlertIcon />{error}</Alert>;
+    if (faturas.length === 0) return <Text>Nenhuma fatura ou boleto pendente.</Text>;
+
+    return (
+        <Box>
+            <Heading as="h4" size="md" mb={4}>
+                Faturas com Pagamento Pendente
+            </Heading>
+            <VStack spacing={3} align="stretch">
+                {faturas.map(fatura => (
+                    <Box key={fatura.id} p={4} borderWidth="1px" borderRadius="md" bg="orange.50">
+                        <HStack justifyContent="space-between" alignItems="center">
+                            <VStack align="flex-start" spacing={0}>
+                                <Text fontWeight="bold">NF: {fatura.numeroNotaFiscal}</Text>
+                                <Text fontSize="sm" color="gray.700">Valor: {formatCurrency(fatura.valorFrete)}</Text>
+                            </VStack>
+                            
+                            <HStack spacing={2}>
+                                <Tag colorScheme={getPaymentColor(fatura.statusPagamento)}>{fatura.statusPagamento}</Tag>
+                                
+                                <Button 
+                                    size="sm" 
+                                    colorScheme="blue" 
+                                    as={Link} 
+                                    href={`${API_URL}/api/fatura/${fatura.numeroNotaFiscal}`} 
+                                    target="_blank"
+                                >
+                                    Ver Fatura
+                                </Button>
+                                {fatura.boletoUrl && (
+                                    <Button size="sm" colorScheme="green" as={Link} href={fatura.boletoUrl} target="_blank">
+                                        Ver Boleto
+                                    </Button>
+                                )}
+                            </HStack>
+                        </HStack>
+                    </Box>
+                ))}
+            </VStack>
+        </Box>
+    );
+}
+
+
 
 function FormColetaEntrega() {
     const [nomeCliente, setNomeCliente] = useState('');
@@ -483,71 +579,6 @@ function FormColetaDevolucao() {
     );
 }
 
-function FormEmissaoFatura() {
-    const [notaFiscal, setNotaFiscal] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const toast = useToast();
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
-
-        const url = `${API_URL}/api/fatura/${notaFiscal}`;
-        const filename = `fatura_${notaFiscal}.pdf`;
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.error || 'Falha ao buscar o documento.');
-            }
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(downloadUrl);
-
-            toast({
-                title: 'Sucesso!',
-                description: 'Download da fatura iniciado.',
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            });
-            setNotaFiscal('');
-
-        } catch (error) {
-            toast({
-                title: 'Erro ao gerar fatura.',
-                description: (error as Error).message,
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    return (
-        <Box as="form" onSubmit={handleSubmit}>
-            <Text mb={4}>Preencha as informações para gerar sua fatura/boleto de forma on-line.</Text>
-            <FormControl isRequired>
-                <FormLabel>Número da Nota Fiscal</FormLabel>
-                <Input type="text" value={notaFiscal} onChange={e => setNotaFiscal(e.target.value)} />
-            </FormControl>
-            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>
-                {isLoading ? 'Gerando...' : 'Gerar Fatura'}
-            </Button>
-        </Box>
-    );
-}
-
 function FormImprimirEtiqueta() {
     const [notaFiscal, setNotaFiscal] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -622,6 +653,12 @@ const secoes = [
         conteudo: <MinhasColetas />
     },
     {
+        id: 'faturas_pendentes', 
+        titulo: 'Faturas e Boletos Pendentes',
+        icon: <FaFileInvoice />,
+        conteudo: <ListaFaturasPendentes />,
+    },
+    {
         id: 'coleta_entrega',
         titulo: 'Solicitar Nova Coleta de Entrega',
         icon: <FaBoxOpen />,
@@ -632,12 +669,6 @@ const secoes = [
         titulo: 'Solicitar Coleta de Devolução',
         icon: <FaUndo />,
         conteudo: <FormColetaDevolucao />
-    },
-    {
-        id: 'emissao_fatura',
-        titulo: 'Emissão de Fatura',
-        icon: <FaFileInvoice />,
-        conteudo: <FormEmissaoFatura />
     },
     {
         id: 'imprimir_etiqueta',
@@ -673,7 +704,6 @@ function AreaCliente() {
             if (response.ok) {
                 const user = await response.json();
                 setIsLoggedIn(true);
-                // Personaliza o nome, usando o nome real ou o email
                 setClienteNome(user.nome || user.email || 'Cliente');
             } else {
                 localStorage.removeItem('cliente_token');
