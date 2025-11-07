@@ -246,15 +246,32 @@ function MinhasColetas() {
                                 </Text>
                                 <Button
                                     size="sm"
-                                    mt={3} 
+                                    mt={3}
                                     variant="link"
                                     colorScheme="blue"
-                                    onClick={() => toggleHistorico(coleta.id)} 
+                                    onClick={() => toggleHistorico(coleta.id)}
                                 >
                                     {expandedColetaId === coleta.id ? 'Ocultar Histórico' : 'Ver Histórico Detalhado'}
                                 </Button>
 
                                 <Collapse in={expandedColetaId === coleta.id} animateOpacity>
+                                    <Box mt={4} pt={4} borderTopWidth="1px" borderColor="gray.100">
+                                        <Text fontWeight="medium" mb={2}>Histórico:</Text>
+                                        <List spacing={2}>
+                                            {coleta.historico.map((h) => (
+                                                <ListItem key={h.id}>
+                                                    <ListIcon
+                                                        as={h.status === 'CONCLUIDA' ? MdCheckCircle : MdErrorOutline}
+                                                        color={getStatusColor(h.status) + '.500'}
+                                                    />
+                                                    <Text as="span" fontWeight="bold" mr={2}>
+                                                        {formatDate(h.data)}
+                                                    </Text>
+                                                    — {h.localizacao} ({h.status.replace(/_/g, ' ')})
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    </Box>
                                 </Collapse>
                             </VStack>
 
