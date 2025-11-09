@@ -36,10 +36,22 @@ function DriverUpdatePage() {
         setMensagem(''); 
         const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
+        const token = localStorage.getItem('admin_token'); 
+
+        if (!token) {
+            setErro("Sessão expirada. Por favor, faça login novamente.");
+            setIsLoading(false);
+            return;
+        }
+
         try {
             const response = await fetch(`${API_URL}/api/driver/update`, { 
                 method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+
+                },
                 body: JSON.stringify({
                     numeroEncomenda,
                     token,
