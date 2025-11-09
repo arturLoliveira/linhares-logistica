@@ -359,7 +359,7 @@ function ListaColetas() {
                             <Text mb={4}>Imprima e cole na etiqueta. O motorista deve escanear este código.</Text>
                             
                             <QRCodeSVG 
-                                value={`${FRONTEND_URL}/driver/update?id=${qrCodeVisivel}&token=${driverTokenVisivel}`}
+                                value={`${FRONTEND_URL}/driver/login?redirect=/driver/update?id=${qrCodeVisivel}&token=${driverTokenVisivel}`}
                                 size={256}
                                 style={{margin: '0 auto', display: 'block'}}
                             />
@@ -540,7 +540,6 @@ function FormAdminCadastraColeta() {
                     </FormControl>
                 </VStack>
 
-                {/* Coluna 2 */}
                 <VStack spacing={4}>
                     <FormControl isRequired>
                         <FormLabel>Nome do Cliente (Remetente)</FormLabel>

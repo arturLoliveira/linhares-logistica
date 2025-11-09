@@ -59,7 +59,7 @@ interface ModalBoletosProps {
     cliente: Cliente | null;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
 function EditarClienteModal({ isOpen, onClose, cliente, onUpdateSuccess }: { isOpen: boolean, onClose: () => void, cliente: Cliente | null, onUpdateSuccess: () => void }) {
     
@@ -86,7 +86,6 @@ function EditarClienteModal({ isOpen, onClose, cliente, onUpdateSuccess }: { isO
         setIsLoading(true);
         const token = localStorage.getItem('admin_token');
         
-        // CORREÇÃO: Usar a API_URL
         const updateData = { nome, email, cpfCnpj, novaSenha };
 
         try {
