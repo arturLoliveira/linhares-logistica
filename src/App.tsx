@@ -11,6 +11,7 @@ import AdminLayout from './components/admin-layout';
 import HomePage from './pages/HomePage';
 import AreaCliente from './pages/area-cliente';
 import AdminLogin from './pages/adminLogin';
+import AdminDriverLogin from './pages/adminDriverLogin';
 
 
 import AdminOverview from './pages/adminOverview';
@@ -33,13 +34,12 @@ function App() {
         // Exemplo em App.tsx
         <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
         <Route path="/driver/update" element={
-          <ProtectedRoute>
-            <DriverUpdatePage />
-          </ProtectedRoute>
+          <DriverUpdatePage />
         }
         />
-
+        <Route path="/driver/login" element={<AdminDriverLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+
 
         <Route
           path="/admin"
