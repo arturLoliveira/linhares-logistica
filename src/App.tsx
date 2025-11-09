@@ -3,9 +3,9 @@ import 'leaflet/dist/leaflet.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 
-import Layout from './components/layout'; 
-import ProtectedRoute from './components/protectedRoute'; 
-import AdminLayout from './components/admin-layout'; 
+import Layout from './components/layout';
+import ProtectedRoute from './components/protectedRoute';
+import AdminLayout from './components/admin-layout';
 
 
 import HomePage from './pages/HomePage';
@@ -19,6 +19,7 @@ import AdminDevolucoes from './pages/adminDevolucoes';
 import AdminClientes from './pages/adminClientes';
 import DriverUpdatePage from './pages/driverUpdatePage';
 import AdminFuncionarios from './components/adminFuncionarios';
+import RecuperarSenhaPage from './components/recuperar-senha';
 
 function App() {
   return (
@@ -29,12 +30,19 @@ function App() {
         </Route>
 
         <Route path="/area-cliente" element={<AreaCliente />} />
-        <Route path="/driver/update" element={<DriverUpdatePage />} />
+        // Exemplo em App.tsx
+        <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
+        <Route path="/driver/update" element={
+          <ProtectedRoute>
+            <DriverUpdatePage />
+          </ProtectedRoute>
+        }
+        />
 
         <Route path="/admin/login" element={<AdminLogin />} />
 
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute>
               <AdminLayout />
@@ -46,7 +54,8 @@ function App() {
           <Route path="devolucoes" element={<AdminDevolucoes />} />
           <Route path="clientes" element={<AdminClientes />} />
           <Route path="funcionarios" element={<AdminFuncionarios />} />
-          
+
+
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 

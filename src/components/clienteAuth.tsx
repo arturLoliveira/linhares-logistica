@@ -12,14 +12,17 @@ import {
     Link,
     Center
 } from '@chakra-ui/react';
-
-interface ClienteAuthProps {
-    onLoginSuccess: () => void;
-}
+import RecuperarSenhaPage from './recuperar-senha';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
-const LoginForm: React.FC<{ onSwitchToRegister: () => void, onLoginSuccess: () => void }> = ({ onSwitchToRegister, onLoginSuccess }) => {
+interface LoginFormProps {
+    onSwitchToRegister: () => void;
+    onLoginSuccess: () => void;
+    onForgotPasswordClick: () => void; 
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSuccess, onForgotPasswordClick }) => {
     const [cpfCnpj, setCpfCnpj] = useState('');
     const [senha, setSenha] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -81,6 +84,18 @@ const LoginForm: React.FC<{ onSwitchToRegister: () => void, onLoginSuccess: () =
                     <FormLabel>Senha</FormLabel>
                     <Input type="password" value={senha} onChange={e => setSenha(e.target.value)} />
                 </FormControl>
+                
+                <Box alignSelf="flex-end" width="100%" mt={-3} mb={-3}>
+                    <Link 
+                        color="blue.500" 
+                        fontSize="sm" 
+                        onClick={onForgotPasswordClick}
+                        _hover={{ textDecoration: 'underline' }}
+                    >
+                        Esqueceu sua senha?
+                    </Link>
+                </Box>
+                
                 <Button type="submit" colorScheme="blue" size="lg" w="100%" mt={4} isLoading={isLoading}>
                     {isLoading ? 'Entrando...' : 'Entrar'}
                 </Button>
@@ -173,9 +188,20 @@ const RegisterForm: React.FC<{ onSwitchToLogin: () => void, onLoginSuccess: () =
     );
 };
 
-
-const ClienteAuth: React.FC<ClienteAuthProps> = ({ onLoginSuccess }) => {
+const ClienteAuth: React.FC<{ onLoginSuccess: () => void; }> = ({ onLoginSuccess }) => {
     const [isRegisterMode, setIsRegisterMode] = useState(false);
+    const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
+    
+    const handleSwitchToForgotPassword = () => {
+        setIsForgotPasswordMode(true);
+        setIsRegisterMode(false); 
+    };
+
+    if (isForgotPasswordMode) {
+        return (
+            <RecuperarSenhaPage />
+        );
+    }
 
     return (
         <Center minH="70vh" p={4}>
@@ -189,6 +215,7 @@ const ClienteAuth: React.FC<ClienteAuthProps> = ({ onLoginSuccess }) => {
                     <LoginForm 
                         onSwitchToRegister={() => setIsRegisterMode(true)}
                         onLoginSuccess={onLoginSuccess}
+                        onForgotPasswordClick={handleSwitchToForgotPassword} 
                     />
                 )}
             </Box>

@@ -28,8 +28,12 @@ import {
     ModalCloseButton,
     ModalBody,
     ModalFooter,
+    useDisclosure,
+    Badge,
+    IconButton,
+    Link as ChakraLink
 } from '@chakra-ui/react';
-import { FaUsers, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaUsers, FaEdit, FaTrash, FaEye, FaDownload } from 'react-icons/fa';
 
 interface Cliente {
     id: number;
@@ -37,10 +41,30 @@ interface Cliente {
     nome: string | null;
     email: string | null;
 }
+type Boleto = {
+    id: number;
+    numeroNotaFiscal: string; 
+    valor: number; 
+    dataVencimento: string;
+    status: 'PAGO' | 'ABERTO' | 'VENCIDO' | string; 
+    urlBoleto: string | null; 
+    coleta: {
+        numeroNotaFiscal: string;
+    } | null;
+};
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+interface ModalBoletosProps {
+    isOpen: boolean;
+    onClose: () => void;
+    cliente: Cliente | null;
+}
 
-function EditarClienteModal({ isOpen, onClose, cliente, onUpdateSuccess }: { isOpen: boolean, onClose: () => void, cliente: Cliente, onUpdateSuccess: () => void }) {
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+function EditarClienteModal({ isOpen, onClose, cliente, onUpdateSuccess }: { isOpen: boolean, onClose: () => void, cliente: Cliente | null, onUpdateSuccess: () => void }) {
+    
+    if (!cliente) return null; 
+
     const [nome, setNome] = useState(cliente.nome || '');
     const [email, setEmail] = useState(cliente.email || '');
     const [cpfCnpj, setCpfCnpj] = useState(cliente.cpfCnpj);
@@ -49,10 +73,12 @@ function EditarClienteModal({ isOpen, onClose, cliente, onUpdateSuccess }: { isO
     const toast = useToast();
 
     useEffect(() => {
-        setNome(cliente.nome || '');
-        setEmail(cliente.email || '');
-        setCpfCnpj(cliente.cpfCnpj);
-        setNovaSenha('');
+        if (cliente) {
+            setNome(cliente.nome || '');
+            setEmail(cliente.email || '');
+            setCpfCnpj(cliente.cpfCnpj);
+            setNovaSenha('');
+        }
     }, [cliente]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -60,10 +86,11 @@ function EditarClienteModal({ isOpen, onClose, cliente, onUpdateSuccess }: { isO
         setIsLoading(true);
         const token = localStorage.getItem('admin_token');
         
+        // CORREÇÃO: Usar a API_URL
         const updateData = { nome, email, cpfCnpj, novaSenha };
 
         try {
-            const response = await fetch(`https://linhares-logistica-backend.onrender.com/api/admin/clientes/${cliente.id}`, {
+            const response = await fetch(`${API_URL}/api/admin/clientes/${cliente.id}`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -100,6 +127,7 @@ function EditarClienteModal({ isOpen, onClose, cliente, onUpdateSuccess }: { isO
             setIsLoading(false);
         }
     };
+   
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -140,7 +168,10 @@ function EditarClienteModal({ isOpen, onClose, cliente, onUpdateSuccess }: { isO
     );
 }
 
-function ExcluirClienteModal({ isOpen, onClose, cliente, onDeleteSuccess }: { isOpen: boolean, onClose: () => void, cliente: Cliente, onDeleteSuccess: () => void }) {
+function ExcluirClienteModal({ isOpen, onClose, cliente, onDeleteSuccess }: { isOpen: boolean, onClose: () => void, cliente: Cliente | null, onDeleteSuccess: () => void }) {
+    
+    if (!cliente) return null;
+    
     const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
 
@@ -209,11 +240,133 @@ function ExcluirClienteModal({ isOpen, onClose, cliente, onDeleteSuccess }: { is
     );
 }
 
+function ModalBoletos({ isOpen, onClose, cliente }: ModalBoletosProps) {
+    const [boletos, setBoletos] = useState<Boleto[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [erro, setErro] = useState('');
+    const toast = useToast();
+
+    const fetchBoletos = useCallback(async () => {
+        if (!cliente?.cpfCnpj) return;
+
+        setIsLoading(true);
+        setErro('');
+        const token = localStorage.getItem('admin_token');
+
+        try {
+            const response = await fetch(`${API_URL}/api/admin/clientes/${cliente.cpfCnpj}/boletos`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                console.log(data)
+                throw new Error(data.error || 'Falha ao buscar boletos.');
+            }
+
+            const data: Boleto[] = await response.json();
+            setBoletos(data);
+
+        } catch (err) {
+            setErro((err as Error).message);
+            toast({
+                title: "Erro ao carregar",
+                description: (err as Error).message,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [cliente, toast]);
+    
+    useEffect(() => {
+        if (isOpen && cliente) {
+            fetchBoletos();
+        } else {
+            setBoletos([]);
+        }
+    }, [isOpen, cliente, fetchBoletos]);
+
+    const getStatusBadge = (status: Boleto['status']) => {
+        let color: 'green' | 'red' | 'yellow' | 'gray' = 'gray';
+        if (status === 'PAGO') color = 'green';
+        if (status === 'VENCIDO') color = 'red';
+        if (status === 'PENDENTE') color = 'yellow';
+        return <Badge colorScheme={color}>{status}</Badge>;
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} size="3xl">
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>Boletos de: {cliente?.nome || cliente?.cpfCnpj}</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    {isLoading ? (
+                        <Box textAlign="center" py={10}><Spinner size="xl" /></Box>
+                    ) : erro ? (
+                        <Text color="red.500" textAlign="center">{erro}</Text>
+                    ) : boletos.length === 0 ? (
+                        <Text textAlign="center">Nenhum boleto de frete encontrado para este cliente.</Text>
+                    ) : (
+                        <Box overflowX="auto">
+                            <Table variant="simple" size="sm">
+                                <Thead>
+                                    <Tr>
+                                        <Th>NF/Coleta</Th>
+                                        <Th isNumeric>Valor</Th>
+                                        <Th>Vencimento</Th>
+                                        <Th>Status</Th>
+                                        <Th>Download</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {boletos.map((boleto) => (
+                                        <Tr key={boleto.id}>
+                                            <Td>{boleto.numeroNotaFiscal}</Td>
+                                            <Td isNumeric>R$ {boleto.valor.toFixed(2).replace('.', ',')}</Td>
+                                            <Td>{new Date(boleto.dataVencimento).toLocaleDateString()}</Td>
+                                            <Td>{getStatusBadge(boleto.status)}</Td>
+                                            <Td>
+                                                {boleto.urlBoleto ? (
+                                                    <ChakraLink href={boleto.urlBoleto} isExternal title="Baixar Boleto">
+                                                        <IconButton 
+                                                            aria-label="Baixar Boleto" 
+                                                            icon={<FaDownload />} 
+                                                            size="sm"
+                                                            colorScheme="green"
+                                                        />
+                                                    </ChakraLink>
+                                                ) : (
+                                                    <Text fontSize="sm" color="gray.500">Link indisponível</Text>
+                                                )}
+                                            </Td>
+                                        </Tr>
+                                    ))}
+                                </Tbody>
+                            </Table>
+                        </Box>
+                    )}
+                </ModalBody>
+                <ModalFooter>
+                    <Button colorScheme="blue" onClick={onClose}>Fechar</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+    );
+}
 
 function FormAdminCadastraCliente({ onCadastroSucesso }: { onCadastroSucesso: () => void }) {
     const [cpfCnpj, setCpfCnpj] = useState('');
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('')
     const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
 
@@ -223,13 +376,13 @@ function FormAdminCadastraCliente({ onCadastroSucesso }: { onCadastroSucesso: ()
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch(`https://linhares-logistica-backend.onrender.com/api/admin/clientes/registrar`, {
+            const response = await fetch(`${API_URL}/api/cliente/cadastro`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ cpfCnpj, nome, email })
+                body: JSON.stringify({ cpfCnpj, nome, email, senha })
             });
 
             const data = await response.json();
@@ -289,7 +442,7 @@ function FormAdminCadastraCliente({ onCadastroSucesso }: { onCadastroSucesso: ()
                 </FormControl>
                 
                 <FormControl id="cliente_nome">
-                    <FormLabel>Nome do Cliente (Opcional)</FormLabel>
+                    <FormLabel>Nome do Cliente</FormLabel>
                     <Input 
                         type="text" 
                         value={nome} 
@@ -298,11 +451,19 @@ function FormAdminCadastraCliente({ onCadastroSucesso }: { onCadastroSucesso: ()
                 </FormControl>
 
                 <FormControl id="cliente_email">
-                    <FormLabel>Email do Cliente (Opcional)</FormLabel>
+                    <FormLabel>Email do Cliente</FormLabel>
                     <Input 
                         type="email" 
                         value={email} 
                         onChange={e => setEmail(e.target.value)}
+                    />
+                </FormControl>
+                <FormControl id="cliente_senha">
+                    <FormLabel>Senha</FormLabel>
+                    <Input 
+                        type="password" 
+                        value={senha} 
+                        onChange={e => setSenha(e.target.value)}
                     />
                 </FormControl>
             </VStack>
@@ -327,6 +488,12 @@ const ListaClientes = ({ refetchTrigger }: { refetchTrigger: number }) => {
 
     const [clienteParaEditar, setClienteParaEditar] = useState<Cliente | null>(null);
     const [clienteParaExcluir, setClienteParaExcluir] = useState<Cliente | null>(null);
+    const [clienteParaBoletos, setClienteParaBoletos] = useState<Cliente | null>(null);
+
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+    const { isOpen: isBoletosOpen, onOpen: onBoletosOpen, onClose: onBoletosClose } = useDisclosure();
+
 
     const fetchClientes = useCallback(async () => {
         setIsLoading(true);
@@ -334,7 +501,7 @@ const ListaClientes = ({ refetchTrigger }: { refetchTrigger: number }) => {
         const token = localStorage.getItem('admin_token');
 
         try {
-            const response = await fetch(`https://linhares-logistica-backend.onrender.com/api/admin/clientes/list`, {
+            const response = await fetch(`${API_URL}/api/admin/clientes`, { 
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -342,11 +509,7 @@ const ListaClientes = ({ refetchTrigger }: { refetchTrigger: number }) => {
             });
 
             if (!response.ok) {
-                if (response.status === 403) {
-                    setErro("Acesso negado. Sua sessão de administrador pode ter expirado.");
-                } else {
-                    setErro("Falha ao carregar a lista de clientes.");
-                }
+                setErro("Falha ao carregar a lista de clientes.");
                 setClientes([]);
                 return;
             }
@@ -365,12 +528,14 @@ const ListaClientes = ({ refetchTrigger }: { refetchTrigger: number }) => {
         fetchClientes();
     }, [fetchClientes, refetchTrigger]);
     
-    const handleEdit = (cliente: Cliente) => setClienteParaEditar(cliente);
-    const handleDelete = (cliente: Cliente) => setClienteParaExcluir(cliente);
-
+    const handleEdit = (cliente: Cliente) => { setClienteParaEditar(cliente); onEditOpen(); };
+    const handleDelete = (cliente: Cliente) => { setClienteParaExcluir(cliente); onDeleteOpen(); };
+    const handleViewBoletos = (cliente: Cliente) => { setClienteParaBoletos(cliente); onBoletosOpen(); };
+    
     const handleSuccess = () => {
         fetchClientes();
     }
+
 
     return (
         <Box w="100%" mt={10}>
@@ -380,15 +545,11 @@ const ListaClientes = ({ refetchTrigger }: { refetchTrigger: number }) => {
             </Heading>
 
             {isLoading ? (
-                <Center py={10}>
-                    <Spinner size="lg" color="blue.500" />
-                    <Text ml={3}>Carregando clientes...</Text>
-                </Center>
+                <Center py={10}><Spinner size="lg" color="blue.500" /><Text ml={3}>Carregando clientes...</Text></Center>
             ) : erro ? (
-                <Alert status="error">
-                    <AlertIcon />
-                    {erro}
-                </Alert>
+                <Alert status="error"><AlertIcon />{erro}</Alert>
+            ) : clientes.length === 0 ? (
+                <Text>Nenhum cliente encontrado.</Text>
             ) : (
                 <TableContainer borderWidth="1px" borderRadius="md" shadow="md" bg="white">
                     <Table variant="simple" size="sm">
@@ -402,7 +563,7 @@ const ListaClientes = ({ refetchTrigger }: { refetchTrigger: number }) => {
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {clientes.length > 0 ? clientes.map((cliente) => (
+                            {clientes.map((cliente) => (
                                 <Tr key={cliente.id} _hover={{ bg: "blue.50" }}>
                                     <Td fontWeight="bold">{cliente.id}</Td>
                                     <Td>{cliente.nome || 'N/A'}</Td>
@@ -410,6 +571,9 @@ const ListaClientes = ({ refetchTrigger }: { refetchTrigger: number }) => {
                                     <Td>{cliente.email || 'N/A'}</Td>
                                     <Td textAlign="center">
                                         <HStack spacing={2} justifyContent="center">
+                                            <Button size="xs" colorScheme="purple" leftIcon={<FaEye />} onClick={() => handleViewBoletos(cliente)}>
+                                                Boletos
+                                            </Button>
                                             <Button size="xs" colorScheme="orange" leftIcon={<FaEdit />} onClick={() => handleEdit(cliente)}>
                                                 Editar
                                             </Button>
@@ -419,32 +583,29 @@ const ListaClientes = ({ refetchTrigger }: { refetchTrigger: number }) => {
                                         </HStack>
                                     </Td>
                                 </Tr>
-                            )) : (
-                                <Tr>
-                                    <Td colSpan={5} textAlign="center">Nenhum cliente encontrado.</Td>
-                                </Tr>
-                            )}
+                            ))}
                         </Tbody>
                     </Table>
                 </TableContainer>
             )}
             
-            {clienteParaEditar && (
-                <EditarClienteModal
-                    isOpen={!!clienteParaEditar}
-                    onClose={() => setClienteParaEditar(null)}
-                    cliente={clienteParaEditar}
-                    onUpdateSuccess={handleSuccess}
-                />
-            )}
-            {clienteParaExcluir && (
-                <ExcluirClienteModal
-                    isOpen={!!clienteParaExcluir}
-                    onClose={() => setClienteParaExcluir(null)}
-                    cliente={clienteParaExcluir}
-                    onDeleteSuccess={handleSuccess}
-                />
-            )}
+            <EditarClienteModal
+                isOpen={isEditOpen}
+                onClose={onEditClose}
+                cliente={clienteParaEditar}
+                onUpdateSuccess={handleSuccess}
+            />
+            <ExcluirClienteModal
+                isOpen={isDeleteOpen}
+                onClose={onDeleteClose}
+                cliente={clienteParaExcluir}
+                onDeleteSuccess={handleSuccess}
+            />
+            <ModalBoletos 
+                isOpen={isBoletosOpen} 
+                onClose={onBoletosClose} 
+                cliente={clienteParaBoletos} 
+            />
         </Box>
     );
 };
@@ -458,7 +619,7 @@ const AdminClientes = () => {
 
     return (
         <Box w="100%" p={4}>
-            <Heading as="h2" size="lg" mb={8}>
+            <Heading as="h2" size="xl" mb={8}>
                 Gerenciar Clientes
             </Heading>
             
