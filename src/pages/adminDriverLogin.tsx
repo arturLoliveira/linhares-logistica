@@ -32,7 +32,7 @@ function AdminDriverLogin() {
             const response = await fetch(`${apiUrl}/api/admin/login`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, senha }) //
+                body: JSON.stringify({ email, senha }) 
             });
 
             const data = await response.json();

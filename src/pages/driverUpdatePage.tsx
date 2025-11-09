@@ -15,28 +15,26 @@ import {
     AlertIcon,
     Icon
 } from '@chakra-ui/react';
-import { FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa'; 
+import { FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
 
 function DriverUpdatePage() {
-    const [searchParams] = useSearchParams(); 
+    const [searchParams] = useSearchParams();
 
-    const numeroEncomenda = searchParams.get('id'); 
-    const token = searchParams.get('token'); //
-
-    const [localizacao, setLocalizacao] = useState(''); 
-    const [status, setStatus] = useState('COLETADO'); 
-    const [mensagem, setMensagem] = useState(''); 
-    const [isLoading, setIsLoading] = useState(false); 
-    const [erro, setErro] = useState(''); 
+    const numeroEncomenda = searchParams.get('id');
+    const token = localStorage.getItem('admin_token');
+    const [localizacao, setLocalizacao] = useState('');
+    const [status, setStatus] = useState('COLETADO');
+    const [mensagem, setMensagem] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [erro, setErro] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); 
-        setIsLoading(true); 
-        setErro(''); 
-        setMensagem(''); 
+        e.preventDefault();
+        setIsLoading(true);
+        setErro('');
+        setMensagem('');
         const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
-        const token = localStorage.getItem('admin_token'); 
 
         if (!token) {
             setErro("Sessão expirada. Por favor, faça login novamente.");
@@ -45,9 +43,9 @@ function DriverUpdatePage() {
         }
 
         try {
-            const response = await fetch(`${API_URL}/api/driver/update`, { 
-                method: 'POST', 
-                headers: { 
+            const response = await fetch(`${API_URL}/api/driver/update`, {
+                method: 'POST',
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
 
@@ -62,18 +60,18 @@ function DriverUpdatePage() {
 
             const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.error || 'Falha ao atualizar.'); 
+                throw new Error(data.error || 'Falha ao atualizar.');
             }
-            setMensagem('Status atualizado com sucesso!'); 
+            setMensagem('Status atualizado com sucesso!');
 
         } catch (err) {
-            setErro((err as Error).message); 
+            setErro((err as Error).message);
         } finally {
-            setIsLoading(false); 
+            setIsLoading(false);
         }
     };
 
-    if (!numeroEncomenda || !token) { 
+    if (!numeroEncomenda || !token) {
         return (
             <Center minH="80vh" p={4}>
                 <Box textAlign="center" p={8} borderWidth={1} borderRadius="lg" shadow="md">
@@ -84,9 +82,9 @@ function DriverUpdatePage() {
             </Center>
         );
     }
-    
-    if (mensagem) { 
-         return (
+
+    if (mensagem) {
+        return (
             <Center minH="80vh" p={4}>
                 <Box textAlign="center" p={8} borderWidth={1} borderRadius="lg" shadow="md">
                     <Icon as={FaCheckCircle} boxSize={12} color="green.500" />
@@ -101,7 +99,7 @@ function DriverUpdatePage() {
         <Center minH="80vh" py={8} px={4}>
             <Box
                 as="form"
-                onSubmit={handleSubmit} 
+                onSubmit={handleSubmit}
                 w={{ base: '90%', md: '450px' }}
                 p={8}
                 borderWidth={1}
@@ -114,18 +112,18 @@ function DriverUpdatePage() {
                 <VStack spacing={4}>
                     <FormControl id="localizacao" isRequired>
                         <FormLabel>Sua Localização Atual</FormLabel>
-                        <Input 
-                            type="text" 
+                        <Input
+                            type="text"
                             value={localizacao}
-                            onChange={(e) => setLocalizacao(e.target.value)} 
+                            onChange={(e) => setLocalizacao(e.target.value)}
                             placeholder="Ex: Sede Ouro Branco"
                         />
                     </FormControl>
                     <FormControl id="status" isRequired>
                         <FormLabel>Marcar como:</FormLabel>
-                        <Select 
-                            value={status} 
-                            onChange={(e) => setStatus(e.target.value)} 
+                        <Select
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
                         >
                             <option value="COLETADO">Coletado (Retirado no cliente)</option>
                             <option value="EM_TRANSITO">Em Trânsito (Chegou no CD)</option>
@@ -141,11 +139,11 @@ function DriverUpdatePage() {
                         </Alert>
                     )}
 
-                    <Button 
-                        type="submit" 
-                        colorScheme="blue" 
+                    <Button
+                        type="submit"
+                        colorScheme="blue"
                         width="100%"
-                        isLoading={isLoading} 
+                        isLoading={isLoading}
                         loadingText="Atualizando..."
                     >
                         Atualizar Status
