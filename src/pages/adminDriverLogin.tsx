@@ -20,6 +20,7 @@ function AdminDriverLogin() {
     const [erro, setErro] = useState(''); 
     const navigate = useNavigate(); 
     const [searchParams] = useSearchParams();
+    
     const redirectUrl = searchParams.get('redirect');
 
     const handleSubmit = async (e: React.FormEvent) => {

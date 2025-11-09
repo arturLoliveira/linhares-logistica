@@ -217,7 +217,8 @@ function ListaColetas() {
             setIsDeleteLoading(false);
         }
     };
-
+ const updatePath = `/driver/update?id=${qrCodeVisivel}&token=${driverTokenVisivel}`;
+        const encodedRedirect = encodeURIComponent(updatePath);
 
     return (
         <Box w="100%">
@@ -359,7 +360,7 @@ function ListaColetas() {
                             <Text mb={4}>Imprima e cole na etiqueta. O motorista deve escanear este código.</Text>
                             
                             <QRCodeSVG 
-                                value={`${FRONTEND_URL}/driver/login?redirect=/driver/update?id=${qrCodeVisivel}&token=${driverTokenVisivel}`}
+                                value={`${FRONTEND_URL}/driver/login?redirect=${encodedRedirect}`}
                                 size={256}
                                 style={{margin: '0 auto', display: 'block'}}
                             />
