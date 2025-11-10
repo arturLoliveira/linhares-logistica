@@ -1,9 +1,7 @@
 import { FaWhatsapp, FaBars } from "react-icons/fa"; 
-import logoDaEmpresa from '../assets/logo.png'; 
 import { 
     Box, 
-    Flex, 
-    Image, 
+    Flex,  
     Link as ChakraLink, 
     Spacer, 
     HStack,
@@ -19,7 +17,8 @@ import {
     VStack,
     DrawerHeader,  
 } from '@chakra-ui/react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom'
+import Logo from '../assets/logo.svg?react';
 
 const linkWhatsapp = "https://wa.me/5531993751683?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20transportadora%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.";
 
@@ -57,11 +56,11 @@ function Header() {
                 align="center"
             >
                 <RouterLink to="/">
-                    <Image 
-                      src={logoDaEmpresa} 
-                      alt="Logo Transportes Linhares" 
+                    <Icon 
+                      as={Logo} 
                       h={{ base: '60px', md: '80px' }} 
-                      objectFit="contain"
+                      w="auto" 
+                      objectFit="contain" 
                     />
                 </RouterLink>
             </Flex>
