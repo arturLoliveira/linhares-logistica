@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FaTruck, FaFileInvoice, FaPrint, FaBoxOpen, FaUndo, FaSignOutAlt } from 'react-icons/fa';
+import { FaTruck, FaFileInvoice, FaBoxOpen, FaUndo, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -367,16 +367,6 @@ function ListaFaturasPendentes() {
 
                             <HStack spacing={2}>
                                 <Tag colorScheme={getPaymentColor(fatura.statusPagamento)}>{fatura.statusPagamento}</Tag>
-
-                                <Button
-                                    size="sm"
-                                    colorScheme="blue"
-                                    as={Link}
-                                    href={`${API_URL}/api/fatura/${fatura.numeroNotaFiscal}`}
-                                    target="_blank"
-                                >
-                                    Ver Fatura
-                                </Button>
                                 {fatura.boletoUrl && (
                                     <Button size="sm" colorScheme="green" as={Link} href={fatura.boletoUrl} target="_blank">
                                         Ver Boleto
@@ -614,70 +604,6 @@ function FormColetaDevolucao() {
     );
 }
 
-function FormImprimirEtiqueta() {
-    const [notaFiscal, setNotaFiscal] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const toast = useToast();
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
-
-        const url = `${API_URL}/api/etiqueta/${notaFiscal}`;
-        const filename = `etiqueta_${notaFiscal}.pdf`;
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.error || 'Falha ao buscar o documento.');
-            }
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(downloadUrl);
-
-            toast({
-                title: 'Sucesso!',
-                description: 'Download da etiqueta iniciado.',
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            });
-            setNotaFiscal('');
-
-        } catch (error) {
-            toast({
-                title: 'Erro ao gerar etiqueta.',
-                description: (error as Error).message,
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    return (
-        <Box as="form" onSubmit={handleSubmit}>
-            <Text mb={4}>Realize aqui as impressões das etiquetas identificadoras de volumes.</Text>
-            <FormControl isRequired>
-                <FormLabel>Número da Nota Fiscal</FormLabel>
-                <Input type="text" value={notaFiscal} onChange={e => setNotaFiscal(e.target.value)} />
-            </FormControl>
-            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>
-                {isLoading ? 'Gerando...' : 'Imprimir Etiqueta'}
-            </Button>
-        </Box>
-    );
-}
 
 
 const secoes = [
@@ -704,12 +630,6 @@ const secoes = [
         titulo: 'Solicitar Coleta de Devolução',
         icon: <FaUndo />,
         conteudo: <FormColetaDevolucao />
-    },
-    {
-        id: 'imprimir_etiqueta',
-        titulo: 'Imprimir Etiqueta',
-        icon: <FaPrint />,
-        conteudo: <FormImprimirEtiqueta />
     }
 ];
 
