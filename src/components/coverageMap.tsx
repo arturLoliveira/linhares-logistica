@@ -181,7 +181,7 @@ function StatBox({ label, value }: { label: string, value: string }) {
 const todasAsCidades = [
     
     { nome: 'Ouro Branco', top: '66%', left: '65%', isFeatured: true },
-    { nome: 'Carandaí', top: '77%', left: '63%' },
+    { nome: 'Carandaí', top: '79%', left: '63%' },
     { nome: 'Cristiano Otoni', top: '73%', left: '57%' },
     { nome: 'Casa Grande', top: '78%', left: '59%' },
     { nome: 'Capela Nova', top: '75%', left: '64%' },
