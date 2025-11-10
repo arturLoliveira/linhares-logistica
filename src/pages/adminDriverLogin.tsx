@@ -41,7 +41,7 @@ function AdminDriverLogin() {
                 throw new Error(data.error || 'Falha no login');
             }
 
-            localStorage.setItem('admin_token', data.token); 
+            localStorage.setItem('driver_token', data.token); 
             navigate(redirectUrl || '/driver/dashboard', { replace: true }); 
 
         } catch (err) {

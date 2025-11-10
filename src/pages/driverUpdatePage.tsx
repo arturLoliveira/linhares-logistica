@@ -21,7 +21,7 @@ function DriverUpdatePage() {
     const [searchParams] = useSearchParams();
 
     const numeroEncomenda = searchParams.get('id');
-    const token = localStorage.getItem('admin_token');
+    const token = localStorage.getItem('driver_token');
     const [localizacao, setLocalizacao] = useState('');
     const [status, setStatus] = useState('COLETADO');
     const [mensagem, setMensagem] = useState('');
