@@ -637,6 +637,7 @@ function AreaCliente() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [clienteNome, setClienteNome] = useState('Cliente');
     const toast = useToast();
+    const navigate = useNavigate();
     const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
 
     const checkAuthStatus = useCallback(async () => {
@@ -682,7 +683,6 @@ function AreaCliente() {
 
 
     const handleLogout = () => {
-        const navigate = useNavigate();
         localStorage.removeItem('cliente_token');
         setIsLoggedIn(false);
         setClienteNome('Cliente');
