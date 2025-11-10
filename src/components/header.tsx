@@ -58,7 +58,7 @@ function Header() {
                 <RouterLink to="/">
                     <Icon 
                       as={Logo} 
-                      h={{ base: '60px', md: '80px' }} 
+                      h={{ base: '40px', md: '60px' }} 
                       w="auto" 
                       objectFit="contain" 
                     />
