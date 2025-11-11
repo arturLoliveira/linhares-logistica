@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { FaSearch } from 'react-icons/fa'; 
 import EditarColetaModal from '../components/editarColetaModal'; 
-import { 
-    Box, 
-    Heading, 
-    FormControl, 
-    FormLabel, 
-    Input, 
-    Select, 
-    Button, 
+import {
+    Box,
+    Heading,
+    FormControl,
+    FormLabel,
+    Input,
+    Select,
+    Button,
     useToast,
     VStack,
     HStack,
@@ -22,8 +22,8 @@ import {
     Thead,
     Tbody,
     Tr,
-    Th, 
-    Td, 
+    Th,
+    Td,
     TableContainer,
     Badge,
     Modal,
@@ -37,45 +37,194 @@ import {
     InputGroup,
     InputLeftAddon,
     NumberInput,
-    NumberInputField
+    NumberInputField,
+    useDisclosure,
+    Link as ChakraLink 
 } from '@chakra-ui/react';
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
+
+
+type StatusPagamento = 'PENDENTE' | 'PAGO' | 'ATRASADO' | null;
+
+type Coleta = {
+    id: number;
+    numeroEncomenda: string;
+    numeroNotaFiscal: string;
+    nomeCliente: string;
+    cpfCnpjDestinatario: string;
+    status: string;
+    valorFrete: number;
+    driverToken: string;
+    pesoKg: number | null;
+    statusPagamento: StatusPagamento; 
+    emailCliente: string;
+    enderecoColeta: string;
+    tipoCarga: string | null;
+    cpfCnpjRemetente: string;
+    dataVencimento: string | null;
+    boletoUrl?: string | null; 
+};
+
+type ColetaParaEdicao = Pick<Coleta, 'id' | 'numeroEncomenda' | 'numeroNotaFiscal' | 'valorFrete' | 'boletoUrl'>;
+
+type PaginationData = {
+    totalCount: number;
+    pageSize: number;
+    currentPage: number;
+    totalPages: number;
+};
+
+
+const getPaymentColor = (status: StatusPagamento) => {
+    switch (status) {
+        case 'PAGO': return 'green';
+        case 'ATRASADO': return 'red';
+        case 'PENDENTE': return 'orange';
+        default: return 'gray';
+    }
+};
+
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case 'PENDENTE': return 'yellow';
+        case 'COLETADO': return 'blue';
+        case 'EM_TRANSITO': return 'cyan';
+        case 'EM_ROTA_ENTREGA': return 'orange';
+        case 'CONCLUIDA': return 'green';
+        case 'CANCELADA': return 'red';
+        case 'EM_DEVOLUCAO': return 'purple';
+        default: return 'gray';
+    }
+};
+
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+};
+
+
+function ModalGerarBoleto({ isOpen, onClose, coleta, onBoletoGerado }: { 
+    isOpen: boolean, 
+    onClose: () => void, 
+    coleta: ColetaParaEdicao | null,
+    onBoletoGerado: () => void
+}) {
+    if (!coleta) return null;
+
+    const [novoValor, setNovoValor] = useState(coleta.valorFrete.toFixed(2));
+    const [isLoading, setIsLoading] = useState(false);
+    const toast = useToast();
+    
+    useEffect(() => {
+        setNovoValor(coleta.valorFrete.toFixed(2));
+    }, [coleta]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        const token = localStorage.getItem('admin_token');
+        const valorNumerico = parseFloat(novoValor);
+
+        try {
+            const response = await fetch(`${API_URL}/api/admin/coletas/${coleta.id}/gerar-boleto`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ novoValorFrete: valorNumerico.toFixed(2) })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Falha ao gerar boleto.');
+            }
+
+            toast({
+                title: 'Boleto Gerado!',
+                description: `Boleto criado com sucesso. Valor: ${formatCurrency(valorNumerico)}`,
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+            
+            onBoletoGerado(); 
+            onClose();
+
+        } catch (error) {
+            toast({
+                title: 'Erro na Geração.',
+                description: (error as Error).message,
+                status: 'error',
+                duration: 7000,
+                isClosable: true,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+            <ModalOverlay />
+            <ModalContent as="form" onSubmit={handleSubmit}>
+                <ModalHeader>Gerar Boleto - NF {coleta.numeroNotaFiscal}</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <Text mb={4}>
+                        Ajuste o valor final do frete. Um novo boleto será gerado e vinculado à coleta.
+                    </Text>
+                    <FormControl isRequired>
+                        <FormLabel>Valor Final do Frete (R$)</FormLabel>
+                        <InputGroup>
+                            <InputLeftAddon>R$</InputLeftAddon>
+                            <NumberInput
+                                value={novoValor}
+                                onChange={setNovoValor}
+                                precision={2}
+                                min={0.01}
+                                w="100%"
+                            >
+                                <NumberInputField />
+                            </NumberInput>
+                        </InputGroup>
+                    </FormControl>
+                    
+                    {coleta.boletoUrl && (
+                        <Alert status="info" mt={4}>
+                            <AlertIcon />
+                            Boleto anterior já existe. Será substituído. 
+                            <ChakraLink href={coleta.boletoUrl} isExternal ml={2}>Ver link</ChakraLink>
+                        </Alert>
+                    )}
+                </ModalBody>
+                <ModalFooter>
+                    <Button variant="ghost" mr={3} onClick={onClose} disabled={isLoading}>
+                        Cancelar
+                    </Button>
+                    <Button colorScheme="green" type="submit" isLoading={isLoading} disabled={parseFloat(novoValor) <= 0}>
+                        Gerar Boleto ({formatCurrency(parseFloat(novoValor) || 0)})
+                    </Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+    );
+}
+
 
 function ListaColetas() {
     
-    type Coleta = {
-        id: number;
-        numeroEncomenda: string;
-        numeroNotaFiscal: string;
-        nomeCliente: string;
-        cpfCnpjDestinatario: string;
-        status: string;
-        valorFrete: number;
-        driverToken: string; 
-        pesoKg: number | null;
-        emailCliente: string; 
-        enderecoColeta: string;
-        tipoCarga: string | null;
-        cpfCnpjRemetente: string;
-        dataVencimento: string | null;
-    };
-
-    type PaginationData = {
-        totalCount: number;
-        pageSize: number;
-        currentPage: number;
-        totalPages: number;
-    };
-
     const [coletas, setColetas] = useState<Coleta[]>([]);
     const [pagination, setPagination] = useState<PaginationData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [erro, setErro] = useState('');
-    
+
     const [filtroStatus, setFiltroStatus] = useState('PENDENTE');
     const [currentPage, setCurrentPage] = useState(1);
-    
-    const [searchTerm, setSearchTerm] = useState(''); 
-    const [searchQuery, setSearchQuery] = useState(''); 
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
 
     const [qrCodeVisivel, setQrCodeVisivel] = useState<string | null>(null);
     const [driverTokenVisivel, setDriverTokenVisivel] = useState<string | null>(null);
@@ -86,6 +235,10 @@ function ListaColetas() {
     const [coletaParaExcluir, setColetaParaExcluir] = useState<Coleta | null>(null);
     const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
+    const [coletaParaEdicaoBoleto, setColetaParaEdicaoBoleto] = useState<ColetaParaEdicao | null>(null);
+    const { isOpen: isBoletoOpen, onOpen: onBoletoOpen, onClose: onBoletoClose } = useDisclosure();
+
+
     const toast = useToast();
     const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
     const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'https://transportelinhares.vercel.app/';
@@ -95,7 +248,7 @@ function ListaColetas() {
         const token = localStorage.getItem('admin_token');
         setIsLoading(true);
         setErro('');
-        
+
         const url = `${API_URL}/api/admin/coletas?status=${filtroStatus}&page=${currentPage}&search=${searchQuery}`;
 
         try {
@@ -104,51 +257,52 @@ function ListaColetas() {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) throw new Error('Falha ao buscar coletas.');
-            
+
             const data = await response.json();
             setColetas(data.coletas);
-            setPagination(data.pagination); 
+            setPagination(data.pagination);
 
         } catch (err) {
             setErro((err as Error).message);
         } finally {
             setIsLoading(false);
         }
-    }, [filtroStatus, currentPage, searchQuery, API_URL]); 
+    }, [filtroStatus, currentPage, searchQuery, API_URL]);
 
 
     useEffect(() => {
         fetchColetas();
-    }, [fetchColetas]); 
+    }, [fetchColetas]);
 
     const handlePrint = () => {
         window.print();
     };
 
+    const handleOpenBoletoModal = (coleta: Coleta) => {
+        setColetaParaEdicaoBoleto({
+            id: coleta.id,
+            numeroEncomenda: coleta.numeroEncomenda,
+            numeroNotaFiscal: coleta.numeroNotaFiscal,
+            valorFrete: coleta.valorFrete,
+            boletoUrl: coleta.boletoUrl 
+        });
+        onBoletoOpen();
+    };
+    const handleBoletoSuccess = () => {
+        fetchColetas(); 
+    }
+
     const handleFiltroStatusChange = (status: string) => {
         setFiltroStatus(status);
-        setCurrentPage(1); 
+        setCurrentPage(1);
     };
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setCurrentPage(1); 
-        setSearchQuery(searchTerm); 
+        setCurrentPage(1);
+        setSearchQuery(searchTerm);
     };
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'PENDENTE': return 'yellow';
-            case 'COLETADO': return 'blue';
-            case 'EM_TRANSITO': return 'cyan';
-            case 'EM_ROTA_ENTREGA': return 'orange';
-            case 'CONCLUIDA': return 'green';
-            case 'CANCELADA': return 'red';
-            case 'EM_DEVOLUCAO': return 'purple'; 
-            default: return 'gray';
-        }
-    };
-    
     const handleOpenModal = (coleta: Coleta) => {
         setQrCodeVisivel(coleta.numeroEncomenda);
         setDriverTokenVisivel(coleta.driverToken);
@@ -158,7 +312,7 @@ function ListaColetas() {
         setQrCodeVisivel(null);
         setDriverTokenVisivel(null);
     };
-    
+
     const handleEdit = (coleta: Coleta) => {
         setColetaParaEditar(coleta);
         setIsEditModalOpen(true);
@@ -168,10 +322,10 @@ function ListaColetas() {
         setIsEditModalOpen(false);
         setColetaParaEditar(null);
     };
-    
+
     const handleColetaAtualizada = () => {
         handleCloseEditModal();
-        fetchColetas(); 
+        fetchColetas();
     };
 
     const handleDeleteConfirmation = (coleta: Coleta) => {
@@ -194,7 +348,7 @@ function ListaColetas() {
                 const data = await response.json();
                 throw new Error(data.error || 'Falha ao excluir a coleta.');
             }
-            
+
             toast({
                 title: 'Excluída!',
                 description: `Coleta ${coletaParaExcluir.numeroEncomenda} removida com sucesso.`,
@@ -203,8 +357,8 @@ function ListaColetas() {
                 isClosable: true,
             });
 
-            setColetaParaExcluir(null); 
-            fetchColetas(); 
+            setColetaParaExcluir(null);
+            fetchColetas();
         } catch (error) {
             toast({
                 title: 'Erro na Exclusão.',
@@ -217,13 +371,15 @@ function ListaColetas() {
             setIsDeleteLoading(false);
         }
     };
- const updatePath = `/driver/update?id=${qrCodeVisivel}&token=${driverTokenVisivel}`;
-        const encodedRedirect = encodeURIComponent(updatePath);
+    
+    const updatePath = `/driver/update?id=${qrCodeVisivel}&token=${driverTokenVisivel}`;
+    const encodedRedirect = encodeURIComponent(updatePath);
+
 
     return (
         <Box w="100%">
             <Heading as="h4" size="md" mb={4}>Visualizar Coletas</Heading>
-            
+
             <HStack spacing={2} wrap="wrap" mb={4}>
                 <Button variant={filtroStatus === 'PENDENTE' ? 'solid' : 'outline'} colorScheme="blue" onClick={() => handleFiltroStatusChange('PENDENTE')}>Pendentes</Button>
                 <Button variant={filtroStatus === 'COLETADO' ? 'solid' : 'outline'} colorScheme="blue" onClick={() => handleFiltroStatusChange('COLETADO')}>Coletados</Button>
@@ -235,13 +391,13 @@ function ListaColetas() {
             </HStack>
 
             <HStack as="form" onSubmit={handleSearchSubmit} mb={4} w="100%">
-                <Input 
-                    type="text" 
+                <Input
+                    type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Buscar por Nº Encomenda, NF, Cliente..."
                 />
-                <IconButton 
+                <IconButton
                     aria-label="Buscar"
                     icon={<FaSearch />}
                     type="submit"
@@ -256,14 +412,14 @@ function ListaColetas() {
                     <Text mt={2}>Carregando coletas...</Text>
                 </Box>
             )}
-            
+
             {erro && (
                 <Alert status="error" mb={4}>
                     <AlertIcon />
                     {erro}
                 </Alert>
             )}
-            
+
             {!isLoading && !erro && coletas.length === 0 && (
                 <Text>Nenhuma coleta encontrada.</Text>
             )}
@@ -278,8 +434,10 @@ function ListaColetas() {
                                 <Th>Cliente</Th>
                                 <Th isNumeric>Valor (R$)</Th>
                                 <Th isNumeric>Peso (Kg)</Th>
-                                <Th>Status</Th>
+                                <Th>Status Pag.</Th>
+                                <Th>Status Coleta</Th>
                                 <Th>Ações</Th>
+                                <Th>Opções</Th> 
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -293,33 +451,49 @@ function ListaColetas() {
                                         {coleta.pesoKg ? `${coleta.pesoKg.toFixed(1)}` : 'N/A'}
                                     </Td>
                                     <Td>
+                                        <Badge colorScheme={getPaymentColor(coleta.statusPagamento)}>
+                                            {coleta.statusPagamento || 'N/A'}
+                                        </Badge>
+                                    </Td>
+                                    <Td>
                                         <Badge colorScheme={getStatusColor(coleta.status)}>
                                             {coleta.status.replace(/_/g, ' ')}
                                         </Badge>
                                     </Td>
                                     <Td>
-                                        <Button 
-                                            size="xs"
-                                            onClick={() => handleOpenModal(coleta)}
-                                            mr={2}
-                                        >
-                                            Ver QR Code
-                                        </Button>
-                                        <Button 
-                                            size="xs"
-                                            colorScheme="orange" 
-                                            onClick={() => handleEdit(coleta)}
-                                            mr={2}
-                                        >
-                                            Editar
-                                        </Button>
-                                        <Button 
-                                            size="xs"
-                                            colorScheme="red" 
-                                            onClick={() => handleDeleteConfirmation(coleta)}
-                                        >
-                                            Excluir
-                                        </Button>
+                                        <HStack spacing={1}>
+                                            <Button
+                                                size="xs"
+                                                colorScheme="orange"
+                                                onClick={() => handleEdit(coleta)}
+                                            >
+                                                Editar
+                                            </Button>
+                                            <Button
+                                                size="xs"
+                                                colorScheme="red"
+                                                onClick={() => handleDeleteConfirmation(coleta)}
+                                            >
+                                                Excluir
+                                            </Button>
+                                        </HStack>
+                                    </Td>
+                                    <Td>
+                                        <HStack spacing={2}>
+                                            <Button
+                                                size="xs"
+                                                colorScheme="purple"
+                                                onClick={() => handleOpenBoletoModal(coleta)}
+                                            >
+                                                Gerar Boleto
+                                            </Button>
+                                            <Button
+                                                size="xs"
+                                                onClick={() => handleOpenModal(coleta)}
+                                            >
+                                                Ver QR Code
+                                            </Button>
+                                        </HStack>
                                     </Td>
                                 </Tr>
                             ))}
@@ -327,10 +501,10 @@ function ListaColetas() {
                     </Table>
                 </TableContainer>
             )}
-            
+
             {pagination && pagination.totalPages > 1 && (
                 <HStack justifyContent="space-between" mt={4}>
-                    <Button 
+                    <Button
                         onClick={() => setCurrentPage(currentPage - 1)}
                         disabled={currentPage <= 1 || isLoading}
                         size="sm"
@@ -340,7 +514,7 @@ function ListaColetas() {
                     <Text fontSize="sm">
                         Página {pagination.currentPage} de {pagination.totalPages}
                     </Text>
-                    <Button 
+                    <Button
                         onClick={() => setCurrentPage(currentPage + 1)}
                         disabled={currentPage >= pagination.totalPages || isLoading}
                         size="sm"
@@ -350,6 +524,7 @@ function ListaColetas() {
                 </HStack>
             )}
 
+            {/* Modal de QR Code */}
             <Modal isOpen={qrCodeVisivel !== null} onClose={handleCloseModal} isCentered>
                 <ModalOverlay />
                 <ModalContent>
@@ -358,11 +533,11 @@ function ListaColetas() {
                         <ModalCloseButton />
                         <ModalBody textAlign="center">
                             <Text mb={4}>Imprima e cole na etiqueta. O motorista deve escanear este código.</Text>
-                            
-                            <QRCodeSVG 
+
+                            <QRCodeSVG
                                 value={`${FRONTEND_URL}/driver/login?redirect=${encodedRedirect}`}
                                 size={256}
-                                style={{margin: '0 auto', display: 'block'}}
+                                style={{ margin: '0 auto', display: 'block' }}
                             />
                         </ModalBody>
                     </Box>
@@ -374,7 +549,7 @@ function ListaColetas() {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-            
+
             {isEditModalOpen && coletaParaEditar && (
                 <EditarColetaModal
                     isOpen={isEditModalOpen}
@@ -391,22 +566,22 @@ function ListaColetas() {
                     <ModalCloseButton />
                     <ModalBody>
                         <Text>
-                            Você tem certeza que deseja excluir a coleta 
+                            Você tem certeza que deseja excluir a coleta
                             <Text as="span" fontWeight="bold"> #{coletaParaExcluir?.numeroEncomenda}</Text> (NF: {coletaParaExcluir?.numeroNotaFiscal})?
                             Esta ação é irreversível.
                         </Text>
                     </ModalBody>
                     <ModalFooter>
-                        <Button 
-                            variant="ghost" 
-                            mr={3} 
+                        <Button
+                            variant="ghost"
+                            mr={3}
                             onClick={() => setColetaParaExcluir(null)}
                             disabled={isDeleteLoading}
                         >
                             Cancelar
                         </Button>
-                        <Button 
-                            colorScheme="red" 
+                        <Button
+                            colorScheme="red"
                             onClick={handleDeleteColeta}
                             isLoading={isDeleteLoading}
                             loadingText="Excluindo..."
@@ -416,9 +591,17 @@ function ListaColetas() {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+            
+            <ModalGerarBoleto
+                isOpen={isBoletoOpen}
+                onClose={onBoletoClose}
+                coleta={coletaParaEdicaoBoleto} 
+                onBoletoGerado={handleBoletoSuccess}
+            />
         </Box>
     );
 }
+
 
 function FormAdminCadastraColeta() {
     const [nomeCliente, setNomeCliente] = useState('');
@@ -431,9 +614,9 @@ function FormAdminCadastraColeta() {
     const [valorFrete, setValorFrete] = useState('');
     const [pesoKg, setPesoKg] = useState('');
     const [dataVencimento, setDataVencimento] = useState('');
-    
+
     const [isLoading, setIsLoading] = useState(false);
-    const toast = useToast(); 
+    const toast = useToast();
 
     const handleSubmitColeta = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -451,11 +634,11 @@ function FormAdminCadastraColeta() {
                 body: JSON.stringify(dadosColeta),
             });
             if (!response.ok) {
-                 const data = await response.json();
-                 throw new Error(data.error || 'Falha ao cadastrar a coleta.');
+                const data = await response.json();
+                throw new Error(data.error || 'Falha ao cadastrar a coleta.');
             }
             const novaColeta = await response.json();
-            
+
             toast({
                 title: 'Coleta cadastrada!',
                 description: `Nº Encomenda: ${novaColeta.numeroEncomenda}`,
@@ -482,26 +665,26 @@ function FormAdminCadastraColeta() {
     };
 
     return (
-        <Box 
-            as="form" 
-            onSubmit={handleSubmitColeta} 
-            mt="40px" 
-            borderTopWidth="1px" 
-            borderColor="gray.200" 
+        <Box
+            as="form"
+            onSubmit={handleSubmitColeta}
+            mt="40px"
+            borderTopWidth="1px"
+            borderColor="gray.200"
             pt="40px"
         >
             <Heading as="h4" size="md" mb={1}>Cadastrar Nova Coleta</Heading>
             <Text mb={6}>O funcionário preenche estes dados quando a carga é recebida.</Text>
-            
+
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                
+
                 <VStack spacing={4}>
                     <FormControl isRequired>
                         <FormLabel>Valor do Frete (R$)</FormLabel>
                         <InputGroup>
                             <InputLeftAddon>R$</InputLeftAddon>
-                            <NumberInput 
-                                value={valorFrete} 
+                            <NumberInput
+                                value={valorFrete}
                                 onChange={(valueString) => setValorFrete(valueString)}
                                 precision={2}
                                 min={0.01}
@@ -511,12 +694,12 @@ function FormAdminCadastraColeta() {
                             </NumberInput>
                         </InputGroup>
                     </FormControl>
-                    
+
                     <FormControl isRequired>
                         <FormLabel>Número da Nota Fiscal</FormLabel>
                         <Input value={numeroNotaFiscal} onChange={(e) => setNumeroNotaFiscal(e.target.value)} />
                     </FormControl>
-                    
+
                     <FormControl isRequired>
                         <FormLabel>CPF/CNPJ Remetente</FormLabel>
                         <Input value={cpfCnpjRemetente} onChange={(e) => setCpfCnpjRemetente(e.target.value)} />
@@ -529,8 +712,8 @@ function FormAdminCadastraColeta() {
 
                     <FormControl>
                         <FormLabel>Peso (Kg) (Opcional)</FormLabel>
-                        <NumberInput 
-                            value={pesoKg} 
+                        <NumberInput
+                            value={pesoKg}
                             onChange={(valueString) => setPesoKg(valueString)}
                             precision={1}
                             step={0.5}
@@ -556,10 +739,10 @@ function FormAdminCadastraColeta() {
                         <FormLabel>Endereço de Coleta</FormLabel>
                         <Input value={enderecoColeta} onChange={(e) => setEnderecoColeta(e.target.value)} />
                     </FormControl>
-                    
+
                     <FormControl>
                         <FormLabel>Tipo da Carga (Opcional)</FormLabel>
-                        <Input value={tipoCarga} onChange={(e) => setTipoCarga(e.target.value)} placeholder="Ex: Caixas, Pallets"/>
+                        <Input value={tipoCarga} onChange={(e) => setTipoCarga(e.target.value)} placeholder="Ex: Caixas, Pallets" />
                     </FormControl>
 
                     <FormControl>
@@ -567,12 +750,12 @@ function FormAdminCadastraColeta() {
                         <Input type="date" value={dataVencimento} onChange={(e) => setDataVencimento(e.target.value)} />
                     </FormControl>
                 </VStack>
-            
+
             </SimpleGrid>
-            
-            <Button 
-                type="submit" 
-                colorScheme="blue" 
+
+            <Button
+                type="submit"
+                colorScheme="blue"
                 mt={6}
                 isLoading={isLoading}
                 loadingText="Salvando..."
@@ -589,8 +772,8 @@ function FormAdminAdicionaHistorico() {
     const [localizacao, setLocalizacao] = useState('');
     const [novoStatus, setNovoStatus] = useState('EM_TRANSITO');
     const [isLoading, setIsLoading] = useState(false);
-    
-    const toast = useToast(); 
+
+    const toast = useToast();
 
     const handleAddHistorico = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -603,7 +786,7 @@ function FormAdminAdicionaHistorico() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ status: novoStatus, localizacao: localizacao })
             });
@@ -620,7 +803,7 @@ function FormAdminAdicionaHistorico() {
                 duration: 5000,
                 isClosable: true,
             });
-            
+
             setNotaFiscal('');
             setLocalizacao('');
 
@@ -638,38 +821,38 @@ function FormAdminAdicionaHistorico() {
     };
 
     return (
-        <Box 
-            as="form" 
-            onSubmit={handleAddHistorico} 
-            mt="40px" 
-            borderTopWidth="1px" 
-            borderColor="gray.200" 
+        <Box
+            as="form"
+            onSubmit={handleAddHistorico}
+            mt="40px"
+            borderTopWidth="1px"
+            borderColor="gray.200"
             pt="40px"
         >
             <Heading as="h4" size="md" mb="20px">Adicionar Evento de Rastreio</Heading>
-            
+
             <FormControl id="nf_status" isRequired mb="16px">
                 <FormLabel>Número da Nota Fiscal</FormLabel>
-                <Input 
+                <Input
                     value={notaFiscal}
                     onChange={(e) => setNotaFiscal(e.target.value)}
                     placeholder="NF da coleta que será atualizada"
                 />
             </FormControl>
-            
+
             <FormControl id="localizacao" isRequired mb="16px">
                 <FormLabel>Localização Atual</FormLabel>
-                <Input 
+                <Input
                     value={localizacao}
                     onChange={(e) => setLocalizacao(e.target.value)}
                     placeholder="Ex: Centro de Distribuição - BH/MG"
                 />
             </FormControl>
-            
+
             <FormControl id="status" isRequired mb="24px">
                 <FormLabel>Novo Status</FormLabel>
-                <Select 
-                    value={novoStatus} 
+                <Select
+                    value={novoStatus}
                     onChange={(e) => setNovoStatus(e.target.value)}
                 >
                     <option value="COLETADO">Coletado</option>
@@ -680,12 +863,12 @@ function FormAdminAdicionaHistorico() {
                     <option value="EM_DEVOLUCAO">Em Devolução</option>
                 </Select>
             </FormControl>
-            
-            <Button 
-                type="submit" 
-                colorScheme="blue" 
-                isLoading={isLoading} 
-                loadingText="Adicionando..." 
+
+            <Button
+                type="submit"
+                colorScheme="blue"
+                isLoading={isLoading}
+                loadingText="Adicionando..."
             >
                 Adicionar Evento
             </Button>

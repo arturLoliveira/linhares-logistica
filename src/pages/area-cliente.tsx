@@ -26,8 +26,6 @@ import {
     SimpleGrid,
     NumberInput,
     NumberInputField,
-    InputGroup,
-    InputLeftAddon,
     Flex,
     HStack,
     Badge,
@@ -397,14 +395,18 @@ function FormColetaEntrega() {
     const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
 
+        const valorNumerico = valorFrete ? parseFloat(valorFrete) : 0; 
+        const pesoNumerico = pesoKg ? parseFloat(pesoKg) : 0;
+
     const handleSubmitColeta = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+
         const dadosColeta = {
             nomeCliente, emailCliente, enderecoColeta, tipoCarga,
             cpfCnpjRemetente, cpfCnpjDestinatario, numeroNotaFiscal,
-            valorFrete: valorFrete,
-            pesoKg: pesoKg || null,
+            valorFrete: valorNumerico,
+            pesoKg: pesoNumerico,
             dataVencimento: null
         };
 
@@ -448,26 +450,10 @@ function FormColetaEntrega() {
 
     return (
         <Box as="form" onSubmit={handleSubmitColeta}>
-            <Text mb={4}>Após o preenchimento do formulário será gerado o número da coleta.</Text>
+            <Text mb={4}>O valor do frete será calculado pela administração. Você receberá um boleto após a conferência.</Text>
 
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                 <VStack spacing={4}>
-                    <FormControl isRequired>
-                        <FormLabel>Valor do Frete (R$) (Conforme cotação)</FormLabel>
-                        <InputGroup>
-                            <InputLeftAddon>R$</InputLeftAddon>
-                            <NumberInput
-                                value={valorFrete}
-                                onChange={(valueString) => setValorFrete(valueString)}
-                                precision={2}
-                                min={0.01}
-                                w="100%"
-                            >
-                                <NumberInputField placeholder="Ex: 150.00" />
-                            </NumberInput>
-                        </InputGroup>
-                    </FormControl>
-
                     <FormControl isRequired>
                         <FormLabel>Seu Nome (Remetente)</FormLabel>
                         <Input type="text" value={nomeCliente} onChange={(e) => setNomeCliente(e.target.value)} />
