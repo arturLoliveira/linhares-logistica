@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FaTruck, FaFileInvoice, FaBoxOpen, FaUndo, FaSignOutAlt } from 'react-icons/fa';
+import { FaTruck, FaFileInvoice, FaUndo, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -23,9 +23,6 @@ import {
     List,
     ListItem,
     ListIcon,
-    SimpleGrid,
-    NumberInput,
-    NumberInputField,
     Flex,
     HStack,
     Badge,
@@ -380,139 +377,6 @@ function ListaFaturasPendentes() {
 }
 
 
-
-function FormColetaEntrega() {
-    const [nomeCliente, setNomeCliente] = useState('');
-    const [emailCliente, setEmailCliente] = useState('');
-    const [enderecoColeta, setEnderecoColeta] = useState('');
-    const [tipoCarga, setTipoCarga] = useState('');
-    const [cpfCnpjRemetente, setCpfCnpjRemetente] = useState('');
-    const [cpfCnpjDestinatario, setCpfCnpjDestinatario] = useState('');
-    const [numeroNotaFiscal, setNumeroNotaFiscal] = useState('');
-    const [valorFrete, setValorFrete] = useState('');
-    const [pesoKg, setPesoKg] = useState('');
-
-    const [isLoading, setIsLoading] = useState(false);
-    const toast = useToast();
-
-        const valorNumerico = valorFrete ? parseFloat(valorFrete) : 0; 
-        const pesoNumerico = pesoKg ? parseFloat(pesoKg) : 0;
-
-    const handleSubmitColeta = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-
-        const dadosColeta = {
-            nomeCliente, emailCliente, enderecoColeta, tipoCarga,
-            cpfCnpjRemetente, cpfCnpjDestinatario, numeroNotaFiscal,
-            valorFrete: valorNumerico,
-            pesoKg: pesoNumerico,
-            dataVencimento: null
-        };
-
-        const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
-
-        try {
-            const response = await fetch(`${API_URL}/api/coletas/solicitar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dadosColeta),
-            });
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.error || 'Falha ao solicitar a coleta.');
-            }
-            const novaColeta = await response.json();
-
-            toast({
-                title: 'Solicitação recebida!',
-                description: `Sua coleta foi agendada. N° de Encomenda: ${novaColeta.numeroEncomenda}`,
-                status: 'success',
-                duration: 7000,
-                isClosable: true,
-            });
-
-            setNomeCliente(''); setEmailCliente(''); setEnderecoColeta(''); setTipoCarga('');
-            setCpfCnpjRemetente(''); setCpfCnpjDestinatario(''); setNumeroNotaFiscal('');
-            setValorFrete(''); setPesoKg('');
-        } catch (error) {
-            toast({
-                title: 'Erro ao solicitar.',
-                description: (error as Error).message,
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    return (
-        <Box as="form" onSubmit={handleSubmitColeta}>
-            <Text mb={4}>O valor do frete será calculado pela administração. Você receberá um boleto após a conferência.</Text>
-
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                <VStack spacing={4}>
-                    <FormControl isRequired>
-                        <FormLabel>Seu Nome (Remetente)</FormLabel>
-                        <Input type="text" value={nomeCliente} onChange={(e) => setNomeCliente(e.target.value)} />
-                    </FormControl>
-
-                    <FormControl isRequired>
-                        <FormLabel>Seu E-mail</FormLabel>
-                        <Input type="email" value={emailCliente} onChange={(e) => setEmailCliente(e.target.value)} />
-                    </FormControl>
-
-                    <FormControl isRequired>
-                        <FormLabel>Seu CPF/CNPJ (Remetente)</FormLabel>
-                        <Input type="text" value={cpfCnpjRemetente} onChange={(e) => setCpfCnpjRemetente(e.target.value)} />
-                    </FormControl>
-                </VStack>
-
-                <VStack spacing={4}>
-                    <FormControl>
-                        <FormLabel>Peso (Kg) (Opcional)</FormLabel>
-                        <NumberInput
-                            value={pesoKg}
-                            onChange={(valueString) => setPesoKg(valueString)}
-                            precision={1}
-                            step={0.5}
-                            min={0}
-                        >
-                            <NumberInputField placeholder="Ex: 25.5" />
-                        </NumberInput>
-                    </FormControl>
-
-                    <FormControl isRequired>
-                        <FormLabel>Endereço de Coleta</FormLabel>
-                        <Input type="text" value={enderecoColeta} onChange={(e) => setEnderecoColeta(e.target.value)} />
-                    </FormControl>
-
-                    <FormControl isRequired>
-                        <FormLabel>Número da Nota Fiscal</FormLabel>
-                        <Input type="text" value={numeroNotaFiscal} onChange={(e) => setNumeroNotaFiscal(e.target.value)} />
-                    </FormControl>
-
-                    <FormControl isRequired>
-                        <FormLabel>CPF/CNPJ do Destinatário</FormLabel>
-                        <Input type="text" value={cpfCnpjDestinatario} onChange={(e) => setCpfCnpjDestinatario(e.target.value)} />
-                    </FormControl>
-                </VStack>
-            </SimpleGrid>
-
-            <FormControl mt={4}>
-                <FormLabel>Tipo da Carga (Opcional)</FormLabel>
-                <Input type="text" value={tipoCarga} onChange={(e) => setTipoCarga(e.target.value)} placeholder="Ex: Caixas, Pallets" />
-            </FormControl>
-
-            <Button type="submit" colorScheme="blue" mt={6} isLoading={isLoading}>
-                {isLoading ? 'Enviando...' : 'Solicitar Coleta'}
-            </Button>
-        </Box>
-    );
-}
-
 function FormColetaDevolucao() {
     const [nomeCliente, setNomeCliente] = useState('');
     const [emailCliente, setEmailCliente] = useState('');
@@ -604,12 +468,6 @@ const secoes = [
         titulo: 'Faturas e Boletos Pendentes',
         icon: <FaFileInvoice />,
         conteudo: <ListaFaturasPendentes />,
-    },
-    {
-        id: 'coleta_entrega',
-        titulo: 'Solicitar Nova Coleta de Entrega',
-        icon: <FaBoxOpen />,
-        conteudo: <FormColetaEntrega />
     },
     {
         id: 'coleta_devolucao',
