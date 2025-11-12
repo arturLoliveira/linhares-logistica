@@ -251,7 +251,6 @@ function CoverageMap() {
                                     position="absolute"
                                     left={{ base: getMobileOffset(cidade.left, HORIZONTAL_OFFSET), md: cidade.left }}
                                     top={{ base: getMobileOffset(cidade.top, VERTICAL_OFFSET), md: cidade.top }}
-                                    style={{ left: cidade.left, top: cidade.top }} 
                                     transform="translate(-50%, -50%)"
                                     zIndex={cidade.isFeatured ? 10 : 1}
                                     color={cidade.isFeatured ? 'white' : 'gray.800'}
