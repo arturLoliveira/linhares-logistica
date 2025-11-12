@@ -254,7 +254,7 @@ function CoverageMap() {
                                     transform="translate(-50%, -50%)"
                                     zIndex={cidade.isFeatured ? 10 : 1}
                                     color={cidade.isFeatured ? 'white' : 'gray.800'}
-                                    fontSize="1.5rem"
+                                    fontSize={{base:"1rem", md: "1.5rem"}}
                                     cursor="pointer"
                                     _hover={{
                                         transform: "translate(-50%, -50%) scale(1.5)",
