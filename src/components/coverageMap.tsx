@@ -241,8 +241,8 @@ function CoverageMap() {
                             <Tooltip key={cidade.nome} label={cidade.nome} hasArrow>
                                 <Box
                                     position="absolute"
-                                    left={{ base: `calc(${cidade.left} - 5%)`, md: cidade.left }}
-                                    top={{ base: `calc(${cidade.top} - 10%)`, md: cidade.top }}
+                                    left={{ base: `calc(${cidade.left} - 25%)`, md: cidade.left }}
+                                    top={{ base: `calc(${cidade.top} - 30%)`, md: cidade.top }}
                                     style={{ left: cidade.left, top: cidade.top }} 
                                     transform="translate(-50%, -50%)"
                                     zIndex={cidade.isFeatured ? 10 : 1}
