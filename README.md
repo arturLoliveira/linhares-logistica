@@ -56,3 +56,16 @@ O Painel Admin é a ferramenta central de gestão, com acesso restrito via token
 * **Banco de Dados/ORM:** PostgreSQL, Prisma
 * **Autenticação:** JSON Web Tokens (JWT), `bcrypt`
 * **Frontend:** React, TypeScript, Chakra UI
+
+## Telas
+![Texto Alternativo](public/prints/first.png)
+![Texto Alternativo](public/prints/second.png)
+![Texto Alternativo](public/prints/third.png)
+![Texto Alternativo](public/prints/fourth.png)
+![Texto Alternativo](public/prints/fifth.png)
+![Texto Alternativo](public/prints/clients.png)
+![Texto Alternativo](public/prints/clients2.png)
+![Texto Alternativo](public/prints/drivers.png)
+![Texto Alternativo](public/prints/area-cliente-1.png)
+![Texto Alternativo](public/prints/area-cliente-2.png)
+![Texto Alternativo](public/prints/area-cliente-3.png)
