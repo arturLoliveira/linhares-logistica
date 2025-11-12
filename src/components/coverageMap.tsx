@@ -208,7 +208,15 @@ const todasAsCidades = [
     { nome: 'Cachoeira do Campo', top: '60%', left: '65%' },
 ];
 
+const getMobileOffset = (desktopValue: string, offset: number) => {
+    const desktopNum = parseFloat(desktopValue.replace('%', ''));
+    const newNum = Math.min(100, desktopNum + offset);
+    return `${newNum.toFixed(1)}%`;
+}
+
 function CoverageMap() {
+    const VERTICAL_OFFSET = 15; 
+    const HORIZONTAL_OFFSET = -2; 
     return (
         
         <Box as="section" w="100%" py={16} bg="#F0F4FA"> 
@@ -241,8 +249,8 @@ function CoverageMap() {
                             <Tooltip key={cidade.nome} label={cidade.nome} hasArrow>
                                 <Box
                                     position="absolute"
-                                    left={{ base: `calc(${cidade.left} + 2%)`, md: cidade.left }}
-                                    top={{ base: `calc(${cidade.top} + 30%)`, md: cidade.top }}
+                                    left={{ base: getMobileOffset(cidade.left, HORIZONTAL_OFFSET), md: cidade.left }}
+                                    top={{ base: getMobileOffset(cidade.top, VERTICAL_OFFSET), md: cidade.top }}
                                     style={{ left: cidade.left, top: cidade.top }} 
                                     transform="translate(-50%, -50%)"
                                     zIndex={cidade.isFeatured ? 10 : 1}
