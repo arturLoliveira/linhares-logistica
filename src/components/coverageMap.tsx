@@ -215,7 +215,7 @@ const getMobileOffset = (desktopValue: string, offset: number) => {
 }
 
 function CoverageMap() {
-    const VERTICAL_OFFSET = -15; 
+    const VERTICAL_OFFSET = -11; 
     const HORIZONTAL_OFFSET = -2; 
     return (
         
