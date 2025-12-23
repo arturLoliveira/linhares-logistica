@@ -15,17 +15,19 @@ import {
 
 function AdminLogin() {
     const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState(''); 
-    const [erro, setErro] = useState(''); 
-    const navigate = useNavigate(); 
+    const [senha, setSenha] = useState('');
+    const [erro, setErro] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
         setErro('');
         const API_URL = import.meta.env.VITE_API_URL || 'https://linhares-logistica-backend.onrender.com';
         try {
             const apiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-            const response = await fetch(`${apiUrl}/api/admin/login`, { 
+            const response = await fetch(`${apiUrl}/api/admin/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, senha }) //
@@ -37,11 +39,13 @@ function AdminLogin() {
                 throw new Error(data.error || 'Falha no login');
             }
 
-            localStorage.setItem('admin_token', data.token); 
-            navigate('/admin/dashboard'); 
+            localStorage.setItem('admin_token', data.token);
+            navigate('/admin/dashboard');
 
         } catch (err) {
-            setErro((err as Error).message); 
+            setErro((err as Error).message);
+        } finally {
+            setIsLoading(false)
         }
     };
 
@@ -75,7 +79,7 @@ function AdminLogin() {
                                 onChange={(e) => setSenha(e.target.value)} //
                             />
                         </FormControl>
-                        
+
                         {erro && (
                             <Alert status="error" borderRadius="md">
                                 <AlertIcon />
@@ -83,8 +87,8 @@ function AdminLogin() {
                             </Alert>
                         )}
 
-                        <Button type="submit" colorScheme="blue" width="100%">
-                            Entrar
+                        <Button type="submit" colorScheme="blue" size="lg" w="100%" mt={4} isLoading={isLoading}>
+                            {isLoading ? 'Entrando...' : 'Entrar'}
                         </Button>
                     </VStack>
                 </Box>
